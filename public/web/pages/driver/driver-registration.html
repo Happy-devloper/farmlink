@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>FarmLink Driver — सारथी पंजीकरण</title>
+    <link rel="stylesheet" href="../../shared/assets/css/driver.css" />
+  </head>
+  <body>
+    <div class="driver-app-frame no-bottom-nav">
+      <!-- Header -->
+      <header class="driver-header">
+        <a href="../../login.html" class="driver-brand">
+          <div class="driver-brand-icon"><i data-lucide="leaf"></i></div>
+          <div>
+            <div class="driver-brand-title">
+              FarmLink <span style="color: var(--primary)">AI</span>
+            </div>
+            <div class="driver-brand-tag">ड्राइवर ऑनबोर्डिंग</div>
+          </div>
+        </a>
+        <a
+          href="tel:1800FARMLINK"
+          class="btn-icon-head"
+          title="सहायता हेल्पलाइन"
+        >
+          <i data-lucide="phone" style="width: 16px; height: 16px"></i>
+        </a>
+      </header>
+
+      <!-- Main Form Container -->
+      <main
+        class="driver-main"
+        style="max-width: 760px; margin: 0 auto; width: 100%"
+      >
+        <div style="text-align: center; margin-bottom: 12px">
+          <div
+            style="
+              width: 56px;
+              height: 56px;
+              border-radius: 20px;
+              background: var(--primary-tint);
+              color: var(--primary);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto 12px;
+            "
+          >
+            <i data-lucide="truck" style="width: 28px; height: 28px"></i>
+          </div>
+          <h1>सारथी पंजीकरण (Driver Onboarding)</h1>
+          <p style="font-size: 14px; color: var(--ink-soft); margin-top: 2px">
+            डिलीवरी पार्टनर के रूप में जुड़ें और दैनिक अच्छी कमाई करें
+          </p>
+        </div>
+
+        <form
+          id="driverRegForm"
+          class="driver-card"
+          style="box-shadow: var(--shadow-md); padding: 24px"
+        >
+          <!-- Personal Info -->
+          <h3
+            style="
+              font-size: 15px;
+              color: var(--primary);
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+              margin-bottom: 14px;
+              border-bottom: 1px solid var(--line);
+              padding-bottom: 8px;
+            "
+          >
+            1. व्यक्तिगत जानकारी (Personal Details)
+          </h3>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px">
+            <div class="form-field">
+              <label class="form-label" for="fullName"
+                >पूरा नाम (Full Name) *</label
+              >
+              <input
+                type="text"
+                id="fullName"
+                class="form-input"
+                placeholder="जैसे सुनील यादव"
+                required
+              />
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="phoneNumber"
+                >मोबाइल नंबर (Mobile Number) *</label
+              >
+              <div style="display: flex; gap: 8px">
+                <span
+                  style="
+                    display: flex;
+                    align-items: center;
+                    padding: 0 12px;
+                    background: var(--surface);
+                    border: 1.5px solid var(--line);
+                    border-radius: var(--radius-md);
+                    font-weight: 700;
+                    font-size: 14px;
+                  "
+                  >+91</span
+                >
+                <input
+                  type="tel"
+                  id="phoneNumber"
+                  class="form-input"
+                  maxlength="10"
+                  placeholder="10 अंकों का नंबर"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <div
+            style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px"
+          >
+            <div class="form-field">
+              <label class="form-label" for="state">राज्य (State) *</label>
+              <select id="state" class="form-select" required>
+                <option value="Uttar Pradesh">उत्तर प्रदेश (U.P.)</option>
+                <option value="Punjab">पंजाब (Punjab)</option>
+                <option value="Haryana">हरियाणा (Haryana)</option>
+                <option value="Madhya Pradesh">मध्य प्रदेश (M.P.)</option>
+                <option value="Rajasthan">राजस्थान (Rajasthan)</option>
+                <option value="Delhi">दिल्ली NCR (Delhi)</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="district"
+                >ज़िला (District) *</label
+              >
+              <input
+                type="text"
+                id="district"
+                class="form-input"
+                placeholder="जैसे लखनऊ"
+                required
+              />
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="city">शहर / तहसील *</label>
+              <input
+                type="text"
+                id="city"
+                class="form-input"
+                placeholder="जैसे मोहनलालगंज"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Vehicle Info -->
+          <h3
+            style="
+              font-size: 15px;
+              color: var(--primary);
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+              margin: 20px 0 14px;
+              border-bottom: 1px solid var(--line);
+              padding-bottom: 8px;
+            "
+          >
+            2. वाहन विवरण (Vehicle Details)
+          </h3>
+
+          <div class="form-field">
+            <label class="form-label" for="vehicleType"
+              >वाहन प्रकार (Vehicle Type) *</label
+            >
+            <select id="vehicleType" class="form-select" required>
+              <option value="pickup" selected>
+                🛻 पिकअप वैन / बोलेरो (Pickup - 1.5 से 3 टन)
+              </option>
+              <option value="mini_truck">
+                🚚 छोटा हाथी / मिनी ट्रक (Mini Truck - 1 टन)
+              </option>
+              <option value="truck">🚛 बड़ा ट्रक (Heavy Truck - 5+ टन)</option>
+              <option value="auto">🛺 लोडर ऑटो (Cargo Auto - 500 kg)</option>
+              <option value="bike">
+                🛵 टू-व्हीलर / पार्सल बाइक (Bike - 50 kg)
+              </option>
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px">
+            <div class="form-field">
+              <label class="form-label" for="vehicleNumber"
+                >गाड़ी नंबर (RC No.) *</label
+              >
+              <input
+                type="text"
+                id="vehicleNumber"
+                class="form-input mono"
+                placeholder="UP32 AB 1234"
+                style="text-transform: uppercase"
+                required
+              />
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="capacityKg"
+                >क्षमता (Capacity kg) *</label
+              >
+              <input
+                type="number"
+                id="capacityKg"
+                class="form-input"
+                value="2500"
+                min="50"
+                step="50"
+                required
+              />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px">
+            <div class="form-field">
+              <label class="form-label" for="licenceNumber"
+                >ड्राइविंग लाइसेंस नंबर (DL No.) *</label
+              >
+              <input
+                type="text"
+                id="licenceNumber"
+                class="form-input mono"
+                placeholder="UP-3220200012345"
+                style="text-transform: uppercase"
+                required
+              />
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="emergencyContact"
+                >आपातकालीन संपर्क</label
+              >
+              <input
+                type="text"
+                id="emergencyContact"
+                class="form-input"
+                placeholder="नाम और 10 अंकों का फोन नंबर"
+              />
+            </div>
+          </div>
+
+          <div
+            style="
+              background: var(--primary-tint);
+              border: 1px solid var(--primary);
+              border-radius: var(--radius-md);
+              padding: 12px 14px;
+              margin: 16px 0 20px;
+              display: flex;
+              gap: 10px;
+              font-size: 13px;
+              color: var(--primary-dark);
+            "
+          >
+            <i
+              data-lucide="info"
+              style="width: 20px; height: 20px; flex-shrink: 0"
+            ></i>
+            <span
+              >पंजीकरण के बाद अगले चरण में ड्राइविंग लाइसेंस व गाड़ी RC का
+              सत्यापन किया जाएगा।</span
+            >
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+            id="btnSubmitReg"
+            style="font-size: 16px; height: 52px"
+          >
+            <span>दस्तावेज़ सत्यापन के लिए आगे बढ़ें &nbsp;&rarr;</span>
+          </button>
+        </form>
+
+        <div
+          style="
+            text-align: center;
+            font-size: 13.5px;
+            color: var(--ink-soft);
+            margin-top: 16px;
+          "
+        >
+          पहले से पंजीकृत हैं?
+          <a
+            href="driver-dashboard.html"
+            style="
+              color: var(--primary);
+              font-weight: 700;
+              text-decoration: underline;
+            "
+            >डैशबोर्ड पर जाएँ</a
+          >
+        </div>
+      </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../shared/assets/js/firebase.js"></script>
+    <script src="../../shared/assets/js/driver-data.js"></script>
+    <script src="../../shared/assets/js/driver-shell.js"></script>
+    <script defer src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      lucide.createIcons();
+
+      // Autofill phone if already in session
+      const savedPhone =
+        sessionStorage.getItem("farmlink_phone") ||
+        localStorage.getItem("farmlink_demo_phone");
+      if (savedPhone) {
+        document.getElementById("phoneNumber").value = savedPhone
+          .replace("+91", "")
+          .trim();
+      }
+
+      document
+        .getElementById("driverRegForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const btn = document.getElementById("btnSubmitReg");
+          btn.disabled = true;
+          btn.innerHTML = "सहेज रहा है...";
+
+          const profileData = {
+            full_name: document.getElementById("fullName").value.trim(),
+            phone_number:
+              "+91 " + document.getElementById("phoneNumber").value.trim(),
+            state: document.getElementById("state").value,
+            district: document.getElementById("district").value.trim(),
+            city: document.getElementById("city").value.trim(),
+            vehicle_type: document.getElementById("vehicleType").value,
+            vehicle_number: document
+              .getElementById("vehicleNumber")
+              .value.trim()
+              .toUpperCase(),
+            capacity_kg: Number(document.getElementById("capacityKg").value),
+            licence_number: document
+              .getElementById("licenceNumber")
+              .value.trim()
+              .toUpperCase(),
+            emergency_contact: document
+              .getElementById("emergencyContact")
+              .value.trim(),
+            verification_status: "pending",
+            availability_status: "offline", // Offline until approved
+          };
+
+          try {
+            window.farmlinkDriver.saveProfile(profileData);
+            sessionStorage.setItem("farmlink_phone", profileData.phone_number);
+
+            window.driverShell.showToast(
+              "पंजीकरण सहेजा गया! सत्यापन पृष्ठ लोड हो रहा है...",
+            );
+            setTimeout(() => {
+              window.location.href = "driver-verification.html";
+            }, 800);
+          } catch (error) {
+            console.error("Driver reg error:", error);
+            alert("पंजीकरण में त्रुटि आई: " + error.message);
+            btn.disabled = false;
+            btn.innerHTML = "दस्तावेज़ सत्यापन के लिए आगे बढ़ें &rarr;";
+          }
+        });
+    </script>
+  </body>
+</html>

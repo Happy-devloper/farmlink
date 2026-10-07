@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FarmLink AI — भूमिका चुनें</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+    <style>
+      .role-card {
+        transition: all 0.2s ease;
+        border: 1.5px solid var(--line);
+        cursor: pointer;
+        text-decoration: none;
+        color: var(--ink);
+      }
+      .role-card:hover {
+        border-color: #10b981;
+        background: #f8fafc;
+      }
+      .role-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        background: #eaf7ed;
+        color: #10b981;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Top Header Bar -->
+    <header class="auth-header">
+      <div class="header-left">
+        <div class="logo-wrap">
+          <span class="logo-icon"><i data-lucide="leaf"></i></span>
+          <div class="logo-text">
+            <span class="brand-title"
+              >FarmLink <span class="ai-text">AI</span></span
+            >
+            <span class="brand-sub">सीधी किसान सेवा</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Centered Card Container -->
+    <div class="auth-centered-layout">
+      <div class="auth-centered-card">
+        <h1
+          style="
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 4px;
+            font-weight: 700;
+          "
+        >
+          आप कौन हैं? · Choose your role
+        </h1>
+        <p
+          style="
+            text-align: center;
+            margin-bottom: 28px;
+            font-size: 14.5px;
+            color: #64748b;
+          "
+        >
+          यह चुनाव आपके अनुभव को तैयार करता है
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 16px">
+          <a
+            href="farmer-registration.html"
+            class="card role-card"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 18px;
+              border-radius: 16px;
+              padding: 20px;
+            "
+          >
+            <div class="role-icon">
+              <i data-lucide="sprout"></i>
+            </div>
+            <div style="flex: 1; text-align: left">
+              <h3
+                style="
+                  margin-bottom: 4px;
+                  font-size: 17px;
+                  font-weight: 700;
+                  color: #0f172a;
+                "
+              >
+                किसान / विक्रेता
+              </h3>
+              <p style="margin: 0; font-size: 13.5px; color: #64748b">
+                Farmer / Seller — अपनी फसल बेचें
+              </p>
+            </div>
+            <span style="color: #10b981; font-size: 20px; font-weight: 700"
+              >&rsaquo;</span
+            >
+          </a>
+
+          <a
+            href="buyer-registration.html"
+            class="card role-card"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 18px;
+              border-radius: 16px;
+              padding: 20px;
+            "
+          >
+            <div class="role-icon">
+              <i data-lucide="shopping-cart"></i>
+            </div>
+            <div style="flex: 1; text-align: left">
+              <h3
+                style="
+                  margin-bottom: 4px;
+                  font-size: 17px;
+                  color: #0f172a;
+                  font-weight: 700;
+                "
+              >
+                खरीदार / FPO / एजेंट
+              </h3>
+              <p style="margin: 0; font-size: 13.5px; color: #64748b">
+                Buyer / FPO / Agent — सामग्री खरीदें
+              </p>
+            </div>
+            <span style="color: #10b981; font-size: 20px; font-weight: 700"
+              >&rsaquo;</span
+            >
+          </a>
+        </div>
+
+        <div class="auth-foot-new" style="margin-top: 28px; text-align: center">
+          पहले से खाता है?
+          <a href="../seller/seller-dashboard.html">डैशबोर्ड पर जाएँ</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lucide Icons CDN -->
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script defer src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    </script>
+  </body>
+</html>

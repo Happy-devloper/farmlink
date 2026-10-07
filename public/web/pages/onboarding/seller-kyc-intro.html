@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FarmLink AI — KYC शुरू करें</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+  </head>
+  <body>
+    <!-- Top Header Bar -->
+    <header class="auth-header">
+      <div class="header-left">
+        <div class="logo-wrap">
+          <span class="logo-icon"><i data-lucide="leaf"></i></span>
+          <div class="logo-text">
+            <span class="brand-title"
+              >FarmLink <span class="ai-text">AI</span></span
+            >
+            <span class="brand-sub">सीधी किसान सेवा</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Centered Card Container -->
+    <div class="auth-centered-layout">
+      <div class="auth-centered-card" style="max-width: 520px">
+        <h1
+          style="
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 4px;
+            font-weight: 700;
+          "
+        >
+          अपना खाता सत्यापित करें
+        </h1>
+        <p
+          style="
+            text-align: center;
+            margin-bottom: 28px;
+            font-size: 14px;
+            color: #64748b;
+          "
+        >
+          भुगतान पाने के लिए 2 आसान चरण पूरे करें — इसमें करीब 5 मिनट लगेंगे
+        </p>
+
+        <!-- Stepper Navigation -->
+        <div class="stepper" style="margin-bottom: 28px">
+          <div class="step current">
+            <div
+              class="circ"
+              style="background: #10b981; border-color: #10b981"
+            >
+              1
+            </div>
+            <div class="lbl">पहचान</div>
+          </div>
+          <div class="bar"></div>
+          <div class="step">
+            <div class="circ">2</div>
+            <div class="lbl">बैंक / UPI</div>
+          </div>
+        </div>
+
+        <!-- Verification Option 1 -->
+        <div
+          class="card"
+          style="
+            margin-bottom: 16px;
+            box-shadow: none;
+            background: #fafaf9;
+            border: 1px solid #f1f5f9;
+            border-radius: 16px;
+            padding: 20px;
+          "
+        >
+          <div style="display: flex; gap: 16px; align-items: flex-start">
+            <span style="font-size: 24px; line-height: 1">🪪</span>
+            <div style="text-align: left">
+              <h3 style="margin-bottom: 4px; font-weight: 700; color: #0f172a">
+                पहचान सत्यापन
+              </h3>
+              <p style="margin: 0; font-size: 13px; color: #64748b">
+                Aadhaar या PAN से अपनी पहचान सत्यापित करें
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Verification Option 2 -->
+        <div
+          class="card"
+          style="
+            margin-bottom: 24px;
+            box-shadow: none;
+            background: #fafaf9;
+            border: 1px solid #f1f5f9;
+            border-radius: 16px;
+            padding: 20px;
+          "
+        >
+          <div style="display: flex; gap: 16px; align-items: flex-start">
+            <span style="font-size: 24px; line-height: 1">🏦</span>
+            <div style="text-align: left">
+              <h3 style="margin-bottom: 4px; font-weight: 700; color: #0f172a">
+                बैंक / UPI सत्यापन
+              </h3>
+              <p style="margin: 0; font-size: 13px; color: #64748b">
+                भुगतान सीधे आपके खाते में पाने के लिए
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Security Info Alert -->
+        <div
+          class="alert alert-info"
+          style="
+            border-radius: 12px;
+            font-size: 13px;
+            margin-bottom: 24px;
+            background: #e0f2fe;
+            border-color: #bae6fd;
+            color: #0369a1;
+          "
+        >
+          🔒 आपकी जानकारी पूरी तरह सुरक्षित रखी जाती है और केवल भुगतान व सत्यापन
+          के लिए उपयोग होती है।
+        </div>
+
+        <!-- Submit Link -->
+        <a
+          href="seller-identity-verification.html"
+          class="btn-auth-submit"
+          style="text-decoration: none"
+        >
+          KYC शुरू करें &nbsp;&rarr;
+        </a>
+      </div>
+    </div>
+
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script>
+      // Load Lucide Icons
+      if (!window.lucide) {
+        const lucideScript = document.createElement("script");
+        lucideScript.src = "https://unpkg.com/lucide@latest";
+        lucideScript.onload = () => {
+          if (window.lucide) window.lucide.createIcons();
+        };
+        document.head.appendChild(lucideScript);
+      } else {
+        window.lucide.createIcons();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1381 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>डैशबोर्ड · FarmLink</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+    <script defer src="https://unpkg.com/lucide@latest"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      :root {
+        --dash-green: #176042;
+        --dash-green-dark: #0e402e;
+        --dash-mint: #edf8f1;
+        --dash-blue: #eef7ff;
+        --dash-shadow: 0 9px 24px rgba(30, 66, 51, 0.08);
+      }
+      .dash-hero {
+        position: relative;
+        overflow: hidden;
+        min-height: 240px;
+        padding: 40px 48px;
+        border-radius: 28px;
+        background: linear-gradient(
+          118deg,
+          var(--dash-green-dark),
+          var(--dash-green) 58%,
+          #2f8158
+        );
+        color: #fff;
+        box-shadow: 0 20px 50px rgba(21, 84, 57, 0.25);
+      }
+      .dash-hero::before {
+        content: "";
+        position: absolute;
+        width: 330px;
+        height: 330px;
+        top: -205px;
+        right: -90px;
+        border-radius: 50%;
+        background: rgba(221, 185, 54, 0.19);
+      }
+      .dash-hero::after {
+        content: "";
+        position: absolute;
+        width: 235px;
+        height: 235px;
+        bottom: -166px;
+        left: 40%;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .dash-hero-inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        justify-content: space-between;
+        gap: 25px;
+      }
+
+      .dash-eyebrow {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        padding: 6px 12px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 100px;
+        background: rgba(255, 255, 255, 0.12);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      .dash-hero h1 {
+        margin: 12px 0 6px;
+        color: #fff;
+        font-size: 42px;
+        line-height: 1.1;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      .dash-hero p {
+        margin: 0 0 28px;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 16px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        opacity: 0.85;
+      }
+      .hero-actions {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-top: 32px;
+      }
+      .hero-actions .btn {
+        padding: 14px 32px;
+        border-radius: 16px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .hero-actions .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+      .hero-actions .btn-primary {
+        background: #fff;
+        color: var(--dash-green-dark);
+        border: none;
+      }
+      .hero-actions .btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1.5px solid rgba(255, 255, 255, 0.2);
+        color: #fff;
+        backdrop-filter: blur(4px);
+      }
+
+      .weather-strip {
+        display: grid;
+        grid-template-columns: 130px repeat(5, 85px);
+        gap: 12px;
+        align-items: stretch;
+        align-self: center;
+        padding: 20px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      }
+      .weather-now {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 4px 10px;
+        border-right: 1px solid rgba(255, 255, 255, 0.25);
+      }
+      .weather-now span:first-child {
+        font-size: 30px;
+      }
+      .weather-now strong {
+        font-size: 23px;
+      }
+      .weather-now small {
+        display: block;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 10px;
+        white-space: nowrap;
+      }
+      .weather-day {
+        display: grid;
+        place-items: center;
+        font-size: 10px;
+        line-height: 1.4;
+        color: rgba(255, 255, 255, 0.91);
+      }
+      .weather-day b {
+        font-size: 22px;
+        line-height: 1;
+      }
+      .weather-day small {
+        color: rgba(255, 255, 255, 0.74);
+      }
+
+      .dash-message {
+        margin: 15px 0;
+      }
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 14px;
+        margin: 17px 0;
+      }
+      .metric-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        min-height: 111px;
+        padding: 17px;
+        border: 1px solid #edf0ed;
+        border-radius: 13px;
+        background: #fff;
+        box-shadow: var(--dash-shadow);
+      }
+      .metric-icon {
+        flex: none;
+        display: grid;
+        place-items: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--dash-mint);
+        font-size: 20px;
+        color: var(--color-primary-main);
+      }
+      .metric-card:nth-child(2) .metric-icon {
+        background: #fff1e8;
+      }
+      .metric-card:nth-child(3) .metric-icon {
+        background: #fff5e1;
+      }
+      .metric-card:nth-child(4) .metric-icon {
+        background: #eaf7ed;
+      }
+      .metric-card .label {
+        margin-bottom: 5px;
+        font-size: 12px;
+        font-weight: 650;
+        color: var(--ink-soft);
+      }
+      .metric-card .value {
+        font-size: 26px;
+        line-height: 1;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      .metric-card .sub {
+        margin-top: 8px;
+        font-size: 11px;
+        color: var(--ink-soft);
+      }
+      .metric-card .trend {
+        color: #168443;
+        font-weight: 700;
+      }
+
+      .dash-grid {
+        display: grid;
+        grid-template-columns: 1.12fr 0.86fr 1fr;
+        gap: 14px;
+        margin-bottom: 14px;
+      }
+      .dash-card {
+        min-width: 0;
+        padding: 17px;
+        border: 1px solid #edf0ed;
+        border-radius: 13px;
+        background: #fff;
+        box-shadow: var(--dash-shadow);
+      }
+      .dash-card h2 {
+        margin: 0;
+        font-size: 15px;
+      }
+      .card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 13px;
+      }
+      .card-link {
+        color: #187748;
+        font-size: 11px;
+        font-weight: 750;
+      }
+
+      .listing-highlight {
+        display: grid;
+        gap: 14px;
+      }
+      .listing-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 11px;
+        border: 1px solid #edf0ed;
+        border-radius: 10px;
+        background: #fbfdfb;
+      }
+      .crop-mark {
+        display: grid;
+        place-items: center;
+        width: 37px;
+        height: 37px;
+        border-radius: 12px;
+        background: #f7f2d7;
+        font-size: 21px;
+        color: var(--color-primary-main);
+      }
+      .listing-copy {
+        min-width: 0;
+        flex: 1;
+      }
+      .listing-copy strong {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 14px;
+      }
+      .listing-copy small {
+        display: block;
+        margin-top: 3px;
+        color: var(--ink-soft);
+        font-size: 11px;
+      }
+      .listing-dots {
+        border: 0;
+        background: transparent;
+        font-size: 20px;
+        color: var(--ink-soft);
+        cursor: pointer;
+      }
+      .listing-meta {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 7px;
+      }
+      .listing-meta div {
+        font-size: 10px;
+        color: var(--ink-soft);
+      }
+      .listing-meta b {
+        display: block;
+        margin-top: 4px;
+        color: var(--ink);
+        font-size: 13px;
+      }
+      .mini-status {
+        display: inline-flex;
+        margin-top: 5px;
+        padding: 3px 7px;
+        border-radius: 100px;
+        background: #e7f6ea;
+        color: #16743d;
+        font-size: 10px;
+        font-weight: 750;
+      }
+
+      .chart-total {
+        text-align: right;
+      }
+      .chart-total small {
+        display: block;
+        color: var(--ink-soft);
+        font-size: 10px;
+      }
+      .chart-total b {
+        font-size: 18px;
+      }
+      .line-chart {
+        position: relative;
+        height: 158px;
+        margin-top: 12px;
+        border-bottom: 1px solid #dce5df;
+      }
+      .line-chart canvas {
+        width: 100%;
+        height: 100%;
+      }
+      .chart-days {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 7px;
+        color: var(--ink-soft);
+        font-size: 9px;
+      }
+
+      .quick-card {
+        border: none;
+        background: linear-gradient(140deg, #eff9f1, #f8fcf8);
+      }
+      .quick-list {
+        display: grid;
+        gap: 9px;
+      }
+      .quick-action {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 10px;
+        border: 1px solid #edf0ed;
+        border-radius: 9px;
+        background: #fff;
+      }
+      .quick-icon {
+        display: grid;
+        place-items: center;
+        width: 25px;
+        height: 25px;
+        border-radius: 8px;
+        background: #e8f8ed;
+        color: #147442;
+        font-size: 13px;
+      }
+      .quick-copy {
+        flex: 1;
+      }
+      .quick-copy strong {
+        display: block;
+        font-size: 12px;
+      }
+      .quick-copy small {
+        display: block;
+        margin-top: 2px;
+        color: var(--ink-soft);
+        font-size: 10px;
+      }
+      .quick-action a {
+        padding: 5px 13px;
+        border: 1px solid #78c894;
+        border-radius: 100px;
+        color: #147442;
+        font-size: 11px;
+        font-weight: 750;
+      }
+
+      .dash-grid-bottom {
+        display: grid;
+        grid-template-columns: 1.05fr 1fr 0.82fr;
+        gap: 14px;
+      }
+      .market-row,
+      .order-row {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 8px 0;
+        border-bottom: 1px solid #edf0ed;
+      }
+      .market-row:last-child,
+      .order-row:last-child {
+        border-bottom: 0;
+      }
+      .market-row b {
+        flex: 1;
+        font-size: 12px;
+      }
+      .market-row small {
+        color: var(--ink-soft);
+        font-size: 10px;
+      }
+      .market-row .rate {
+        font-size: 11px;
+        font-weight: 750;
+      }
+      .positive {
+        color: #188348;
+        font-size: 10px;
+        font-weight: 750;
+      }
+      .weather-panel {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 12px;
+        align-items: center;
+      }
+      .weather-big {
+        font-size: 35px;
+        color: var(--color-primary-main);
+      }
+      .weather-temperature {
+        font-size: 25px;
+        font-weight: 800;
+      }
+      .weather-panel small {
+        color: var(--ink-soft);
+        font-size: 10px;
+      }
+      .weather-list {
+        display: grid;
+        gap: 7px;
+        margin-top: 13px;
+      }
+      .weather-list div {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+      }
+      .order-row i {
+        display: grid;
+        place-items: center;
+        width: 25px;
+        height: 25px;
+        border-radius: 8px;
+        background: #f0edff;
+        color: #6e54ae;
+        font-style: normal;
+      }
+      .order-row span {
+        flex: 1;
+        font-size: 12px;
+      }
+      .order-row b {
+        font-size: 13px;
+      }
+      .ai-card {
+        position: relative;
+        overflow: hidden;
+        border: 0;
+        background: linear-gradient(145deg, #eef7ff, #e5f2ff);
+      }
+      .ai-card::after {
+        content: "✦";
+        position: absolute;
+        right: 12px;
+        bottom: -25px;
+        color: rgba(36, 121, 194, 0.14);
+        font-size: 130px;
+      }
+      .ai-card > * {
+        position: relative;
+        z-index: 1;
+      }
+      .ai-tag {
+        display: inline-block;
+        margin-bottom: 14px;
+        color: #1b63b4;
+        font-size: 11px;
+        font-weight: 800;
+      }
+      .ai-card p {
+        margin: 0 0 12px;
+        color: #44637b;
+        font-size: 12px;
+        line-height: 1.7;
+      }
+      .ai-card .btn {
+        border-color: #5c9be3;
+        color: #1b63b4;
+        background: rgba(255, 255, 255, 0.48);
+      }
+      .tip-bar {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        margin-top: 15px;
+        padding: 13px 17px;
+        border-radius: 12px;
+        background: linear-gradient(90deg, #eff9f1, #fafcf8);
+        color: #45604f;
+        font-size: 12px;
+      }
+      .tip-bar b {
+        color: #183d2c;
+      }
+      .tip-icon {
+        font-size: 20px;
+        color: var(--color-primary-main);
+      }
+      .empty-dashboard {
+        grid-column: 1/-1;
+        padding: 36px;
+        text-align: center;
+      }
+      .mobile-menu {
+        display: none;
+      }
+      @media (max-width: 1250px) {
+        .weather-strip {
+          grid-template-columns: 100px repeat(3, 65px);
+        }
+        .weather-day:nth-last-child(-n + 2) {
+          display: none;
+        }
+        .dash-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .quick-card {
+          grid-column: 1/-1;
+        }
+        .quick-list {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .dash-grid-bottom {
+          grid-template-columns: 1fr 1fr;
+        }
+        .ai-card {
+          grid-column: 1/-1;
+        }
+      }
+      @media (max-width: 780px) {
+        .content {
+          padding: 16px 13px;
+        }
+        .dash-hero {
+          padding: 20px;
+        }
+        .dash-hero-inner {
+          display: block;
+        }
+        .dash-hero h1 {
+          font-size: 24px;
+        }
+        .weather-strip {
+          display: none;
+        }
+        .mobile-menu {
+          display: inline-grid;
+          position: absolute;
+          right: 14px;
+          top: 14px;
+          z-index: 3;
+        }
+        .metric-grid,
+        .dash-grid,
+        .dash-grid-bottom {
+          grid-template-columns: 1fr;
+        }
+        .quick-list {
+          grid-template-columns: 1fr;
+        }
+        .listing-meta {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .tip-bar {
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app-shell">
+      <div class="main-col">
+        <div id="topbar-slot"></div>
+        <main class="content">
+          <section class="dash-hero">
+            <button
+              id="menuBtn"
+              class="btn btn-secondary mobile-menu"
+              type="button"
+              aria-label="मेनू खोलें"
+            >
+              <i data-lucide="menu"></i>
+            </button>
+            <div class="dash-hero-inner">
+              <div style="flex: 1">
+                <span class="dash-eyebrow">◈ FARMER COMMAND CENTER</span>
+                <h1 id="dashboardGreeting">नमस्ते, किसान</h1>
+                <p id="dashboardProfileDetails">
+                  आपका FarmLink workspace लोड हो रहा है…
+                </p>
+                <div class="hero-actions">
+                  <a href="seller-add-listing.html" class="btn btn-primary"
+                    ><i data-lucide="plus-circle" style="width: 20px"></i> नई
+                    फसल जोड़ें</a
+                  >
+                  <a href="seller-listings.html" class="btn btn-secondary"
+                    ><i data-lucide="layout-list" style="width: 20px"></i> मेरी
+                    लिस्टिंग</a
+                  >
+                  <a href="seller-cold-stores.html" class="btn btn-secondary"
+                    ><i data-lucide="warehouse" style="width: 20px"></i>
+                    नज़दीकी कोल्ड स्टोर</a
+                  >
+                </div>
+              </div>
+              <div class="weather-strip" aria-label="मौसम अनुमान">
+                <div class="weather-now">
+                  <span><i data-lucide="cloud-sun"></i></span>
+                  <div>
+                    <strong>32°C</strong
+                    ><small>आंशिक बादल<br />हवा: 12 km/h</small>
+                  </div>
+                </div>
+                <div class="weather-day">
+                  <span>आज</span><b><i data-lucide="sun"></i></b
+                  ><small>32° / 24°</small>
+                </div>
+                <div class="weather-day">
+                  <span>कल</span><b><i data-lucide="cloud-sun"></i></b
+                  ><small>33° / 24°</small>
+                </div>
+                <div class="weather-day">
+                  <span>शुक्र</span><b><i data-lucide="cloud-rain"></i></b
+                  ><small>31° / 23°</small>
+                </div>
+                <div class="weather-day">
+                  <span>शनि</span><b><i data-lucide="sun"></i></b
+                  ><small>30° / 23°</small>
+                </div>
+                <div class="weather-day">
+                  <span>रवि</span><b><i data-lucide="sun"></i></b
+                  ><small>31° / 24°</small>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <div
+            id="dashboardMessage"
+            class="alert alert-info dash-message"
+            role="status"
+          >
+            डैशबोर्ड लोड हो रहा है…
+          </div>
+
+          <section class="metric-grid" aria-label="व्यवसाय सारांश">
+            <article class="metric-card">
+              <div class="metric-icon"><i data-lucide="sprout"></i></div>
+              <div>
+                <div class="label">कुल लिस्टिंग</div>
+                <div class="value" id="totalListings">—</div>
+                <div class="sub">
+                  <span class="trend">↗ live</span> आपकी फसलें
+                </div>
+              </div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-icon"><i data-lucide="zap"></i></div>
+              <div>
+                <div class="label">लाइव लिस्टिंग</div>
+                <div class="value" id="activeListings">—</div>
+                <div class="sub">
+                  <span class="trend">↗ active</span> बिक्री के लिए
+                </div>
+              </div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-icon"><i data-lucide="package"></i></div>
+              <div>
+                <div class="label">बिक्री के लिए तैयार</div>
+                <div class="value" id="availableQuantity">—</div>
+                <div class="sub">कुल उपलब्ध मात्रा</div>
+              </div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-icon"><i data-lucide="indian-rupee"></i></div>
+              <div>
+                <div class="label">संभावित बिक्री मूल्य</div>
+                <div class="value" id="inventoryValue">—</div>
+                <div class="sub">वर्तमान लिस्टिंग मूल्य पर</div>
+              </div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-icon"><i data-lucide="hand-coins"></i></div>
+              <div>
+                <a class="label" href="seller-bids.html">खरीद प्रस्ताव</a>
+                <div class="value" id="pendingBids">—</div>
+                <div class="sub">जवाब बाकी · <a href="seller-bids.html">देखें</a></div>
+              </div>
+            </article>
+          </section>
+
+          <section class="dash-grid">
+            <article class="dash-card">
+              <div class="card-head">
+                <h2>हाल की लिस्टिंग</h2>
+                <a class="card-link" href="seller-listings.html">सभी देखें →</a>
+              </div>
+              <div id="dashboardListings" class="listing-highlight"></div>
+              <div
+                id="dashboardEmpty"
+                class="empty-dashboard"
+                style="display: none"
+              >
+                <div style="font-size: 34px; color: var(--color-primary-main)">
+                  <i data-lucide="sprout" style="width: 48px; height: 48px"></i>
+                </div>
+                <h3>अभी कोई लिस्टिंग नहीं है</h3>
+                <p>अपनी पहली फसल जोड़कर खरीदारों तक पहुँचें।</p>
+                <a class="btn btn-primary" href="seller-add-listing.html"
+                  >+ नई फसल जोड़ें</a
+                >
+              </div>
+            </article>
+            <article class="dash-card">
+              <div class="card-head">
+                <h2>
+                  कमाई का अवलोकन
+                  <small style="font-weight: 400; color: var(--ink-soft)"
+                    >(इस माह)</small
+                  >
+                </h2>
+                <div class="chart-total">
+                  <small>संभावित मूल्य</small><b id="chartValue">₹0</b>
+                </div>
+              </div>
+              <div
+                class="line-chart"
+                style="border: none; background: none; height: 180px"
+              >
+                <canvas id="earningsChart"></canvas>
+              </div>
+              <div id="chart-days-container" class="chart-days"></div>
+            </article>
+            <article id="quickTasksCard" class="dash-card quick-card">
+              <div id="quickTasksContent">
+                <div class="card-head"><h2>जल्दी करें</h2></div>
+                <div class="quick-list">
+                  <div id="kycTask" class="quick-action">
+                    <div class="quick-icon"><i data-lucide="check"></i></div>
+                    <div class="quick-copy">
+                      <strong>अपनी KYC पूरा करें</strong
+                      ><small>तेज़ भुगतान के लिए KYC अपडेट करें</small>
+                    </div>
+                    <a
+                      id="kycAction"
+                      href="../onboarding/seller-identity-verification.html"
+                      >करें</a
+                    >
+                  </div>
+                  <div id="bankTask" class="quick-action">
+                    <div class="quick-icon">
+                      <i data-lucide="credit-card"></i>
+                    </div>
+                    <div class="quick-copy">
+                      <strong>बैंक खाता जोड़ें</strong
+                      ><small>पेमेन्ट प्राप्त करने के लिए</small>
+                    </div>
+                    <a
+                      id="bankAction"
+                      href="../onboarding/seller-bank-verification.html"
+                      >करें</a
+                    >
+                  </div>
+                  <div class="quick-action">
+                    <div class="quick-icon"><i data-lucide="sparkles"></i></div>
+                    <div class="quick-copy">
+                      <strong>AI सुझाव देखें</strong
+                      ><small>अपनी फसल के लिए बेहतर निर्णय लें</small>
+                    </div>
+                    <a href="seller-ai-insights.html">देखें</a>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </section>
+
+          <section class="dash-grid-bottom">
+            <article class="dash-card">
+              <div class="card-head">
+                <h2>
+                  बाज़ार भाव
+                  <small style="font-weight: 400; color: var(--ink-soft)"
+                    >(आज का)</small
+                  >
+                </h2>
+                <span
+                  id="mandi-source-badge"
+                  style="
+                    font-size: 9px;
+                    padding: 2px 6px;
+                    border-radius: 4px;
+                    background: #f1f5f9;
+                    color: #64748b;
+                    font-weight: 800;
+                    text-transform: uppercase;
+                  "
+                  >खोज रहे हैं...</span
+                >
+              </div>
+              <div class="market-row">
+                <span><i data-lucide="wheat"></i></span
+                ><b>गेहूं <small>(सामान्य)</small></b
+                ><span class="rate">₹-- / किलो</span
+                ><span class="positive">--</span>
+              </div>
+              <div class="market-row">
+                <span><i data-lucide="wheat"></i></span
+                ><b>धान <small>(सामान्य)</small></b
+                ><span class="rate">₹-- / किलो</span
+                ><span class="positive">--</span>
+              </div>
+              <div class="market-row">
+                <span><i data-lucide="wheat"></i></span><b>मक्का</b
+                ><span class="rate">₹-- / किलो</span
+                ><span class="positive">--</span>
+              </div>
+              <div class="market-row">
+                <span><i data-lucide="sprout"></i></span><b>सरसों</b
+                ><span class="rate">₹-- / किलो</span
+                ><span class="positive">--</span>
+              </div>
+              <div class="market-row">
+                <span><i data-lucide="circle"></i></span><b>आलू</b
+                ><span class="rate">₹-- / किलो</span
+                ><span class="positive">--</span>
+              </div>
+              <div
+                id="demandSummary"
+                style="
+                  margin-top: 12px;
+                  padding-top: 10px;
+                  border-top: 1px solid #edf0ed;
+                  font-size: 11px;
+                  color: var(--ink-soft);
+                "
+              >
+                बिक्री और मांग डेटा लोड हो रहा है…
+              </div>
+            </article>
+            <article class="dash-card">
+              <div class="card-head">
+                <h2>मौसम अपडेट</h2>
+                <span class="card-link">IMD</span>
+              </div>
+              <div class="weather-panel">
+                <div class="weather-big"><i data-lucide="cloud-sun"></i></div>
+                <div>
+                  <div class="weather-temperature">32°C</div>
+                  <small>आंशिक बादल · हवा 12 km/h · नमी 61%</small>
+                </div>
+              </div>
+              <div class="weather-list">
+                <div>
+                  <span>कल</span
+                  ><span
+                    ><i data-lucide="cloud-sun" style="width: 14px"></i></span
+                  ><b>33° / 24°</b>
+                </div>
+                <div>
+                  <span>शुक्र</span
+                  ><span
+                    ><i data-lucide="cloud-rain" style="width: 14px"></i></span
+                  ><b>31° / 23°</b>
+                </div>
+                <div>
+                  <span>शनि</span
+                  ><span><i data-lucide="sun" style="width: 14px"></i></span
+                  ><b>30° / 23°</b>
+                </div>
+              </div>
+            </article>
+            <article class="dash-card">
+              <div class="card-head">
+                <h2>ऑर्डर स्थिति</h2>
+                <a class="card-link" href="seller-orders.html">सभी देखें →</a>
+              </div>
+              <div class="order-row">
+                <i><i data-lucide="list-checks"></i></i><span>कुल ऑर्डर</span
+                ><b>0</b>
+              </div>
+              <div class="order-row">
+                <i><i data-lucide="settings"></i></i><span>प्रोसेसिंग</span
+                ><b>0</b>
+              </div>
+              <div class="order-row">
+                <i><i data-lucide="box"></i></i><span>पिकअप के लिए तैयार</span
+                ><b>0</b>
+              </div>
+              <div class="order-row">
+                <i><i data-lucide="check-circle-2"></i></i
+                ><span>डिलीवर किए गए</span><b>0</b>
+              </div>
+            </article>
+            <article class="dash-card ai-card">
+              <span class="ai-tag">FarmLink AI सुझाव</span>
+              <h2>बेहतर बिक्री निर्णय लें</h2>
+              <p>
+                आज गेहूं की मांग आपके क्षेत्र में स्थिर hai. सही समय पर listing
+                अपडेट karke बेहतर अवसर पाएं.
+              </p>
+              <a class="btn btn-secondary btn-sm" href="seller-ai-insights.html"
+                >सुझाव देखें</a
+              >
+            </article>
+          </section>
+
+          <div class="tip-bar">
+            <span class="tip-icon"><i data-lucide="graduation-cap"></i></span
+            ><span
+              ><b>किसान गाइड</b><br />गेहूं की बुवाई के बाद पहली सिंचाई 20–25
+              दिनों में करें।</span
+            ><a
+              class="card-link"
+              href="help-center.html"
+              style="margin-left: auto"
+              >और सुझाव देखें →</a
+            >
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script src="../../shared/assets/js/up-post-office.js"></script>
+    <script src="../../shared/assets/js/weather.js"></script>
+    <script src="../../shared/assets/js/market-rates.js"></script>
+    <script>
+      initShell("seller", "home", "डैशबोर्ड");
+      if (window.lucide) window.lucide.createIcons();
+      window.FarmLinkWeather?.refresh({
+        state: "Uttar Pradesh",
+        district: "Lucknow",
+      });
+      const $ = (id) =>
+        document.getElementById(id) || {
+          style: {},
+          textContent: "",
+          innerHTML: "",
+          remove() {},
+        };
+      const escapeHtml = (value) =>
+        String(value ?? "").replace(
+          /[&<>'"]/g,
+          (char) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              "'": "&#39;",
+              '"': "&quot;",
+            })[char],
+        );
+      const statusLabel = (status) =>
+        ({
+          active: "सक्रिय",
+          sold: "बिक चुकी",
+          sold_out: "बिक चुकी",
+          draft: "ड्राफ्ट",
+          inactive: "निष्क्रिय",
+        })[status] ||
+        status ||
+        "—";
+      const emoji = (title) => {
+        const map = {
+          गेहूं: "wheat",
+          धान: "wheat",
+          सरसों: "sprout",
+          मक्का: "wheat",
+          चना: "sprout",
+        };
+        return `<i data-lucide="${map[title] || "sprout"}"></i>`;
+      };
+      const money = (value) =>
+        `₹${Math.round(value || 0).toLocaleString("en-IN")}`;
+
+      let earningsChart = null;
+      let mandiRequestId = 0;
+      function renderEarningsChart(inventoryValue) {
+        const canvas = document.getElementById("earningsChart");
+        if (!canvas || !window.Chart) return;
+        const ctx = canvas.getContext("2d");
+        if (earningsChart) earningsChart.destroy();
+
+        const labels = [];
+        const data = [];
+        const now = new Date();
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(now.getDate() - i);
+          labels.push(
+            d.toLocaleDateString("hi-IN", { day: "numeric", month: "short" }),
+          );
+          const factor = 1 - i * 0.05 + Math.random() * 0.02;
+          data.push(Math.round(inventoryValue * factor));
+        }
+
+        earningsChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                data: data,
+                borderColor: "#168443",
+                backgroundColor: "rgba(22, 132, 67, 0.1)",
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3,
+                pointRadius: 4,
+                pointBackgroundColor: "#fff",
+                pointBorderColor: "#168443",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+              y: { display: false, beginAtZero: false },
+            },
+          },
+        });
+
+        const container = document.getElementById("chart-days-container");
+        container.innerHTML = labels.map((l) => `<span>${l}</span>`).join("");
+      }
+
+      async function loadDashboardData() {
+        syncMandiRates("Uttar Pradesh", "Lucknow");
+        try {
+          await window.firebaseScriptReady;
+          const { client, user } = await getCurrentUser().catch(() => ({
+            client: null,
+            user: null,
+          }));
+
+          let inventoryValue = 0;
+          let name = "किसान";
+          let location = "स्थान जोड़ें";
+          let farmerProfile = null;
+          let pendingBids = null;
+          let bidLoadError = null;
+
+          if (user) {
+            const [profileResult, farmerResult, listingsResult] =
+              await Promise.all([
+                client
+                  .from("users")
+                  .select("full_name")
+                  .eq("id", user.id)
+                  .maybeSingle(),
+                client
+                  .from("farmer_profiles")
+                  .select(
+                    "state,district,village,identity_verified,bank_verified",
+                  )
+                  .eq("user_id", user.id)
+                  .maybeSingle(),
+                client
+                  .from("listings")
+                  .select(
+                    "id,title,available_quantity_kg,price_per_kg,status,created_at",
+                  )
+                  .eq("farmer_id", user.id)
+                  .order("created_at", { ascending: false }),
+              ]);
+            if (profileResult.error) throw profileResult.error;
+            if (farmerResult.error) throw farmerResult.error;
+            if (listingsResult.error) throw listingsResult.error;
+            const profile = profileResult.data;
+            const farmer = farmerResult.data;
+            farmerProfile = farmer;
+            const listings = listingsResult.data;
+            try {
+              const bidsResult = await client
+                .from("bids")
+                .select("id,status")
+                .eq("farmer_id", user.id);
+              if (bidsResult.error) throw bidsResult.error;
+              pendingBids = (bidsResult.data || []).filter(
+                (bid) => bid.status === "pending",
+              ).length;
+            } catch (error) {
+              console.error("Could not load farmer bid count:", error);
+              bidLoadError = error.message;
+            }
+
+            const rows = listings || [];
+            const active = rows.filter((row) => row.status === "active");
+            const availableKg = active.reduce(
+              (sum, row) => sum + Number(row.available_quantity_kg || 0),
+              0,
+            );
+            inventoryValue = active.reduce(
+              (sum, row) =>
+                sum +
+                Number(row.available_quantity_kg || 0) *
+                  Number(row.price_per_kg || 0),
+              0,
+            );
+
+            name = profile?.full_name || "किसान";
+            const isKycVerified = farmer?.identity_verified || false;
+            location =
+              [farmer?.village, farmer?.district, farmer?.state]
+                .filter(Boolean)
+                .join(", ") || "स्थान जोड़ें";
+
+            // Use profile data if logged in
+            let state_val = "Uttar Pradesh";
+            let dist_val = "Lucknow";
+            if (farmer) {
+              state_val = farmer.state || state_val;
+              dist_val = farmer.district || dist_val;
+            }
+
+            // Load Mandi Rates with Profile Location
+            syncMandiRates(state_val, dist_val);
+            syncSellerDemand(client, user, rows);
+
+            $("totalListings").textContent =
+              rows.length.toLocaleString("en-IN");
+            $("activeListings").textContent =
+              active.length.toLocaleString("en-IN");
+            $("availableQuantity").textContent =
+              `${availableKg.toLocaleString("en-IN")} kg`;
+            $("pendingBids").textContent =
+              pendingBids === null ? "—" : pendingBids.toLocaleString("en-IN");
+            $("dashboardListings").innerHTML = rows
+              .slice(0, 2)
+              .map(
+                (row) =>
+                  `<div class="listing-item"><div class="crop-mark">${emoji(row.title)}</div><div class="listing-copy"><strong>${escapeHtml(row.title || "फसल")}</strong><small>ग्रेड (सामान्य) · अच्छी गुणवत्ता</small><span class="mini-status">${escapeHtml(statusLabel(row.status))}</span></div><button class="listing-dots" aria-label="लिस्टिंग विकल्प"><i data-lucide="more-vertical"></i></button></div><div class="listing-meta"><div>कीमत / किलो<b>${money(Number(row.price_per_kg || 0))}</b></div><div>उपलब्ध मात्रा<b>${Number(row.available_quantity_kg || 0).toLocaleString("en-IN")} kg</b></div><div>लिस्टिंग दिनांक<b>${row.created_at ? new Date(row.created_at).toLocaleDateString("hi-IN", { day: "numeric", month: "short" }) : "—"}</b></div></div>`,
+              )
+              .join("");
+
+            // Dynamic verification icon
+            const verifIcon = isKycVerified
+              ? '<i data-lucide="check-circle" style="width:20px; height:20px; color:#10b981; flex-shrink:0" title="KYC सत्यापित"></i>'
+              : '<i data-lucide="alert-circle" style="width:20px; height:20px; color:#f59e0b; flex-shrink:0" title="सत्यापन लंबित"></i>';
+
+            $("dashboardGreeting").innerHTML =
+              `नमस्ते, ${name} <span style="display:inline-flex; align-items:center; gap:8px; margin-left:4px;">${verifIcon}<i data-lucide="user" style="width:26px; height:26px; opacity:0.8"></i></span>`;
+          } else {
+            // Demo mode values
+            inventoryValue = 18000;
+            location = "बिहार, भारत (डेमो)";
+            $("dashboardGreeting").innerHTML =
+              `नमस्ते, किसान <span style="display:inline-flex; align-items:center; gap:8px; margin-left:4px;"><i data-lucide="user" style="width:26px; height:26px; opacity:0.8"></i></span>`;
+            syncMandiRates("Bihar", "Gaya");
+            syncSellerDemand(null, null, []);
+          }
+          if (window.FarmLinkWeather) {
+            window.FarmLinkWeather.refresh(
+              user
+                ? farmerProfile
+                : { state: "Uttar Pradesh", district: "Lucknow" },
+            );
+          }
+          $("dashboardProfileDetails").innerHTML =
+            `<i data-lucide="map-pin" style="width:14px; height:14px"></i> ${location}`;
+          $("inventoryValue").textContent = money(inventoryValue);
+          $("chartValue").textContent = money(inventoryValue);
+
+          renderEarningsChart(inventoryValue);
+
+          if (window.lucide) window.lucide.createIcons();
+          $("dashboardMessage").style.display = "none";
+          if (bidLoadError) {
+            $("dashboardMessage").textContent =
+              `खरीद प्रस्ताव की संख्या लोड नहीं हुई: ${bidLoadError}`;
+            $("dashboardMessage").className = "alert alert-warn dash-message";
+            $("dashboardMessage").style.display = "block";
+          }
+        } catch (error) {
+          console.error("Dashboard data load failed:", error);
+          $("dashboardMessage").textContent =
+            `डैशबोर्ड लोड नहीं हुआ: ${error.message}`;
+        }
+      }
+
+      loadDashboardData();
+      async function syncSellerDemand(client, user, listings) {
+        const panel = document.getElementById("demandSummary");
+        if (!panel) return;
+        if (!client || !user || !listings.length) {
+          panel.innerHTML =
+            "बिक्री: 0 क्विंटल · सक्रिय मांग: 0 क्विंटल · 30 दिन अनुमान: उपलब्ध नहीं";
+          return;
+        }
+        try {
+          const statusResult = await client
+            .from("seller_order_status")
+            .select("order_id,status")
+            .eq("seller_id", user.id);
+          if (statusResult.error) throw statusResult.error;
+          const statuses = new Map(
+            (statusResult.data || []).map((row) => [row.order_id, row.status]),
+          );
+          const itemResults = await Promise.all(
+            listings.map((listing) =>
+              client
+                .from("order_items")
+                .select("order_id,quantity_kg")
+                .eq("listing_id", listing.id),
+            ),
+          );
+          const quantities = itemResults.flatMap((result) =>
+            result.error ? [] : result.data || [],
+          );
+          const soldKg = quantities
+            .filter((item) => statuses.get(item.order_id) === "delivered")
+            .reduce((sum, item) => sum + Number(item.quantity_kg || 0), 0);
+          const pipelineKg = quantities
+            .filter(
+              (item) =>
+                !["cancelled", "delivered"].includes(
+                  statuses.get(item.order_id),
+                ),
+            )
+            .reduce((sum, item) => sum + Number(item.quantity_kg || 0), 0);
+          const recentSoldKg = quantities
+            .filter((item) => statuses.get(item.order_id) === "delivered")
+            .reduce((sum, item) => sum + Number(item.quantity_kg || 0), 0);
+          const projectedKg = Math.round(
+            Math.max(pipelineKg, recentSoldKg * 1.15),
+          );
+          panel.innerHTML = `<div style="display:flex;gap:12px;flex-wrap:wrap;"><span><strong style="color:#147442">बिकी:</strong> ${(soldKg / 100).toFixed(1)} क्विंटल</span><span><strong style="color:#d97706">सक्रिय मांग:</strong> ${(pipelineKg / 100).toFixed(1)} क्विंटल</span><span><strong style="color:#2563eb">30 दिन अनुमान:</strong> ${(projectedKg / 100).toFixed(1)} क्विंटल</span></div><small style="display:block;margin-top:6px;color:var(--ink-soft);">अनुमान आपके Firebase ऑर्डर और वर्तमान पाइपलाइन पर आधारित है।</small>`;
+        } catch (error) {
+          console.warn("Seller demand sync failed:", error);
+          panel.textContent = "बिक्री और मांग डेटा अभी उपलब्ध नहीं है।";
+        }
+      }
+      function renderMandiRates(groups, rows, sourceBadge) {
+        if (sourceBadge) {
+          const source = Object.values(groups)[0]?.[0]?.Source;
+          const isEstimate = source === "sample_estimate";
+          sourceBadge.textContent = isEstimate
+            ? "अनुमानित भाव"
+            : "Live (Agmarknet)";
+          sourceBadge.style.background = isEstimate ? "#fff7e6" : "#eaf7ed";
+          sourceBadge.style.color = isEstimate ? "#946200" : "#10b981";
+        }
+
+        const targets = [
+          "Wheat",
+          "Mustard",
+          "Potato",
+          "Tomato",
+          "Maize",
+          "Rice",
+        ];
+        const topCrops = targets.filter((crop) => groups[crop]);
+        if (topCrops.length < 5) {
+          Object.keys(groups).forEach((crop) => {
+            if (!topCrops.includes(crop) && topCrops.length < 5)
+              topCrops.push(crop);
+          });
+        }
+
+        topCrops.forEach((commodity, index) => {
+          const row = rows[index];
+          if (!row) return;
+
+          const latest = groups[commodity][0];
+          const latestPrice = Number(
+            latest.Modal_Price || latest.modal_price || 0,
+          );
+          const pricePerKg = (latestPrice / 100).toFixed(2);
+          const forecastPrice = Number(latest.Forecast_Price) || latestPrice;
+          const icon = window.FarmLinkMarket.iconMap[commodity] || "leaf";
+          const date = latest.Arrival_Date || latest.arrival_date || "Today";
+
+          row.innerHTML = `
+                <span><i data-lucide="${icon}" style="width:16px"></i></span>
+                <b>${escapeHtml(commodity)} <small>(${escapeHtml(latest.Market || latest.market || "Regional")})</small></b>
+                <span class="rate">₹${pricePerKg} / किलो</span>
+                <span style="color:#64748b; font-size:10px; font-weight:600; margin-left:10px; text-align:right;">${escapeHtml(date)}<br><b>7 दिन: ₹${forecastPrice.toLocaleString("en-IN")}/क्विंटल</b></span>
+            `;
+          row.style.display = "flex";
+        });
+
+        for (let index = topCrops.length; index < rows.length; index++)
+          rows[index].style.display = "none";
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      async function syncMandiRates(state, district) {
+        const requestId = ++mandiRequestId;
+        const marketCard = document.querySelector(
+          ".dash-grid-bottom > article:first-child",
+        );
+        const sourceBadge = document.getElementById("mandi-source-badge");
+        if (!marketCard) return;
+
+        const rows = marketCard.querySelectorAll(".market-row");
+        try {
+          const market = window.FarmLinkMarket;
+          if (!market) throw new Error("Market Service Missing");
+
+          renderMandiRates(market.getFallbackMandiRates(), rows, sourceBadge);
+          const groups = await market.fetchLiveMandiRates(state, district);
+          if (requestId !== mandiRequestId) return;
+          if (!groups) throw new Error("No market data available");
+          renderMandiRates(groups, rows, sourceBadge);
+        } catch (error) {
+          if (requestId !== mandiRequestId) return;
+          console.warn("[MarketJS] Dashboard sync failed.", error);
+          if (sourceBadge) {
+            sourceBadge.textContent = "डेटा अनुपलब्ध";
+            sourceBadge.style.background = "#f1f5f9";
+            sourceBadge.style.color = "#64748b";
+          }
+          rows.forEach((row) => {
+            row.innerHTML = `<div style="text-align:center; width:100%; padding:20px; color:#64748b; font-size:12px;">बाज़ार भाव लोड नहीं हो पाए। कृपया रिफ्रेश करें।</div>`;
+          });
+          for (let index = 1; index < rows.length; index++)
+            rows[index].style.display = "none";
+        }
+      }
+    </script>
+  </body>
+</html>

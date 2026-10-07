@@ -1,0 +1,112 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function ownsUserField() {
+      return signedIn() && request.resource.data.user_id == request.auth.uid;
+    }
+
+    match /users/{userId} {
+      allow read, create, update: if signedIn() && userId == request.auth.uid;
+    }
+
+    match /farmer_profiles/{profileId} {
+      allow read: if signedIn() && resource.data.user_id == request.auth.uid;
+      allow create: if ownsUserField();
+      allow update: if signedIn()
+        && resource.data.user_id == request.auth.uid
+        && request.resource.data.user_id == request.auth.uid;
+    }
+
+    match /buyer_profiles/{profileId} {
+      allow read: if signedIn() && resource.data.user_id == request.auth.uid;
+      allow create: if ownsUserField();
+      allow update: if signedIn()
+        && resource.data.user_id == request.auth.uid
+        && request.resource.data.user_id == request.auth.uid;
+    }
+
+    match /listings/{listingId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.farmer_id == request.auth.uid;
+      allow update, delete: if signedIn() && resource.data.farmer_id == request.auth.uid;
+    }
+
+    match /bids/{bidId} {
+      allow read: if signedIn()
+        && (resource.data.buyer_id == request.auth.uid
+          || resource.data.farmer_id == request.auth.uid);
+
+      allow create: if signedIn()
+        && request.resource.data.buyer_id == request.auth.uid
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
+          == 'buyer'
+        && request.resource.data.status == 'pending'
+        && (request.resource.data.offer_price_per_quintal is int
+          || request.resource.data.offer_price_per_quintal is float)
+        && request.resource.data.offer_price_per_quintal > 0
+        && (request.resource.data.quantity_kg is int
+          || request.resource.data.quantity_kg is float)
+        && request.resource.data.quantity_kg >= 100
+        && exists(/databases/$(database)/documents/listings/$(request.resource.data.listing_id))
+        && get(/databases/$(database)/documents/listings/$(request.resource.data.listing_id)).data.farmer_id
+          == request.resource.data.farmer_id
+        && get(/databases/$(database)/documents/listings/$(request.resource.data.listing_id)).data.status
+          == 'active'
+        && request.resource.data.farmer_id != request.auth.uid;
+
+      allow update: if signedIn()
+        && resource.data.farmer_id == request.auth.uid
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
+          == 'farmer'
+        && resource.data.status == 'pending'
+        && request.resource.data.status in ['accepted', 'rejected']
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'updated_at'])
+        && (request.resource.data.status != 'accepted'
+          || (exists(/databases/$(database)/documents/listings/$(resource.data.listing_id))
+            && get(/databases/$(database)/documents/listings/$(resource.data.listing_id)).data.status
+              == 'active'
+            && get(/databases/$(database)/documents/listings/$(resource.data.listing_id)).data.available_quantity_kg
+              >= resource.data.quantity_kg));
+    }
+
+    match /orders/{orderId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.buyer_id == request.auth.uid;
+      allow update: if signedIn();
+    }
+
+    match /order_items/{itemId} {
+      allow read, write: if signedIn();
+    }
+
+    match /payments/{paymentId} {
+      allow read, create: if signedIn();
+    }
+
+    match /deliveries/{deliveryId} {
+      allow read, create, update: if signedIn();
+    }
+
+    match /delivery_events/{eventId} {
+      allow read, create: if signedIn();
+    }
+
+    match /seller_order_status/{statusId} {
+      allow read, create, update: if signedIn();
+    }
+
+    match /kyc_verifications/{verificationId} {
+      allow read, create, update: if signedIn();
+    }
+
+    match /bank_verifications/{verificationId} {
+      allow read, create, update: if signedIn();
+    }
+  }
+}

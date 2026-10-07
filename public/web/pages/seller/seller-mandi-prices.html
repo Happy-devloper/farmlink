@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>मंडी भाव · FarmLink AI</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+    <style>
+      .mandi-page {
+        max-width: 1180px;
+      }
+      .mandi-hero {
+        padding: 26px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #064f36, #138252);
+        color: #fff;
+      }
+      .mandi-hero p {
+        margin: 6px 0 0;
+        color: #d9f3e4;
+      }
+      .filter-card {
+        margin-top: 18px;
+        border: 0;
+        border-radius: 16px;
+        box-shadow: 0 8px 28px rgba(10, 66, 39, 0.08);
+      }
+      .price-table {
+        overflow: hidden;
+        border-radius: 14px;
+      }
+      .price-table th {
+        background: #edf8f0;
+        color: #155f37;
+        font-size: 12px;
+      }
+      .price-table td {
+        vertical-align: middle;
+      }
+      .price-value {
+        font-weight: 800;
+        color: #08713c;
+      }
+      .busy-state {
+        padding: 42px;
+        text-align: center;
+        color: #60716a;
+      }
+      .table-shimmer span {
+        display: block;
+        height: 14px;
+        width: 75%;
+        border-radius: 8px;
+        background: linear-gradient(90deg, #edf1ee, #fafcfb, #edf1ee);
+        background-size: 220% 100%;
+        animation: mandiShimmer 1.1s infinite;
+      }
+      @keyframes mandiShimmer {
+        to {
+          background-position: -220% 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app-shell">
+      <div class="main-col">
+        <div id="topbar-slot"></div>
+        <main class="content mandi-page">
+          <section class="mandi-hero">
+            <span
+              id="dataSource"
+              style="font-size: 12px; font-weight: 800; letter-spacing: 0.06em"
+              >◈ AGRMARKNET · LIVE DATA</span
+            >
+            <h1 class="mt-2 mb-0">आज के मंडी भाव</h1>
+            <p>सरकारी Agmarknet से variety-wise दैनिक कीमतें खोजें।</p>
+          </section>
+          <form id="mandiForm" class="card filter-card p-4">
+            <div class="row g-3 align-items-end">
+              <div class="col-md-3">
+                <label class="form-label" for="state">राज्य</label
+                ><input
+                  id="state"
+                  class="form-control"
+                  value="Uttar Pradesh"
+                  required
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label" for="district">जिला</label
+                ><input
+                  id="district"
+                  class="form-control"
+                  placeholder="जैसे Lucknow"
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label" for="market">मंडी</label
+                ><input
+                  id="market"
+                  class="form-control"
+                  placeholder="जैसे Lucknow"
+                />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label" for="commodity">फसल</label
+                ><select id="commodity" class="form-select">
+                  <option value="">सभी फसलें</option>
+                  <option>Wheat</option>
+                  <option>Paddy(Dhan)(Common)</option>
+                  <option>Maize</option>
+                  <option>Gram</option>
+                  <option>Mustard</option>
+                  <option>Potato</option>
+                  <option>Rice</option>
+                  <option>Tomato</option>
+                  <option>Onion</option>
+                </select>
+              </div>
+              <div class="col-md-1 d-grid">
+                <button class="btn btn-primary" type="submit">खोजें</button>
+              </div>
+            </div>
+          </form>
+          <div id="mandiMessage" class="alert alert-info mt-3" role="status">
+            मंडी भाव लोड करने के लिए खोजें दबाएँ।
+          </div>
+          <section class="card mt-3 p-0 price-table">
+            <div
+              class="d-flex justify-content-between align-items-center px-4 py-3 border-bottom"
+            >
+              <h2 class="h5 mb-0">मंडी परिणाम (Agmarknet 2.0 Style)</h2>
+              <small id="resultCount" class="text-secondary">—</small>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Commodity Group</th>
+                    <th>Commodity</th>
+                    <th>MSP (Rs./Q)</th>
+                    <th>Latest Price</th>
+                    <th>Arrival (MT)</th>
+                    <th class="text-center">7-day Estimate</th>
+                  </tr>
+                </thead>
+                <tbody id="mandiRows"></tbody>
+              </table>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script>
+      initShell("seller", "market", "मंडी भाव");
+      const $ = (id) => document.getElementById(id),
+        API_BASE =
+          window.FARMLINK_API_BASE || "https://farmlink-retell-api.vercel.app";
+      const normalize = (value) =>
+        value
+          .trim()
+          .toLowerCase()
+          .replace(/\b\w/g, (char) => char.toUpperCase());
+      const sampleCrops = [
+        { commodity: "Wheat", price: 2690, change: 0.4 },
+        { commodity: "Mustard", price: 5850, change: 0.3 },
+        { commodity: "Potato", price: 1850, change: -0.2 },
+        { commodity: "Tomato", price: 3200, change: 0.7 },
+        { commodity: "Maize", price: 2250, change: 0.25 },
+        { commodity: "Rice", price: 3100, change: 0.35 },
+        { commodity: "Gram", price: 6200, change: 0.25 },
+        { commodity: "Onion", price: 2800, change: 0.5 },
+      ];
+      const cropKey = (value) => {
+        const key = normalize(value)
+          .toLowerCase()
+          .replace(/[^a-z]/g, "");
+        return key === "paddydhancommon" ? "rice" : key;
+      };
+      const esc = (value) =>
+        String(value ?? "—").replace(
+          /[&<>"']/g,
+          (char) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[char],
+        );
+      function loading() {
+        $("mandiRows").innerHTML = Array.from(
+          { length: 6 },
+          () =>
+            '<tr class="table-shimmer"><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td></tr>',
+        ).join("");
+      }
+      function showMessage(text, type = "info") {
+        const box = $("mandiMessage");
+        box.className = `alert alert-${type} mt-3`;
+        box.textContent = text;
+      }
+      function render(records) {
+        $("resultCount").textContent = `${records.length} रिकॉर्ड`;
+        $("mandiRows").innerHTML = records.length
+          ? records
+              .map((row) => {
+                const trends = row.trends || [];
+                const trendHtml = trends
+                  .map(
+                    (t) =>
+                      `<span class="badge bg-light text-dark mx-1" title="${t.date}">₹${t.price}</span>`,
+                  )
+                  .join("");
+                return `<tr>
+            <td><span class="badge bg-success bg-opacity-10 text-success">${esc(row.group)}</span></td>
+            <td><strong>${esc(row.commodity)}</strong><br><small class="text-muted">${esc(row.market)} (${esc(row.variety)})</small></td>
+            <td>${esc(row.msp)}</td>
+            <td class="price-value">₹${Number(row.modal_price || 0).toLocaleString("en-IN")}</td>
+            <td>-</td>
+            <td class="text-center">${trendHtml || "—"}</td>
+        </tr>`;
+              })
+              .join("")
+          : '<tr><td class="busy-state" colspan="6">इस filter के लिए कोई सरकारी रिकॉर्ड नहीं मिला।</td></tr>';
+      }
+      async function search() {
+        const controller = new AbortController(),
+          timer = setTimeout(() => controller.abort(), 16000),
+          params = new URLSearchParams();
+        ["state", "district"].forEach((id) => {
+          const value = $(id).value.trim();
+          if (value) params.set(id, normalize(value));
+        });
+        loading();
+        showMessage("सरकारी Agmarknet से ताज़ा डेटा लोड हो रहा है…");
+        try {
+          const response = await fetch(
+            `${API_BASE}/api/market/major-crops?${params}`,
+            { signal: controller.signal },
+          );
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || !data.ok)
+            throw new Error(
+              data.message || "Server Busy — कृपया फिर कोशिश करें।",
+            );
+          const selected = cropKey($("commodity").value);
+          const crops = (data.crops || []).filter(
+            (crop) => !selected || cropKey(crop.commodity) === selected,
+          );
+          const records = crops.map((crop) => {
+            const price = Number(
+              crop.price || crop.modal_price || crop.Modal_Price || 0,
+            );
+            const change = Number(crop.change || 0);
+            return {
+              source: data.source,
+              group:
+                data.source === "sample_estimate"
+                  ? "Sample estimate"
+                  : "Agmarknet",
+              commodity: crop.commodity,
+              market: $("district").value.trim() || "Regional mandi",
+              variety:
+                data.source === "sample_estimate" ? "Indicative estimate" : "—",
+              msp: "—",
+              modal_price: price,
+              trends: [
+                {
+                  date: "7-day estimate",
+                  price:
+                    Number(crop.predicted_price) ||
+                    Math.round(price * (1 + (change / 100) * (7 / 30))),
+                },
+              ],
+            };
+          });
+          if (!records.length)
+            throw new Error("No sample price is configured for this crop.");
+          render(records);
+          if (data.source === "sample_estimate") {
+            $("dataSource").textContent =
+              "SAMPLE ESTIMATES · NOT LIVE MANDI DATA";
+            showMessage(data.message, "warning");
+          } else {
+            $("dataSource").textContent = "AGMARKNET · LIVE DATA";
+            showMessage("Latest mandi prices loaded.", "success");
+          }
+        } catch (error) {
+          const selected = cropKey($("commodity").value);
+          const fallbackRecords = sampleCrops
+            .filter((crop) => !selected || cropKey(crop.commodity) === selected)
+            .map((crop) => ({
+              ...crop,
+              source: "sample_estimate",
+              group: "Sample estimate",
+              market: $("district").value.trim() || "Regional estimate",
+              variety: "Indicative estimate",
+              msp: "—",
+              modal_price: crop.price,
+              trends: [
+                {
+                  date: "7-day estimate",
+                  price: Math.round(
+                    crop.price * (1 + (crop.change / 100) * (7 / 30)),
+                  ),
+                },
+              ],
+            }));
+          if (fallbackRecords.length) {
+            render(fallbackRecords);
+            $("dataSource").textContent =
+              "SAMPLE ESTIMATES · NOT LIVE MANDI DATA";
+            showMessage(
+              "Live mandi data is unavailable; indicative sample prices are shown.",
+              "warning",
+            );
+            return;
+          }
+          $("mandiRows").innerHTML =
+            '<tr><td class="busy-state" colspan="5">Server Busy — सरकारी मंडी सर्वर अभी जवाब नहीं दे रहा। थोड़ी देर बाद फिर कोशिश करें।</td></tr>';
+          showMessage(
+            error.name === "AbortError"
+              ? "Server Busy — request timeout हो गया। फिर कोशिश करें।"
+              : error.message,
+            "warning",
+          );
+        } finally {
+          clearTimeout(timer);
+        }
+      }
+      $("mandiForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        search();
+      });
+      search();
+    </script>
+  </body>
+</html>

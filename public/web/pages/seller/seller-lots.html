@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>लॉट प्रबंधन · FarmLink</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+    <style>
+      .lots-page {
+        max-width: 1180px;
+      }
+      .lots-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 18px;
+        margin-bottom: 20px;
+      }
+      .lots-header h1 {
+        margin: 0;
+        font-size: 28px;
+      }
+      .lots-header p {
+        margin: 6px 0 0;
+        color: var(--ink-soft);
+      }
+      .lots-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
+        gap: 18px;
+        align-items: start;
+      }
+      .lots-panel {
+        padding: 20px;
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow-sm);
+      }
+      .lots-panel h2 {
+        margin: 0 0 16px;
+        font-size: 17px;
+      }
+      .lot-field {
+        margin-bottom: 14px;
+      }
+      .lot-field label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .lot-field select,
+      .lot-field input {
+        width: 100%;
+        min-height: 42px;
+        padding: 9px 11px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+      }
+      .lot-preview {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin: 16px 0;
+      }
+      .lot-stat {
+        padding: 12px;
+        border: 1px solid #e4ebe5;
+        border-radius: 9px;
+        background: #f8fbf8;
+      }
+      .lot-stat small {
+        display: block;
+        color: var(--ink-soft);
+        font-size: 11px;
+      }
+      .lot-stat strong {
+        display: block;
+        margin-top: 4px;
+        font-size: 17px;
+      }
+      .lot-breakdown {
+        display: grid;
+        gap: 7px;
+        margin: 0 0 16px;
+        max-height: 220px;
+        overflow: auto;
+      }
+      .lot-breakdown-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 8px 10px;
+        border-bottom: 1px solid #edf1ed;
+        font-size: 12px;
+      }
+      .lots-note {
+        margin: 12px 0 0;
+        color: var(--ink-soft);
+        font-size: 11px;
+        line-height: 1.6;
+      }
+      .inventory-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .inventory-table th,
+      .inventory-table td {
+        padding: 11px 9px;
+        border-bottom: 1px solid #edf0ed;
+        text-align: left;
+        font-size: 12px;
+      }
+      .inventory-table th {
+        color: var(--ink-soft);
+        font-size: 10px;
+        text-transform: uppercase;
+      }
+      .batch-tag {
+        display: inline-block;
+        margin-top: 4px;
+        padding: 3px 7px;
+        border-radius: 5px;
+        background: #edf7ef;
+        color: #176b3c;
+        font-size: 10px;
+        font-weight: 700;
+      }
+      @media (max-width: 800px) {
+        .lots-layout {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 520px) {
+        .lots-page {
+          padding: 18px 13px !important;
+        }
+        .lots-header {
+          display: block;
+        }
+        .lots-preview {
+          grid-template-columns: 1fr;
+        }
+        .lot-preview {
+          grid-template-columns: 1fr;
+        }
+        .inventory-wrap {
+          overflow-x: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app-shell">
+      <div class="main-col">
+        <div id="topbar-slot"></div>
+        <main class="content lots-page">
+          <header class="lots-header">
+            <div>
+              <div class="breadcrumb">
+                <a href="seller-listings.html">मेरी लिस्टिंग</a> / लॉट प्रबंधन
+              </div>
+              <h1>लॉट प्रबंधन</h1>
+              <p>एक उपलब्ध लिस्टिंग को छोटे, अलग-अलग खरीदार लॉट में बाँटें।</p>
+            </div>
+            <a href="seller-listings.html" class="btn btn-secondary"
+              >लिस्टिंग देखें</a
+            >
+          </header>
+          <div id="lotsMessage" class="alert alert-info" role="status">
+            उपलब्ध लिस्टिंग लोड हो रही हैं…
+          </div>
+          <div class="lots-layout">
+            <section class="card lots-panel">
+              <h2>उपलब्ध स्टॉक बाँटें</h2>
+              <div class="lot-field">
+                <label for="sourceListing">फसल लिस्टिंग</label>
+                <select id="sourceListing" disabled>
+                  <option>लिस्टिंग लोड हो रही हैं…</option>
+                </select>
+              </div>
+              <div class="lot-field">
+                <label for="lotCount">कितने अलग लॉट</label>
+                <select id="lotCount" disabled>
+                  <option value="2">2 लॉट</option>
+                  <option value="3">3 लॉट</option>
+                  <option value="4">4 लॉट</option>
+                  <option value="5">5 लॉट</option>
+                  <option value="10">10 लॉट</option>
+                </select>
+              </div>
+              <div class="lot-preview">
+                <div class="lot-stat">
+                  <small>कुल उपलब्ध स्टॉक</small
+                  ><strong id="totalQuantity">—</strong>
+                </div>
+                <div class="lot-stat">
+                  <small>प्रति लॉट</small><strong id="perLotQuantity">—</strong>
+                </div>
+                <div class="lot-stat">
+                  <small>लिस्टिंग मूल्य</small
+                  ><strong id="sourcePrice">—</strong>
+                </div>
+              </div>
+              <div
+                id="lotBreakdown"
+                class="lot-breakdown"
+                aria-live="polite"
+              ></div>
+              <button
+                id="splitLotsButton"
+                type="button"
+                class="btn btn-primary"
+                disabled
+              >
+                लॉट बनाएँ
+              </button>
+              <p class="lots-note">
+                मूल स्टॉक को घटाकर उतनी ही कुल मात्रा के नए लॉट बनाए जाएंगे। हर
+                लॉट में वही ग्रेड, स्थान और कीमत रहेगी।
+              </p>
+            </section>
+            <section class="card lots-panel">
+              <h2>आपके सक्रिय लॉट</h2>
+              <div class="inventory-wrap">
+                <table class="inventory-table">
+                  <thead>
+                    <tr>
+                      <th>फसल / लॉट</th>
+                      <th>मात्रा</th>
+                      <th>मूल्य / क्विंटल</th>
+                    </tr>
+                  </thead>
+                  <tbody id="activeLots">
+                    <tr>
+                      <td colspan="3">लॉट जानकारी लोड हो रही है…</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script>
+      initShell("seller", "lots", "लॉट प्रबंधन");
+      const $ = (id) => document.getElementById(id);
+      const state = { client: null, userId: null, listings: [] };
+      const esc = (value) =>
+        String(value ?? "").replace(
+          /[&<>"']/g,
+          (char) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[char],
+        );
+      const metadata = (description) => {
+        const values = {};
+        String(description || "")
+          .split("|")
+          .forEach((part) => {
+            const [key, ...rest] = part.split(":");
+            if (key && rest.length) values[key.trim()] = rest.join(":").trim();
+          });
+        return values;
+      };
+      const quantityLabel = (kilograms) =>
+        `${(Number(kilograms || 0) / 100).toLocaleString("hi-IN", { maximumFractionDigits: 2 })} क्विंटल`;
+      const priceLabel = (pricePerKg) =>
+        `₹${Math.round(Number(pricePerKg || 0) * 100).toLocaleString("en-IN")}`;
+      const activeListings = () =>
+        state.listings.filter(
+          (row) =>
+            row.status === "active" && Number(row.available_quantity_kg) > 0,
+        );
+      function selectedListing() {
+        return (
+          activeListings().find((row) => row.id === $("sourceListing").value) ||
+          null
+        );
+      }
+      function setMessage(text, type = "info") {
+        $("lotsMessage").className = `alert alert-${type}`;
+        $("lotsMessage").textContent = text;
+      }
+      function render() {
+        const available = activeListings();
+        const select = $("sourceListing");
+        select.innerHTML = available.length
+          ? available
+              .map((row) => {
+                const meta = metadata(row.description);
+                return `<option value="${esc(row.id)}">${esc(row.title)} · ${esc(meta["ग्रेड"] || "Grade A")} · ${quantityLabel(row.available_quantity_kg)}</option>`;
+              })
+              .join("")
+          : '<option value="">कोई सक्रिय स्टॉक उपलब्ध नहीं</option>';
+        select.disabled = !available.length;
+        $("lotCount").disabled = !available.length;
+        $("splitLotsButton").disabled = !available.length;
+        $("activeLots").innerHTML = available.length
+          ? available
+              .map((row) => {
+                const meta = metadata(row.description);
+                const tag = row.lot_batch_id || meta["लॉट बैच"];
+                const lotNumber = row.lot_number || meta["लॉट क्रमांक"];
+                return `<tr><td><strong>${esc(row.title)}</strong><br><small>${esc(meta["ग्रेड"] || "Grade A")} · ${esc(meta["स्थान"] || "स्थान उपलब्ध नहीं")}</small>${tag ? `<br><span class="batch-tag">${esc(tag)}${lotNumber ? ` · ${esc(lotNumber)}` : ""}</span>` : ""}</td><td>${quantityLabel(row.available_quantity_kg)}</td><td>${priceLabel(row.price_per_kg)}</td></tr>`;
+              })
+              .join("")
+          : '<tr><td colspan="3">अभी कोई सक्रिय लॉट नहीं है।</td></tr>';
+        updatePreview();
+      }
+      function updatePreview() {
+        const row = selectedListing();
+        if (!row) {
+          $("totalQuantity").textContent = "—";
+          $("perLotQuantity").textContent = "—";
+          $("sourcePrice").textContent = "—";
+          $("lotBreakdown").innerHTML = "";
+          return;
+        }
+        const count = Number($("lotCount").value) || 2;
+        const totalKg = Number(row.available_quantity_kg || 0);
+        const baseKg = Math.floor((totalKg / count) * 100) / 100;
+        const lots = Array.from({ length: count }, (_, index) =>
+          index === count - 1
+            ? Math.round((totalKg - baseKg * (count - 1)) * 100) / 100
+            : baseKg,
+        );
+        $("totalQuantity").textContent = quantityLabel(totalKg);
+        $("perLotQuantity").textContent = quantityLabel(baseKg);
+        $("sourcePrice").textContent =
+          `${priceLabel(row.price_per_kg)} / क्विंटल`;
+        $("lotBreakdown").innerHTML = lots
+          .map(
+            (kg, index) =>
+              `<div class="lot-breakdown-row"><span>लॉट ${index + 1}</span><strong>${quantityLabel(kg)}</strong></div>`,
+          )
+          .join("");
+        $("splitLotsButton").disabled =
+          !row || baseKg <= 0 || !Number.isInteger(count);
+      }
+      function lotId() {
+        return (
+          globalThis.crypto?.randomUUID?.() ||
+          `${Date.now()}-${Math.random().toString(16).slice(2, 10)}`
+        );
+      }
+      function lotDescription(description, batch, number, count) {
+        const parts = String(description || "")
+          .split("|")
+          .map((part) => part.trim())
+          .filter(Boolean)
+          .filter(
+            (part) =>
+              !part.startsWith("लॉट बैच:") && !part.startsWith("लॉट क्रमांक:"),
+          );
+        parts.push(`लॉट बैच: ${batch}`, `लॉट क्रमांक: ${number}/${count}`);
+        return parts.join(" | ");
+      }
+      async function createLots() {
+        const source = selectedListing();
+        const count = Number($("lotCount").value);
+        if (!source || count < 2 || count > 10) return;
+        const totalKg = Number(source.available_quantity_kg || 0);
+        const baseKg = Math.floor((totalKg / count) * 100) / 100;
+        if (baseKg < 1) {
+          setMessage("हर लॉट में कम से कम 1 किलो होना चाहिए।", "warning");
+          return;
+        }
+        const quantities = Array.from({ length: count }, (_, index) =>
+          index === count - 1
+            ? Math.round((totalKg - baseKg * (count - 1)) * 100) / 100
+            : baseKg,
+        );
+        const batch = `LOT-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${lotId().slice(0, 6).toUpperCase()}`;
+        const previous = {
+          available_quantity_kg: source.available_quantity_kg,
+          description: source.description || "",
+          lot_batch_id: source.lot_batch_id || null,
+          lot_number: source.lot_number || null,
+          lot_count: source.lot_count || null,
+          source_listing_id: source.source_listing_id || null,
+        };
+        const button = $("splitLotsButton");
+        button.disabled = true;
+        button.textContent = "लॉट बनाए जा रहे हैं…";
+        const createdIds = [];
+        try {
+          const parentId = source.id;
+          const parentDescription = lotDescription(
+            source.description,
+            batch,
+            1,
+            count,
+          );
+          const { error: updateError } = await state.client
+            .from("listings")
+            .update({
+              available_quantity_kg: quantities[0],
+              description: parentDescription,
+              lot_batch_id: batch,
+              lot_number: 1,
+              lot_count: count,
+              source_listing_id: source.source_listing_id || parentId,
+            })
+            .eq("id", parentId)
+            .eq("farmer_id", state.userId);
+          if (updateError) throw updateError;
+
+          for (let index = 1; index < count; index += 1) {
+            const id = lotId();
+            const result = await state.client.from("listings").insert({
+              id,
+              farmer_id: state.userId,
+              title: source.title,
+              description: lotDescription(
+                source.description,
+                batch,
+                index + 1,
+                count,
+              ),
+              category: source.category || "grains",
+              price_per_kg: Number(source.price_per_kg || 0),
+              available_quantity_kg: quantities[index],
+              status: "active",
+              lot_batch_id: batch,
+              lot_number: index + 1,
+              lot_count: count,
+              source_listing_id: source.source_listing_id || parentId,
+            });
+            if (result.error) throw result.error;
+            createdIds.push(id);
+          }
+          setMessage(
+            `${count} अलग लॉट बनाए गए। कुल स्टॉक ${quantityLabel(totalKg)} ही रखा गया है।`,
+            "success",
+          );
+          await loadListings();
+        } catch (error) {
+          await Promise.all(
+            createdIds.map((id) =>
+              state.client
+                .from("listings")
+                .delete()
+                .eq("id", id)
+                .eq("farmer_id", state.userId),
+            ),
+          );
+          const rollback = await state.client
+            .from("listings")
+            .update(previous)
+            .eq("id", source.id)
+            .eq("farmer_id", state.userId);
+          if (rollback.error)
+            console.error("Lot rollback failed:", rollback.error);
+          console.error("Lot creation failed:", error);
+          setMessage(
+            rollback.error
+              ? "लॉट बनाना अधूरा रहा और स्टॉक वापस नहीं रखा जा सका। सहायता से संपर्क करें।"
+              : `लॉट नहीं बने; मूल स्टॉक बहाल किया गया: ${error.message}`,
+            "error",
+          );
+          await loadListings();
+        } finally {
+          button.textContent = "लॉट बनाएँ";
+          button.disabled = !activeListings().length;
+        }
+      }
+      async function loadListings() {
+        const { data, error } = await state.client
+          .from("listings")
+          .select(
+            "id,title,description,category,price_per_kg,available_quantity_kg,status,created_at",
+          )
+          .eq("farmer_id", state.userId)
+          .order("created_at", { ascending: false });
+        if (error) throw error;
+        state.listings = data || [];
+        render();
+      }
+      $("sourceListing").addEventListener("change", updatePreview);
+      $("lotCount").addEventListener("change", updatePreview);
+      $("splitLotsButton").addEventListener("click", createLots);
+      (async () => {
+        try {
+          await window.firebaseScriptReady;
+          const { client, user } = await getCurrentUser();
+          if (!user) {
+            setMessage("लॉट प्रबंधन के लिए पहले लॉग इन करें।", "warning");
+            return;
+          }
+          state.client = client;
+          state.userId = user.id;
+          await loadListings();
+          setMessage("स्टॉक बाँटने के लिए सक्रिय लिस्टिंग चुनें।", "info");
+        } catch (error) {
+          console.error("Lot manager failed to load:", error);
+          setMessage(`लॉट जानकारी लोड नहीं हुई: ${error.message}`, "error");
+        }
+      })();
+    </script>
+  </body>
+</html>

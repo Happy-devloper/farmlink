@@ -1,0 +1,51 @@
+/* Farmlink compact workspace layer: shared across all routes. */
+:root {
+  --fl-green: #08783d;
+  --fl-green-dark: #056331;
+  --fl-ink: #14212c;
+  --fl-muted: #64748b;
+  --fl-line: #e1e8e4;
+  --fl-surface: #ffffff;
+  --fl-page: #f9fbfa;
+  --fl-radius-sm: 8px;
+  --fl-radius-md: 12px;
+  --fl-radius-lg: 16px;
+  --fl-shadow: 0 6px 18px rgba(20, 33, 44, .055);
+}
+
+html { font-size: 16px; }
+body { background: var(--fl-page); color: var(--fl-ink); }
+button, input, select, textarea { font: inherit; }
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 3px solid rgba(8, 120, 61, .24);
+  outline-offset: 2px;
+}
+
+/* Shared desktop seller-workspace dimensions. */
+.app-container { min-height: 100dvh; }
+.sidebar-desktop { width: 252px; }
+.sidebar-desktop .sidebar-item-active,
+.sidebar-desktop nav a { min-height: 44px; padding-block: 10px !important; border-radius: var(--fl-radius-md) !important; }
+.sidebar-desktop nav { padding-top: 16px !important; padding-bottom: 16px !important; }
+.card { border-radius: var(--fl-radius-lg) !important; box-shadow: var(--fl-shadow); }
+.btn { min-height: 44px; border-radius: var(--fl-radius-sm) !important; }
+.form-input, .form-select, .form-textarea { min-height: 44px; border-radius: var(--fl-radius-sm) !important; }
+.badge { border-radius: var(--fl-radius-sm) !important; }
+
+/* Avoid the artificial, oversized onboarding treatment on compact routes. */
+.onboarding-screen { min-height: 100dvh; padding: 28px 20px; align-items: flex-start; overflow-y: auto; }
+.onboarding-card { max-width: 760px; margin: auto; border-radius: var(--fl-radius-lg) !important; box-shadow: var(--fl-shadow); }
+
+@media (min-width: 1024px) {
+  .sidebar-desktop { height: 100dvh; }
+  .app-container > main { min-width: 0; }
+  .page-header, .dashboard-header { padding-block: 18px !important; }
+}
+
+@media (max-width: 768px) {
+  html { font-size: 15px; }
+  body { overflow-x: hidden; }
+  .onboarding-screen { padding: 0; }
+  .onboarding-card { width: 100%; min-height: 100dvh; border: 0 !important; border-radius: 0 !important; box-shadow: none; }
+}

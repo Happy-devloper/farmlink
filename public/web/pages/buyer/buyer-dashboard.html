@@ -1,0 +1,1112 @@
+<!doctype html>
+<html class="h-full bg-[#f4f6f4]" lang="hi">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>FarmLink AI - खरीदार डैशबोर्ड</title>
+    <!-- Tailwind CSS v3 with forms and container plugins -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["system-ui", "-apple-system", "Segoe UI", "sans-serif"],
+            },
+            colors: {
+              farm: {
+                50: "#f0fdf4",
+                100: "#dcfce7",
+                500: "#22c55e",
+                600: "#16a34a",
+                700: "#15803d",
+                800: "#166534",
+                900: "#144c30",
+                950: "#0b2e1c",
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style data-purpose="custom-layout">
+      body {
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      /* Clean custom scrollbar for dashboard */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 9999px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #cbd5e1;
+      }
+    </style>
+  </head>
+  <body
+    class="h-full text-slate-800 flex flex-col lg:flex-row overflow-hidden bg-[#f4f6f4]"
+  >
+    <!-- Mobile Header (Visible on screens < lg) -->
+    <header
+      class="lg:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between z-30 shrink-0"
+    >
+      <div class="flex items-center gap-3">
+        <button
+          id="mobileMenuBtn"
+          type="button"
+          class="p-2 rounded-xl text-slate-600 hover:bg-slate-100 focus:outline-none"
+          aria-label="मेनू खोलें"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+        <a href="buyer-dashboard.html" class="flex items-center gap-2">
+          <div
+            class="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"
+              ></path>
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+            </svg>
+          </div>
+          <span class="font-bold text-lg text-slate-900 tracking-tight"
+            >FarmLink
+            <span
+              class="text-xs px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800"
+              >AI</span
+            ></span
+          >
+        </a>
+      </div>
+      <div class="flex items-center gap-2">
+        <a
+          href="buyer-cart.html"
+          class="relative p-2 rounded-xl text-slate-600 hover:bg-slate-100"
+          aria-label="कार्ट"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></path>
+          </svg>
+          <span
+            id="mobileCartBadge"
+            class="hidden absolute top-1 right-1 w-4 h-4 bg-emerald-600 text-white text-[10px] font-bold rounded-full items-center justify-center"
+            >0</span
+          >
+        </a>
+        <a
+          href="buyer-profile.html"
+          class="w-8 h-8 rounded-full bg-emerald-700 text-white font-bold flex items-center justify-center text-xs shadow-sm"
+          id="mobileUserInitial"
+        >
+          K
+        </a>
+      </div>
+    </header>
+
+    <!-- Mobile Sidebar Backdrop Scrim -->
+    <div
+      id="sidebarScrim"
+      class="fixed inset-0 bg-slate-900/40 z-40 hidden lg:hidden transition-opacity"
+    ></div>
+
+    <!-- BEGIN: Sidebar -->
+    <aside
+      id="sidebar"
+      class="fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-100 flex flex-col justify-between shrink-0 select-none transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-200 ease-in-out shadow-lg lg:shadow-none"
+      data-purpose="sidebar"
+    >
+      <div class="p-6">
+        <!-- Brand Logo Header -->
+        <div class="flex items-center justify-between mb-8">
+          <a href="buyer-dashboard.html" class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm"
+            >
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"
+                ></path>
+                <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 12"></path>
+              </svg>
+            </div>
+            <div>
+              <div class="flex items-center gap-1">
+                <span class="font-bold text-xl tracking-tight text-slate-900"
+                  >FarmLink</span
+                >
+                <span
+                  class="text-xs font-semibold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800"
+                  >AI</span
+                >
+              </div>
+              <p class="text-[11px] text-slate-400 font-medium tracking-wide">
+                खेती smarter, भविष्य बेहतर
+              </p>
+            </div>
+          </a>
+          <button
+            id="closeSidebarBtn"
+            type="button"
+            class="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+            aria-label="बंद करें"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M6 18L18 6M6 6l12 12"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav aria-label="मुख्य नेविगेशन" class="space-y-1.5">
+          <!-- Active Nav: होम -->
+          <a
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-[#ebf7ee] text-farm-900 font-semibold text-[15px] transition-colors"
+            href="buyer-dashboard.html"
+          >
+            <svg
+              class="w-5 h-5 text-farm-700"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+            </svg>
+            <span>होम</span>
+          </a>
+          <!-- बाज़ार -->
+          <a
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium text-[15px] transition-colors"
+            href="buyer-marketplace.html"
+          >
+            <svg
+              class="w-5 h-5 text-slate-400"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+            </svg>
+            <span>बाज़ार</span>
+          </a>
+          <!-- कार्ट -->
+          <a
+            class="flex items-center justify-between px-4 py-3 rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium text-[15px] transition-colors"
+            href="buyer-cart.html"
+          >
+            <div class="flex items-center gap-3.5">
+              <svg
+                class="w-5 h-5 text-slate-400"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+              </svg>
+              <span>कार्ट</span>
+            </div>
+            <span
+              id="sidebarCartBadge"
+              class="hidden px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold"
+              >0</span
+            >
+          </a>
+          <!-- ऑर्डर -->
+          <a
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium text-[15px] transition-colors"
+            href="buyer-orders.html"
+          >
+            <svg
+              class="w-5 h-5 text-slate-400"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+            </svg>
+            <span>ऑर्डर</span>
+          </a>
+          <!-- प्रोफ़ाइल -->
+          <a
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium text-[15px] transition-colors"
+            href="buyer-profile.html"
+          >
+            <svg
+              class="w-5 h-5 text-slate-400"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+            </svg>
+            <span>प्रोफ़ाइल</span>
+          </a>
+          <!-- सहायता -->
+          <a
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium text-[15px] transition-colors"
+            href="../seller/help-center.html"
+          >
+            <svg
+              class="w-5 h-5 text-slate-400"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+            </svg>
+            <span>सहायता</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- User Profile Footer Card -->
+      <a
+        href="buyer-profile.html"
+        class="p-4 border-t border-slate-100 m-4 bg-[#f8faf9] hover:bg-[#eff7f1] rounded-2xl flex items-center justify-between transition-colors group"
+      >
+        <div class="flex items-center gap-3 min-w-0">
+          <div
+            id="sidebarUserInitial"
+            class="w-10 h-10 rounded-full bg-emerald-700 text-white font-bold flex items-center justify-center text-sm shadow-sm shrink-0"
+          >
+            K
+          </div>
+          <div class="flex flex-col min-w-0">
+            <span
+              id="sidebarUserName"
+              class="text-sm font-semibold text-slate-900 truncate group-hover:text-emerald-800"
+              >kartik ji</span
+            >
+            <div class="flex items-center gap-1.5">
+              <span
+                class="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-100"
+              ></span>
+              <span class="text-xs text-slate-500 font-medium"
+                >सत्यापित बायर</span
+              >
+            </div>
+          </div>
+        </div>
+        <svg
+          class="w-4 h-4 text-slate-400 group-hover:text-emerald-600 transition-colors shrink-0"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M8.25 4.5l7.5 7.5-7.5 7.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </a>
+    </aside>
+    <!-- END: Sidebar -->
+
+    <!-- BEGIN: MainContent -->
+    <main
+      class="flex-1 overflow-y-auto px-4 sm:px-8 lg:px-10 py-6 sm:py-8 space-y-7"
+      data-purpose="main-dashboard"
+    >
+      <!-- BEGIN: TopWelcomeBanner -->
+      <section
+        class="relative overflow-hidden bg-gradient-to-br from-[#104a2d] to-[#0a331f] rounded-3xl p-6 sm:p-8 lg:p-10 text-white shadow-sm"
+        data-purpose="hero-banner"
+      >
+        <!-- Background subtle decorative shapes -->
+        <div
+          class="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-white/5 pointer-events-none blur-2xl"
+        ></div>
+        <div
+          class="absolute right-1/4 -bottom-20 w-64 h-64 rounded-full bg-emerald-500/10 pointer-events-none blur-3xl"
+        ></div>
+        <div
+          class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6"
+        >
+          <div class="space-y-2">
+            <div
+              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-emerald-200 text-xs font-semibold backdrop-blur-sm border border-white/10 tracking-wide uppercase"
+            >
+              <span>❖</span>
+              <span>Buyer Command Center</span>
+            </div>
+            <h1
+              id="dashboardGreeting"
+              class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white flex items-center gap-3"
+            >
+              <span>नमस्ते, kartik जी</span>
+              <span class="text-2xl sm:text-3xl select-none">👋</span>
+            </h1>
+            <p
+              class="text-emerald-100/80 text-sm sm:text-base font-normal pt-0.5"
+            >
+              आज कौन सी फसल खरीदना चाहेंगे? अपने ऑर्डर और मांग को आसानी से ट्रैक
+              करें।
+            </p>
+          </div>
+          <!-- Quick Primary Action Buttons -->
+          <div class="flex items-center gap-3 shrink-0 pt-2 md:pt-0">
+            <a
+              class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-farm-950 font-semibold text-sm px-5 py-3 rounded-xl shadow-sm transition-all hover:-translate-y-0.5"
+              href="buyer-marketplace.html"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M12 4.5v15m7.5-7.5h-15"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+              </svg>
+              <span>नई खरीद मांग जोड़ें</span>
+            </a>
+            <a
+              class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 text-white border border-white/15 font-medium text-sm px-5 py-3 rounded-xl backdrop-blur-sm transition-colors"
+              href="buyer-orders.html"
+            >
+              <span>सक्रिय ऑर्डर देखें</span>
+            </a>
+          </div>
+        </div>
+      </section>
+      <!-- END: TopWelcomeBanner -->
+
+      <!-- BEGIN: KeyMetricsSummary -->
+      <section
+        class="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6"
+        data-purpose="metrics-row"
+      >
+        <!-- Card 1: सक्रिय ऑर्डर -->
+        <a
+          href="buyer-orders.html"
+          class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex items-center justify-between hover:border-emerald-200 transition-all group"
+        >
+          <div class="space-y-1">
+            <span
+              class="text-sm font-medium text-slate-500 group-hover:text-emerald-700 transition-colors"
+              >सक्रिय ऑर्डर</span
+            >
+            <div
+              id="activeOrdersCount"
+              class="text-3xl font-bold text-slate-900 tracking-tight"
+            >
+              4
+            </div>
+            <div
+              id="activeOrdersSub"
+              class="flex items-center gap-1.5 text-xs text-emerald-600 font-medium pt-1"
+            >
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <span>2 ऑर्डर डिलीवरी मार्ग में हैं</span>
+            </div>
+          </div>
+          <div
+            class="w-14 h-14 rounded-2xl bg-[#f0faf2] flex items-center justify-center text-emerald-600 shrink-0 group-hover:bg-emerald-100 transition-colors"
+          >
+            <svg
+              class="w-7 h-7"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+            </svg>
+          </div>
+        </a>
+        <!-- Card 2: इस माह खर्च -->
+        <a
+          href="buyer-orders.html"
+          class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex items-center justify-between hover:border-amber-200 transition-all group"
+        >
+          <div class="space-y-1">
+            <span
+              class="text-sm font-medium text-slate-500 group-hover:text-amber-700 transition-colors"
+              >इस माह खर्च</span
+            >
+            <div
+              id="monthlySpend"
+              class="text-3xl font-bold text-slate-900 tracking-tight"
+            >
+              ₹7,561
+            </div>
+            <div
+              id="monthlySpendSub"
+              class="flex items-center gap-1 text-xs text-slate-400 font-medium pt-1"
+            >
+              <span>कुल 3 सफल लेन-देन</span>
+            </div>
+          </div>
+          <div
+            class="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0 group-hover:bg-amber-100 transition-colors"
+          >
+            <span class="text-2xl font-bold">₹</span>
+          </div>
+        </a>
+        <!-- Card 3: सहेजी गई फसलें -->
+        <a
+          href="buyer-marketplace.html"
+          class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex items-center justify-between hover:border-emerald-200 transition-all group"
+        >
+          <div class="space-y-1">
+            <span
+              class="text-sm font-medium text-slate-500 group-hover:text-emerald-700 transition-colors"
+              >सहेजी गई फसलें (Wishlist)</span
+            >
+            <div
+              id="savedListingsCount"
+              class="text-3xl font-bold text-slate-900 tracking-tight"
+            >
+              3
+            </div>
+            <div
+              id="savedListingsSub"
+              class="flex items-center gap-1.5 text-xs text-slate-400 font-medium pt-1"
+            >
+              <span>मंडी भाव निगरानी सक्रिय</span>
+            </div>
+          </div>
+          <div
+            class="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-600 shrink-0 group-hover:bg-emerald-50 group-hover:text-emerald-700 transition-colors"
+          >
+            <svg
+              class="w-7 h-7"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+            </svg>
+          </div>
+        </a>
+      </section>
+      <!-- END: KeyMetricsSummary -->
+
+      <!-- BEGIN: MainContentSplit -->
+      <div
+        class="grid grid-cols-1 lg:grid-cols-12 gap-7"
+        data-purpose="overview-split"
+      >
+        <!-- Left Column: सक्रिय ऑर्डर (Active Orders List) -->
+        <div
+          class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-7 border border-slate-100 shadow-sm flex flex-col justify-between"
+        >
+          <div>
+            <div
+              class="flex items-center justify-between pb-6 border-b border-slate-100"
+            >
+              <div class="flex items-center gap-2.5">
+                <h2 class="text-xl font-bold text-slate-900">सक्रिय ऑर्डर</h2>
+                <span
+                  id="activeOrdersBadge"
+                  class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold"
+                  >4</span
+                >
+              </div>
+              <a
+                class="text-sm font-semibold text-emerald-700 hover:text-emerald-800 transition-colors flex items-center gap-1"
+                href="buyer-orders.html"
+              >
+                <span>सभी देखें</span>
+                <span>→</span>
+              </a>
+            </div>
+
+            <!-- Dynamic List of Active Orders -->
+            <div id="activeOrdersList" class="divide-y divide-slate-100">
+              <!-- Order Item 1 -->
+              <div
+                class="py-5 flex items-center justify-between hover:bg-slate-50/70 rounded-2xl px-2 transition-colors"
+              >
+                <div class="space-y-1">
+                  <div class="flex items-center gap-3">
+                    <span class="font-bold text-base text-slate-900"
+                      >ऑर्डर #a2f6996f</span
+                    >
+                    <span
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100"
+                    >
+                      मार्ग में है
+                    </span>
+                  </div>
+                  <div class="text-sm text-slate-500 font-medium">
+                    राशि:
+                    <span class="text-slate-800 font-semibold">₹1,667</span>
+                    <span class="mx-2 text-slate-300">•</span>
+                    <span>चना (देसी) - 75 किग्रा</span>
+                  </div>
+                </div>
+                <a
+                  href="buyer-order-tracking.html?id=a2f6996f"
+                  class="px-4 py-2 rounded-xl bg-sky-50 text-sky-700 hover:bg-sky-100 font-medium text-xs tracking-wide transition-colors border border-sky-100 shrink-0 inline-block text-center"
+                >
+                  ट्रैक करें
+                </a>
+              </div>
+
+              <!-- Order Item 2 -->
+              <div
+                class="py-5 flex items-center justify-between hover:bg-slate-50/70 rounded-2xl px-2 transition-colors"
+              >
+                <div class="space-y-1">
+                  <div class="flex items-center gap-3">
+                    <span class="font-bold text-base text-slate-900"
+                      >ऑर्डर #18f79168</span
+                    >
+                    <span
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-100"
+                    >
+                      पैकिंग जारी
+                    </span>
+                  </div>
+                  <div class="text-sm text-slate-500 font-medium">
+                    राशि:
+                    <span class="text-slate-800 font-semibold">₹2,560</span>
+                    <span class="mx-2 text-slate-300">•</span>
+                    <span>गेहूं (शरबती) - 120 किग्रा</span>
+                  </div>
+                </div>
+                <a
+                  href="buyer-order-tracking.html?id=18f79168"
+                  class="px-4 py-2 rounded-xl bg-sky-50 text-sky-700 hover:bg-sky-100 font-medium text-xs tracking-wide transition-colors border border-sky-100 shrink-0 inline-block text-center"
+                >
+                  ट्रैक करें
+                </a>
+              </div>
+
+              <!-- Order Item 3 -->
+              <div
+                class="py-5 flex items-center justify-between hover:bg-slate-50/70 rounded-2xl px-2 transition-colors"
+              >
+                <div class="space-y-1">
+                  <div class="flex items-center gap-3">
+                    <span class="font-bold text-base text-slate-900"
+                      >ऑर्डर #6badfb56</span
+                    >
+                    <span
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100"
+                    >
+                      कन्फर्म हुआ
+                    </span>
+                  </div>
+                  <div class="text-sm text-slate-500 font-medium">
+                    राशि:
+                    <span class="text-slate-800 font-semibold">₹1,667</span>
+                    <span class="mx-2 text-slate-300">•</span>
+                    <span>सरसों बीज - 50 किग्रा</span>
+                  </div>
+                </div>
+                <a
+                  href="buyer-order-tracking.html?id=6badfb56"
+                  class="px-4 py-2 rounded-xl bg-sky-50 text-sky-700 hover:bg-sky-100 font-medium text-xs tracking-wide transition-colors border border-sky-100 shrink-0 inline-block text-center"
+                >
+                  ट्रैक करें
+                </a>
+              </div>
+
+              <!-- Order Item 4 -->
+              <div
+                class="py-5 flex items-center justify-between hover:bg-slate-50/70 rounded-2xl px-2 transition-colors"
+              >
+                <div class="space-y-1">
+                  <div class="flex items-center gap-3">
+                    <span class="font-bold text-base text-slate-900"
+                      >ऑर्डर #99cd10e2</span
+                    >
+                    <span
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700"
+                    >
+                      प्रतीक्षारत
+                    </span>
+                  </div>
+                  <div class="text-sm text-slate-500 font-medium">
+                    राशि:
+                    <span class="text-slate-800 font-semibold">₹1,667</span>
+                    <span class="mx-2 text-slate-300">•</span>
+                    <span>मक्का (हाइब्रिड) - 80 किग्रा</span>
+                  </div>
+                </div>
+                <a
+                  href="buyer-order-tracking.html?id=99cd10e2"
+                  class="px-4 py-2 rounded-xl bg-sky-50 text-sky-700 hover:bg-sky-100 font-medium text-xs tracking-wide transition-colors border border-sky-100 shrink-0 inline-block text-center"
+                >
+                  ट्रैक करें
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-slate-100 text-center">
+            <p class="text-xs text-slate-400 font-medium">
+              सभी खरीदार सुरक्षा व डिलीवरी FarmLink AI लॉजिस्टिक्स द्वारा
+              सत्यापित हैं।
+            </p>
+          </div>
+        </div>
+
+        <!-- Right Column: Clean Spend Overview & Minimal AI Advisory -->
+        <div class="lg:col-span-5 space-y-7">
+          <!-- Monthly Spend Summary Chart Card -->
+          <div
+            class="bg-white rounded-3xl p-6 sm:p-7 border border-slate-100 shadow-sm"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h2 class="text-lg font-bold text-slate-900">
+                  मासिक खर्च अवलोकन
+                </h2>
+                <p id="spendMonthLabel" class="text-xs text-slate-400">
+                  जून 2025 का लेखा-जोखा
+                </p>
+              </div>
+              <div class="text-right">
+                <span class="text-xs text-slate-400 font-medium">कुल खर्च</span>
+                <div
+                  id="spendChartTotal"
+                  class="text-xl font-bold text-slate-900"
+                >
+                  ₹7,561
+                </div>
+              </div>
+            </div>
+            <!-- Clean Minimalist Spend Curve Vector -->
+            <div class="h-36 w-full flex items-end pt-4 pb-2">
+              <svg
+                class="w-full h-28 overflow-visible"
+                fill="none"
+                viewBox="0 0 300 100"
+              >
+                <!-- Gradient under curve -->
+                <defs>
+                  <linearGradient id="spendGrad" x1="0" x2="0" y1="0" y2="1">
+                    <stop
+                      offset="0%"
+                      stop-color="#22c55e"
+                      stop-opacity="0.18"
+                    ></stop>
+                    <stop
+                      offset="100%"
+                      stop-color="#22c55e"
+                      stop-opacity="0"
+                    ></stop>
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M0,80 Q70,78 140,70 T230,45 T300,15 L300,100 L0,100 Z"
+                  fill="url(#spendGrad)"
+                ></path>
+                <path
+                  d="M0,80 Q70,78 140,70 T230,45 T300,15"
+                  fill="none"
+                  stroke="#16a34a"
+                  stroke-linecap="round"
+                  stroke-width="3"
+                ></path>
+                <circle
+                  class="animate-pulse"
+                  cx="300"
+                  cy="15"
+                  fill="#16a34a"
+                  r="4.5"
+                ></circle>
+              </svg>
+            </div>
+            <div
+              class="flex justify-between text-[11px] text-slate-400 font-medium pt-2 border-t border-slate-100"
+            >
+              <span>1 जून</span>
+              <span>7 जून</span>
+              <span>14 जून</span>
+              <span>21 जून</span>
+              <span>आज</span>
+            </div>
+          </div>
+
+          <!-- Clean AI Suggestion Card -->
+          <div
+            class="bg-white rounded-3xl p-6 sm:p-7 border border-slate-100 shadow-sm relative overflow-hidden"
+          >
+            <div class="flex items-center gap-2 mb-3">
+              <span
+                class="text-emerald-600 font-semibold text-xs tracking-wide uppercase"
+                >FarmLink AI सुझाव</span
+              >
+            </div>
+            <h3 class="text-base font-bold text-slate-900 mb-2">
+              थोक खरीद पर बचत का अवसर
+            </h3>
+            <p class="text-sm text-slate-500 leading-relaxed mb-6 font-normal">
+              आपके क्षेत्र में गेहूं की नई आवक तेज हो गई है। आगामी सप्ताह में
+              सीधे फार्म गेट से ऑर्डर करने पर लगभग 6% तक की बचत संभावित है।
+            </p>
+            <a
+              class="inline-flex items-center justify-center w-full py-2.5 px-4 rounded-xl bg-[#f0faf2] text-farm-900 hover:bg-emerald-100 font-semibold text-xs tracking-wide transition-colors border border-emerald-200"
+              href="buyer-marketplace.html"
+            >
+              विस्तृत सुझाव देखें
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- END: MainContentSplit -->
+    </main>
+    <!-- END: MainContent -->
+
+    <!-- Scripts -->
+    <script src="../../shared/assets/js/firebase.js"></script>
+    <script src="../../shared/assets/js/buyer-data.js"></script>
+    <script>
+      // Mobile Drawer Toggle Logic
+      const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+      const closeSidebarBtn = document.getElementById("closeSidebarBtn");
+      const sidebar = document.getElementById("sidebar");
+      const sidebarScrim = document.getElementById("sidebarScrim");
+
+      function openSidebar() {
+        sidebar.classList.remove("-translate-x-full");
+        sidebarScrim.classList.remove("hidden");
+      }
+
+      function closeSidebar() {
+        sidebar.classList.add("-translate-x-full");
+        sidebarScrim.classList.add("hidden");
+      }
+
+      if (mobileMenuBtn) mobileMenuBtn.addEventListener("click", openSidebar);
+      if (closeSidebarBtn)
+        closeSidebarBtn.addEventListener("click", closeSidebar);
+      if (sidebarScrim) sidebarScrim.addEventListener("click", closeSidebar);
+
+      // Update Cart Badge from localStorage
+      function updateCartBadges() {
+        try {
+          const cart = JSON.parse(
+            localStorage.getItem("farmlink_buyer_cart") || "[]",
+          );
+          const count = cart.reduce(
+            (acc, item) => acc + (Number(item.quantityKg) > 0 ? 1 : 0),
+            0,
+          );
+          const sidebarBadge = document.getElementById("sidebarCartBadge");
+          const mobileBadge = document.getElementById("mobileCartBadge");
+
+          if (sidebarBadge) {
+            if (count > 0) {
+              sidebarBadge.textContent = count;
+              sidebarBadge.classList.remove("hidden");
+            } else {
+              sidebarBadge.classList.add("hidden");
+            }
+          }
+          if (mobileBadge) {
+            if (count > 0) {
+              mobileBadge.textContent = count;
+              mobileBadge.classList.remove("hidden");
+              mobileBadge.classList.add("flex");
+            } else {
+              mobileBadge.classList.add("hidden");
+              mobileBadge.classList.remove("flex");
+            }
+          }
+        } catch (e) {
+          console.warn("Cart badge update skipped:", e);
+        }
+      }
+      updateCartBadges();
+
+      // Month label in Hindi
+      function formatHindiCurrentMonth() {
+        const hindiMonths = [
+          "जनवरी",
+          "फ़रवरी",
+          "मार्च",
+          "अप्रैल",
+          "मई",
+          "जून",
+          "जुलाई",
+          "अगस्त",
+          "सितंबर",
+          "अक्टूबर",
+          "नवंबर",
+          "दिसंबर",
+        ];
+        const now = new Date();
+        const monthName = hindiMonths[now.getMonth()];
+        const year = now.getFullYear();
+        const label = document.getElementById("spendMonthLabel");
+        if (label) {
+          label.textContent = `${monthName} ${year} का लेखा-जोखा`;
+        }
+      }
+      formatHindiCurrentMonth();
+
+      // Helper for order status badge styling
+      function getStatusBadgeHtml(status) {
+        switch (status) {
+          case "shipped":
+            return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">मार्ग में है</span>`;
+          case "picking":
+            return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-100">पैकिंग जारी</span>`;
+          case "accepted":
+            return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">कन्फर्म हुआ</span>`;
+          case "pending":
+            return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">प्रतीक्षारत</span>`;
+          case "delivered":
+            return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">डिलीवर हुआ</span>`;
+          default:
+            return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">${status || "सक्रिय"}</span>`;
+        }
+      }
+
+      // Load Live Dashboard Data
+      async function loadDashboard() {
+        try {
+          let buyerData = null;
+          let orders = [];
+          let listings = [];
+
+          if (window.farmlinkBuyerData) {
+            try {
+              [buyerData, orders, listings] = await Promise.all([
+                window.farmlinkBuyerData.fetchBuyerProfile().catch(() => null),
+                window.farmlinkBuyerData.fetchBuyerOrders().catch(() => []),
+                window.farmlinkBuyerData.fetchBuyerListings().catch(() => []),
+              ]);
+            } catch (e) {
+              console.warn("Buyer data fetch error:", e);
+            }
+          }
+
+          // 1. Update User Profile Names & Avatars
+          const buyerName = buyerData?.user?.full_name || "kartik";
+          const initial = (buyerName.trim().charAt(0) || "K").toUpperCase();
+
+          const greetingElem = document.getElementById("dashboardGreeting");
+          if (greetingElem) {
+            greetingElem.innerHTML = `<span>नमस्ते, ${buyerName} जी</span> <span class="text-2xl sm:text-3xl select-none">👋</span>`;
+          }
+
+          const sidebarNameElem = document.getElementById("sidebarUserName");
+          if (sidebarNameElem) sidebarNameElem.textContent = `${buyerName} जी`;
+
+          const sidebarInitialElem =
+            document.getElementById("sidebarUserInitial");
+          if (sidebarInitialElem) sidebarInitialElem.textContent = initial;
+
+          const mobileInitialElem =
+            document.getElementById("mobileUserInitial");
+          if (mobileInitialElem) mobileInitialElem.textContent = initial;
+
+          // 2. Metrics calculation
+          if (orders && orders.length > 0) {
+            const activeOrders = orders.filter((order) =>
+              ["pending", "accepted", "picking", "shipped"].includes(
+                order.order_status,
+              ),
+            );
+
+            const inTransitOrders = orders.filter(
+              (order) => order.order_status === "shipped",
+            );
+            const activeCount = activeOrders.length;
+
+            document.getElementById("activeOrdersCount").textContent =
+              String(activeCount);
+            document.getElementById("activeOrdersBadge").textContent =
+              String(activeCount);
+
+            const activeOrdersSub = document.getElementById("activeOrdersSub");
+            if (activeOrdersSub) {
+              if (inTransitOrders.length > 0) {
+                activeOrdersSub.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span><span>${inTransitOrders.length} ऑर्डर डिलीवरी मार्ग में हैं</span>`;
+              } else if (activeCount > 0) {
+                activeOrdersSub.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span><span>${activeCount} ऑर्डर प्रोसेस में हैं</span>`;
+              } else {
+                activeOrdersSub.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span><span>कोई सक्रिय ऑर्डर नहीं है</span>`;
+              }
+            }
+
+            const totalSpend = orders.reduce(
+              (sum, order) => sum + Number(order.total_amount || 0),
+              0,
+            );
+
+            const formattedMoney = window.farmlinkBuyerData
+              ? window.farmlinkBuyerData.money(totalSpend)
+              : `₹${totalSpend.toLocaleString("en-IN")}`;
+            document.getElementById("monthlySpend").textContent =
+              formattedMoney;
+            document.getElementById("spendChartTotal").textContent =
+              formattedMoney;
+
+            const completedOrders = orders.filter(
+              (o) =>
+                o.order_status === "delivered" || o.payment_status === "paid",
+            );
+            document.getElementById("monthlySpendSub").innerHTML =
+              `<span>कुल ${completedOrders.length || orders.length} सफल लेन-देन</span>`;
+
+            // Render active orders dynamically
+            if (activeOrders.length > 0) {
+              const listContainer = document.getElementById("activeOrdersList");
+              listContainer.innerHTML = activeOrders
+                .slice(0, 4)
+                .map((order) => {
+                  const shortId = String(order.id).slice(0, 8);
+                  const amount = window.farmlinkBuyerData
+                    ? window.farmlinkBuyerData.money(order.total_amount || 0)
+                    : `₹${Number(order.total_amount || 0).toLocaleString("en-IN")}`;
+                  const badgeHtml = getStatusBadgeHtml(order.order_status);
+                  const cropTitle =
+                    order.crop_title ||
+                    order.title ||
+                    (order.order_items && order.order_items[0]?.title) ||
+                    "फसल उपज";
+                  const quantityLabel =
+                    order.quantity_label ||
+                    (order.total_quantity_kg
+                      ? `${order.total_quantity_kg} किग्रा`
+                      : "मानक बैच");
+
+                  return `
+                <div class="py-5 flex items-center justify-between hover:bg-slate-50/70 rounded-2xl px-2 transition-colors">
+                  <div class="space-y-1 min-w-0 pr-3">
+                    <div class="flex items-center gap-3 flex-wrap">
+                      <span class="font-bold text-base text-slate-900">ऑर्डर #${shortId}</span>
+                      ${badgeHtml}
+                    </div>
+                    <div class="text-sm text-slate-500 font-medium truncate">
+                      राशि: <span class="text-slate-800 font-semibold">${amount}</span>
+                      <span class="mx-2 text-slate-300">•</span>
+                      <span>${cropTitle} - ${quantityLabel}</span>
+                    </div>
+                  </div>
+                  <a href="buyer-order-tracking.html?id=${order.id}" class="px-4 py-2 rounded-xl bg-sky-50 text-sky-700 hover:bg-sky-100 font-medium text-xs tracking-wide transition-colors border border-sky-100 shrink-0 inline-block text-center">
+                    ट्रैक करें
+                  </a>
+                </div>
+              `;
+                })
+                .join("");
+            }
+          }
+
+          // Update Market / Saved Listings count
+          if (listings && listings.length > 0) {
+            const savedElem = document.getElementById("savedListingsCount");
+            if (savedElem) savedElem.textContent = String(listings.length);
+          }
+        } catch (err) {
+          console.warn("Dashboard sync error:", err);
+        }
+      }
+
+      // Run on load
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", loadDashboard);
+      } else {
+        loadDashboard();
+      }
+    </script>
+  </body>
+</html>

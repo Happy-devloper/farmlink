@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>चेकआउट · KisanMandi</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+  </head>
+  <body>
+    <div id="app-shell">
+      <div class="main-col">
+        <div id="topbar-slot"></div>
+        <main class="content" style="max-width: 900px">
+          <div class="breadcrumb">
+            <a href="buyer-cart.html">कार्ट</a> / चेकआउट
+          </div>
+          <h1 style="margin-bottom: 18px">चेकआउट</h1>
+
+          <div class="grid grid-2" style="align-items: start">
+            <div>
+              <div class="card" style="margin-bottom: 14px">
+                <h2 style="margin-bottom: 12px">डिलीवरी पता</h2>
+                <div class="field">
+                  <label>पूरा पता</label>
+                  <textarea
+                    id="deliveryAddress"
+                    placeholder="दुकान/गोदाम का पता, शहर, पिनकोड"
+                    required
+                  ></textarea>
+                </div>
+                <div class="grid grid-2">
+                  <div class="field">
+                    <label>संपर्क नंबर</label>
+                    <input id="contactNumber" type="tel" value="" />
+                  </div>
+                  <div class="field">
+                    <label>पिनकोड</label>
+                    <input id="pincode" type="text" value="" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="card" style="margin-bottom: 14px">
+                <h2 style="margin-bottom: 12px">डिलीवरी तरीका</h2>
+                <label class="checkbox-row" style="margin-bottom: 10px"
+                  ><input type="radio" name="del" value="home" checked /><span
+                    ><strong>होम डिलीवरी</strong> — 2–3 दिन में · ₹450</span
+                  ></label
+                >
+                <label class="checkbox-row"
+                  ><input type="radio" name="del" value="pickup" /><span
+                    ><strong>स्वयं पिकअप</strong> — किसान के स्थान से ·
+                    निःशुल्क</span
+                  ></label
+                >
+              </div>
+
+              <div class="card">
+                <h2 style="margin-bottom: 12px">भुगतान तरीका</h2>
+                <label class="checkbox-row" style="margin-bottom: 10px"
+                  ><input type="radio" name="pay" value="upi" checked /><span
+                    ><strong>UPI</strong></span
+                  ></label
+                >
+                <label class="checkbox-row" style="margin-bottom: 10px"
+                  ><input type="radio" name="pay" value="bank_transfer" /><span
+                    ><strong>बैंक ट्रांसफर</strong></span
+                  ></label
+                >
+                <label class="checkbox-row"
+                  ><input type="radio" name="pay" value="cod" /><span
+                    ><strong>डिलीवरी पर भुगतान (COD)</strong></span
+                  ></label
+                >
+              </div>
+            </div>
+
+            <div class="card">
+              <h2 style="margin-bottom: 14px">ऑर्डर सारांश</h2>
+              <div
+                id="checkoutItems"
+                style="display: flex; flex-direction: column; gap: 8px"
+              ></div>
+              <div class="divider"></div>
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  padding: 6px 0;
+                  font-size: 13.5px;
+                "
+              >
+                <span>डिलीवरी शुल्क</span
+                ><span class="mono" id="deliveryCharge">₹0</span>
+              </div>
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  padding: 6px 0;
+                  font-size: 13.5px;
+                "
+              >
+                <span>प्लेटफ़ॉर्म शुल्क</span
+                ><span class="mono" id="platformFee">₹0</span>
+              </div>
+              <div class="divider"></div>
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  padding: 4px 0;
+                  font-weight: 700;
+                  font-size: 16px;
+                "
+              >
+                <span>कुल राशि</span
+                ><span class="mono" id="checkoutTotal">₹0</span>
+              </div>
+              <button
+                id="placeOrderBtn"
+                class="btn btn-primary btn-block"
+                style="margin-top: 16px"
+              >
+                भुगतान करें और ऑर्डर करें
+              </button>
+              <p class="hint" style="text-align: center; margin-top: 8px">
+                भुगतान करते ही आपको पुष्टि प्राप्त होगी
+              </p>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/buyer-data.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script>
+      initShell("buyer", "cart", "चेकआउट");
+      const checkoutState = { total: 0 };
+
+      async function renderCheckout() {
+        const cart = window.farmlinkBuyerData.getBuyerCart();
+        const checkoutItems = document.getElementById("checkoutItems");
+        const deliveryChargeEl = document.getElementById("deliveryCharge");
+        const platformFeeEl = document.getElementById("platformFee");
+        const checkoutTotalEl = document.getElementById("checkoutTotal");
+
+        if (!cart.length) {
+          checkoutItems.innerHTML =
+            '<div class="alert alert-info">कार्ट खाली है।</div>';
+          deliveryChargeEl.textContent = "₹0";
+          platformFeeEl.textContent = "₹0";
+          checkoutTotalEl.textContent = "₹0";
+          return;
+        }
+
+        const subtotal = cart.reduce(
+          (sum, item) =>
+            sum + (item.pricePerKg || 0) * (item.quantityKg || 100),
+          0,
+        );
+        const delivery = subtotal > 0 ? 450 : 0;
+        const fee = subtotal > 0 ? 110 : 0;
+        const total = subtotal + delivery + fee;
+        checkoutState.total = total;
+
+        checkoutItems.innerHTML = cart
+          .map(
+            (item) =>
+              `<div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 13.5px;"><span>${item.title} × ${Math.round((item.quantityKg || 100) / 100)} क्विंटल</span><span class="mono">${window.farmlinkBuyerData.money((item.pricePerKg || 0) * (item.quantityKg || 100))}</span></div>`,
+          )
+          .join("");
+
+        deliveryChargeEl.textContent = window.farmlinkBuyerData.money(delivery);
+        platformFeeEl.textContent = window.farmlinkBuyerData.money(fee);
+        checkoutTotalEl.textContent = window.farmlinkBuyerData.money(total);
+
+        const { user, profile } = await window.farmlinkBuyerData.fetchBuyerProfile();
+        const address = document.getElementById("deliveryAddress");
+        const contact = document.getElementById("contactNumber");
+        const pincode = document.getElementById("pincode");
+        if (user) {
+          contact.value = user.phone_number || "+91 00000 00000";
+        }
+        if (profile?.delivery_address) address.value = profile.delivery_address;
+        if (profile?.pin_code) pincode.value = profile.pin_code;
+        if (window.location.search.includes("itemId")) {
+          const item = cart[0];
+          if (item) {
+            address.value = `${item.title}, ${item.location || "लखनऊ"}`;
+            pincode.value = "226001";
+          }
+        }
+      }
+
+      document
+        .getElementById("placeOrderBtn")
+        .addEventListener("click", async function () {
+          const cart = window.farmlinkBuyerData.getBuyerCart();
+          if (!cart.length) {
+            showToast("कार्ट खाली है।");
+            return;
+          }
+
+          const address = document
+            .getElementById("deliveryAddress")
+            .value.trim();
+          if (!address) {
+            showToast("डिलीवरी पता दर्ज करें।");
+            return;
+          }
+
+          this.disabled = true;
+          this.textContent = "ऑर्डर भेजा जा रहा है...";
+
+          try {
+            const items = cart.map((item) => ({
+              listingId: item.listingId,
+              title: item.title,
+              quantityKg: Number(item.quantityKg || 100),
+              pricePerKg: Number(item.pricePerKg || 0),
+            }));
+
+            await window.farmlinkBuyerData.placeBuyerOrder({
+              address,
+              items,
+              paymentMethod: document.querySelector('input[name="pay"]:checked').value,
+              deliveryMethod: document.querySelector('input[name="del"]:checked').value,
+              orderTotal: checkoutState.total,
+            });
+
+            localStorage.removeItem("farmlink_buyer_cart");
+            showToast("✓ ऑर्डर सफलतापूर्वक दिया गया");
+            setTimeout(() => (window.location.href = "buyer-orders.html"), 900);
+          } catch (error) {
+            console.error("Order placement failed", error);
+            showToast(`ऑर्डर सेव नहीं हुआ: ${error.message}`);
+            this.disabled = false;
+            this.textContent = "भुगतान करें और ऑर्डर करें";
+          }
+        });
+
+      renderCheckout();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,780 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>मेरे ऑर्डर · FarmLink</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+    <style>
+      .orders-page {
+        max-width: 1260px !important;
+      }
+      .orders-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: start;
+        margin-bottom: 22px;
+      }
+      .orders-head h1 {
+        margin: 0;
+        font-size: 30px;
+      }
+      .orders-head p {
+        margin: 5px 0;
+        color: var(--ink-soft);
+      }
+      .head-income {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .head-income div {
+        padding-left: 14px;
+        border-left: 1px solid var(--line);
+        font-size: 11px;
+        color: var(--ink-soft);
+      }
+      .head-income b {
+        display: block;
+        color: var(--ink);
+        font-size: 19px;
+      }
+      .order-metrics {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+      .order-metric {
+        display: flex;
+        gap: 11px;
+        align-items: start;
+        min-height: 102px;
+        padding: 17px;
+        border: 1px solid #e7ede8;
+        border-radius: 13px;
+        background: #fff;
+        box-shadow: 0 7px 20px rgba(30, 66, 51, 0.055);
+      }
+      .metric-icon {
+        display: grid;
+        place-items: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: #eaf7ed;
+        font-size: 18px;
+      }
+      .order-metric:nth-child(2) .metric-icon {
+        background: #fff2e5;
+      }
+      .order-metric:nth-child(3) .metric-icon {
+        background: #edf7ff;
+      }
+      .order-metric:nth-child(4) .metric-icon {
+        background: #eaf8ed;
+      }
+      .order-metric:nth-child(5) .metric-icon {
+        background: #fff0ef;
+      }
+      .order-metric small {
+        display: block;
+        color: var(--ink-soft);
+        font-size: 11px;
+        font-weight: 650;
+      }
+      .order-metric strong {
+        display: block;
+        margin-top: 5px;
+        font-size: 26px;
+        line-height: 1;
+      }
+      .order-metric span {
+        display: block;
+        margin-top: 7px;
+        color: var(--ink-soft);
+        font-size: 10px;
+      }
+      .filter-panel {
+        padding: 12px;
+        margin-bottom: 12px;
+        border: 1px solid #e9efea;
+        border-radius: 13px;
+        background: #fff;
+        box-shadow: 0 7px 20px rgba(30, 66, 51, 0.04);
+      }
+      .filters {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr auto;
+        gap: 10px;
+      }
+      .filters input,
+      .filters select {
+        height: 44px;
+      }
+      .tabs {
+        display: flex;
+        gap: 26px;
+        margin: 0 0 13px;
+        padding: 0 10px;
+        border-bottom: 1px solid var(--line);
+      }
+      .tabs button {
+        padding: 11px 2px;
+        border: 0;
+        border-bottom: 2px solid transparent;
+        background: transparent;
+        color: var(--ink-soft);
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .tabs button.active {
+        border-color: #168049;
+        color: #147441;
+      }
+      .order-list {
+        display: grid;
+        gap: 12px;
+      }
+      .order-row-card {
+        display: grid;
+        grid-template-columns: 1.05fr 1.1fr 1.55fr 1.9fr 1.05fr;
+        gap: 0;
+        padding: 16px;
+        border: 1px solid #e5ece7;
+        border-radius: 13px;
+        background: #fff;
+        box-shadow: 0 7px 20px rgba(30, 66, 51, 0.055);
+      }
+      .order-cell {
+        min-width: 0;
+        padding: 0 16px;
+        border-right: 1px solid #edf0ed;
+      }
+      .order-cell:first-child {
+        padding-left: 2px;
+      }
+      .order-cell:last-child {
+        border: 0;
+      }
+      .cell-label {
+        display: block;
+        margin-bottom: 7px;
+        color: var(--ink-soft);
+        font-size: 10px;
+        font-weight: 700;
+      }
+      .order-id {
+        font-size: 15px;
+        font-weight: 800;
+      }
+      .order-cell small {
+        display: block;
+        margin-top: 7px;
+        color: var(--ink-soft);
+        font-size: 11px;
+      }
+      .buyer {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .buyer-avatar {
+        display: grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #147441;
+        color: #fff;
+        font-size: 12px;
+      }
+      .buyer b {
+        font-size: 13px;
+      }
+      .buyer-contact {
+        display: grid;
+        gap: 4px;
+        margin-top: 9px;
+        color: #51665b;
+        font-size: 11px;
+      }
+      .crop-info {
+        display: flex;
+        gap: 9px;
+      }
+      .crop-image {
+        display: grid;
+        place-items: center;
+        width: 62px;
+        height: 62px;
+        border-radius: 9px;
+        background: linear-gradient(145deg, #dcefeb, #a87839);
+        font-size: 30px;
+      }
+      .crop-info b {
+        font-size: 14px;
+      }
+      .crop-info p {
+        margin: 5px 0;
+        color: #147441;
+        font-size: 10px;
+        font-weight: 700;
+      }
+      .crop-info strong {
+        font-size: 13px;
+      }
+      .progress-status {
+        display: grid;
+        gap: 9px;
+      }
+      .status-pill {
+        display: inline-flex;
+        width: max-content;
+        padding: 4px 9px;
+        border-radius: 99px;
+        background: #e7f6ea;
+        color: #157441;
+        font-size: 11px;
+        font-weight: 800;
+      }
+      .status-pill.pending {
+        background: #fff5df;
+        color: #aa6c08;
+      }
+      .status-pill.cancelled {
+        background: #f7eceb;
+        color: #bd4038;
+      }
+      .order-progress {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 3px;
+      }
+      .step {
+        text-align: center;
+        color: #748278;
+        font-size: 9px;
+      }
+      .step-dot {
+        display: grid;
+        place-items: center;
+        width: 21px;
+        height: 21px;
+        margin: 0 auto 4px;
+        border-radius: 50%;
+        background: #e2e9e4;
+        color: #748278;
+        font-size: 10px;
+      }
+      .step.done .step-dot {
+        background: #118043;
+        color: #fff;
+      }
+      .step.current .step-dot {
+        background: #f1c24c;
+        color: #4b3900;
+        box-shadow: 0 0 0 3px #fff5d7;
+      }
+      .actions {
+        display: grid;
+        gap: 8px;
+      }
+      .actions .btn {
+        height: 39px;
+      }
+      .actions small {
+        text-align: center;
+        margin: 0;
+      }
+      .empty-state {
+        padding: 42px;
+      }
+      .support-bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 16px;
+        padding: 16px;
+        border: 1px solid #dcefe0;
+        border-radius: 12px;
+        background: linear-gradient(90deg, #eff9f1, #f8fcf8);
+      }
+      .support-bar b {
+        display: block;
+        color: #174c32;
+      }
+      .support-bar p {
+        margin: 3px 0 0;
+        color: var(--ink-soft);
+        font-size: 11px;
+      }
+      .support-bar a {
+        margin-left: auto;
+        color: #147441;
+        font-size: 12px;
+        font-weight: 800;
+      }
+      @media (max-width: 1100px) {
+        .order-metrics {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .order-row-card {
+          grid-template-columns: 1fr 1.3fr 1.5fr;
+        }
+        .order-cell {
+          padding: 12px;
+          border-right: 0;
+          border-bottom: 1px solid #edf0ed;
+        }
+        .order-cell:nth-child(3) {
+          border-bottom: 0;
+        }
+        .order-cell:nth-child(4),
+        .order-cell:nth-child(5) {
+          grid-column: span 1;
+        }
+        .filters {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (max-width: 650px) {
+        .orders-page {
+          padding: 16px 13px !important;
+        }
+        .orders-head {
+          display: block;
+        }
+        .head-income {
+          margin-top: 12px;
+        }
+        .order-metrics {
+          grid-template-columns: 1fr 1fr;
+        }
+        .filters {
+          grid-template-columns: 1fr;
+        }
+        .order-row-card {
+          grid-template-columns: 1fr;
+        }
+        .order-cell {
+          padding: 12px 3px;
+        }
+        .order-cell:nth-child(3) {
+          border-bottom: 1px solid #edf0ed;
+        }
+        .tabs {
+          overflow: auto;
+          gap: 18px;
+        }
+        .support-bar {
+          align-items: start;
+        }
+        .support-bar a {
+          margin-left: 0;
+          white-space: nowrap;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app-shell">
+      <div class="main-col">
+        <div id="topbar-slot"></div>
+        <main class="content orders-page">
+          <header class="orders-head">
+            <div>
+              <h1>मेरे ऑर्डर</h1>
+              <p id="orderSummary">ऑर्डर लोड हो रहे हैं…</p>
+            </div>
+            <div class="head-income">
+              <button id="refreshOrders" class="btn btn-secondary btn-sm">
+                ↻ रिफ्रेश
+              </button>
+              <div>कुल कमाई (इन ऑर्डर्स से)<b id="headIncome">₹0</b></div>
+            </div>
+          </header>
+          <div id="orderMessage" class="alert alert-info">
+            ऑर्डर लोड हो रहे हैं…
+          </div>
+          <section class="order-metrics">
+            <article class="order-metric">
+              <div class="metric-icon">🛍</div>
+              <div>
+                <small>कुल ऑर्डर</small><strong id="totalCount">0</strong
+                ><span>कुल प्राप्त ऑर्डर</span>
+              </div>
+            </article>
+            <article class="order-metric">
+              <div class="metric-icon">🛍</div>
+              <div>
+                <small>नए ऑर्डर</small><strong id="newCount">0</strong
+                ><span>नए प्राप्त</span>
+              </div>
+            </article>
+            <article class="order-metric">
+              <div class="metric-icon">▣</div>
+              <div>
+                <small>प्रोसेसिंग</small><strong id="processingCount">0</strong
+                ><span>प्रोसेसिंग में</span>
+              </div>
+            </article>
+            <article class="order-metric">
+              <div class="metric-icon">✓</div>
+              <div>
+                <small>पूरे हुए</small><strong id="completedCount">0</strong
+                ><span>सफलतापूर्वक पूरे</span>
+              </div>
+            </article>
+            <article class="order-metric">
+              <div class="metric-icon">✕</div>
+              <div>
+                <small>रद्द</small><strong id="cancelledCount">0</strong
+                ><span>रद्द हुए</span>
+              </div>
+            </article>
+          </section>
+          <section class="filter-panel">
+            <div class="filters">
+              <input
+                id="orderSearch"
+                type="search"
+                placeholder="⌕  ऑर्डर ID / खरीदार / फसल खोजें…"
+              /><select id="statusFilter">
+                <option value="">सभी स्थितियाँ</option>
+                <option value="pending">नया</option>
+                <option value="accepted">स्वीकार</option>
+                <option value="picking">पिकअप</option>
+                <option value="shipped">रास्ते में</option>
+                <option value="delivered">पूरा</option>
+                <option value="cancelled">रद्द</option></select
+              ><select id="cropFilter">
+                <option value="">सभी फसलें</option></select
+              ><button id="clearFilters" class="btn btn-secondary">
+                ⌘ फ़िल्टर हटाएँ
+              </button>
+            </div>
+          </section>
+          <div class="tabs" id="orderTabs">
+            <button class="active" data-tab="">सभी</button
+            ><button data-tab="pending">नए</button
+            ><button data-tab="processing">प्रोसेसिंग</button
+            ><button data-tab="delivered">पूरे हुए</button
+            ><button data-tab="cancelled">रद्द</button>
+          </div>
+          <section id="ordersList" class="order-list"></section>
+          <div id="emptyOrders" class="card empty-state" style="display: none">
+            <div style="font-size: 34px">🛍</div>
+            <h2>अभी कोई ऑर्डर नहीं है</h2>
+            <p>आपकी लिस्टिंग पर नया ऑर्डर आते ही यहाँ दिखेगा।</p>
+            <a class="btn btn-primary" href="seller-add-listing.html"
+              >नई फसल जोड़ें</a
+            >
+          </div>
+          <div class="support-bar">
+            <span style="font-size: 23px">🛡</span>
+            <div>
+              <b>सुरक्षित ऑर्डर अनुभव</b>
+              <p>
+                हम आपके सभी ऑर्डर्स को सुरक्षित और समय पर पूरा करने में मदद करते
+                हैं।
+              </p>
+            </div>
+            <a href="help-center.html">ऑर्डर संबंधी सहायता →</a>
+          </div>
+        </main>
+      </div>
+    </div>
+    <dialog id="orderDetails" class="modal">
+      <form method="dialog" class="card" style="min-width: min(520px, 88vw)">
+        <div class="card-title-row">
+          <h2>ऑर्डर विवरण</h2>
+          <button class="btn btn-secondary btn-sm">बंद करें</button>
+        </div>
+        <div id="orderDetailsBody"></div>
+      </form>
+    </dialog>
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script>
+      initShell("seller", "orders", "मेरे ऑर्डर");
+      const $ = (id) => document.getElementById(id),
+        state = { client: null, userId: null, orders: [], tab: "" },
+        esc = (v) =>
+          String(v ?? "").replace(
+            /[&<>'"]/g,
+            (c) =>
+              ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                "'": "&#39;",
+                '"': "&quot;",
+              })[c],
+          ),
+        money = (v) => `₹${Math.round(Number(v || 0)).toLocaleString("en-IN")}`,
+        date = (v) =>
+          v
+            ? new Date(v).toLocaleDateString("hi-IN", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })
+            : "—",
+        flow = ["pending", "accepted", "picking", "shipped", "delivered"],
+        labels = ["नया", "स्वीकार", "पिकअप", "रास्ते में", "पूरा"],
+        next = (s) =>
+          ({
+            pending: ["accepted", "स्वीकार करें"],
+            accepted: ["picking", "पिकअप तैयार"],
+            picking: ["shipped", "भेज दिया"],
+            shipped: ["delivered", "डिलीवर पूरा करें"],
+          })[s];
+      function status(s) {
+        return (
+          {
+            pending: "नया",
+            accepted: "स्वीकार",
+            picking: "पिकअप तैयार",
+            shipped: "रास्ते में",
+            delivered: "डिलीवर",
+            cancelled: "रद्द",
+          }[s] || "नया"
+        );
+      }
+      function progress(s) {
+        if (s === "cancelled")
+          return '<span class="status-pill cancelled">रद्द किया गया</span>';
+        const active = Math.max(0, flow.indexOf(s));
+        return `<div class="progress-status"><span class="status-pill ${s === "pending" ? "pending" : ""}">${status(s)}</span><div class="order-progress">${labels.map((l, i) => `<div class="step ${i < active ? "done" : ""} ${i === active ? "current" : ""}"><div class="step-dot">${i < active ? "✓" : i + 1}</div>${l}</div>`).join("")}</div></div>`;
+      }
+      function filtered() {
+        const q = $("orderSearch").value.trim().toLowerCase(),
+          statusFilter = $("statusFilter").value,
+          crop = $("cropFilter").value;
+        return state.orders.filter((o) => {
+          const text =
+              `${o.id} ${o.buyerName} ${o.items.map((i) => i.title).join(" ")}`.toLowerCase(),
+            tabOK =
+              !state.tab ||
+              (state.tab === "processing"
+                ? ["accepted", "picking", "shipped"].includes(o.order_status)
+                : o.order_status === state.tab);
+          return (
+            (!q || text.includes(q)) &&
+            (!statusFilter || o.order_status === statusFilter) &&
+            (!crop || o.items.some((i) => i.title === crop)) &&
+            tabOK
+          );
+        });
+      }
+      function render() {
+        const all = state.orders,
+          counts = {
+            pending: all.filter((o) => o.order_status === "pending").length,
+            processing: all.filter((o) =>
+              ["accepted", "picking", "shipped"].includes(o.order_status),
+            ).length,
+            delivered: all.filter((o) => o.order_status === "delivered").length,
+            cancelled: all.filter((o) => o.order_status === "cancelled").length,
+          };
+        $("totalCount").textContent = all.length;
+        $("newCount").textContent = counts.pending;
+        $("processingCount").textContent = counts.processing;
+        $("completedCount").textContent = counts.delivered;
+        $("cancelledCount").textContent = counts.cancelled;
+        $("headIncome").textContent = money(
+          all.reduce((a, o) => a + o.sellerAmount, 0),
+        );
+        $("orderSummary").textContent = `${all.length} ऑर्डर मिले`;
+        const crops = [
+          ...new Set(all.flatMap((o) => o.items.map((i) => i.title))),
+        ];
+        $("cropFilter").innerHTML =
+          '<option value="">सभी फसलें</option>' +
+          crops.map((c) => `<option>${esc(c)}</option>`).join("");
+        const rows = filtered();
+        $("ordersList").innerHTML = rows
+          .map((o) => {
+            const action = next(o.order_status),
+              crop = o.items[0] || {};
+            return `<article class="order-row-card"><div class="order-cell"><span class="cell-label">ऑर्डर ID</span><div class="order-id">#${esc(String(o.id).slice(0, 8))}</div><small>दिनांक<br><b>${date(o.created_at)}</b></small></div><div class="order-cell"><span class="cell-label">खरीदार</span><div class="buyer"><span class="buyer-avatar">${esc((o.buyerName || "ख")[0])}</span><b>${esc(o.buyerName)}</b></div><div class="buyer-contact"><span>☎ खरीदार संपर्क उपलब्ध</span><span>⌖ डिलीवरी पता दर्ज है</span></div></div><div class="order-cell"><span class="cell-label">फसल और मात्रा</span><div class="crop-info"><div class="crop-image">🌾</div><div><b>${esc(crop.title || "फसल")} · Grade A</b><p>${(Number(crop.quantity_kg || 0) / 100).toLocaleString("hi-IN")} क्विंटल</p><strong>${money(o.sellerAmount)}</strong></div></div></div><div class="order-cell"><span class="cell-label">स्थिति</span>${progress(o.order_status)}</div><div class="order-cell"><span class="cell-label">कार्रवाई</span><div class="actions"><button class="btn btn-secondary btn-sm" data-action="details" data-id="${esc(o.id)}">विवरण देखें</button>${action ? `<button class="btn btn-primary btn-sm" data-action="status" data-status="${action[0]}" data-id="${esc(o.id)}">${action[1]} →</button>` : "<small>कोई अगला कदम नहीं</small>"}</div></div></article>`;
+          })
+          .join("");
+        $("emptyOrders").style.display = rows.length ? "none" : "block";
+      }
+      function setMessage(message, type = "info") {
+        const messageBox = $("orderMessage");
+        messageBox.textContent = message;
+        messageBox.className = `alert alert-${type}`;
+        messageBox.style.display = "block";
+      }
+      async function load() {
+        if (!state.client || !state.userId) {
+          setMessage("ऑर्डर देखने के लिए पहले लॉग इन करें।", "warning");
+          return;
+        }
+        const { data: listings, error } = await state.client
+          .from("listings")
+          .select("id,title")
+          .eq("farmer_id", state.userId);
+        if (error) throw error;
+        const map = new Map((listings || []).map((x) => [x.id, x]));
+        if (!map.size) {
+          state.orders = [];
+          render();
+          $("orderMessage").style.display = "none";
+          return;
+        }
+        const itemGroups = new Map();
+        await Promise.all(
+          [...map.keys()].map(async (id) => {
+            const r = await state.client
+              .from("order_items")
+              .select("order_id,listing_id,price_per_kg,quantity_kg")
+              .eq("listing_id", id);
+            if (r.error) throw r.error;
+            (r.data || []).forEach((x) =>
+              itemGroups.set(x.order_id, [
+                ...(itemGroups.get(x.order_id) || []),
+                { ...x, title: map.get(x.listing_id).title },
+              ]),
+            );
+          }),
+        );
+        const statuses = await state.client
+          .from("seller_order_status")
+          .select("order_id,status")
+          .eq("seller_id", state.userId);
+        const smap = new Map(
+          (!statuses.error ? statuses.data || [] : []).map((x) => [
+            x.order_id,
+            x.status,
+          ]),
+        );
+        const raw = await Promise.all(
+          [...itemGroups.keys()].map(async (id) => {
+            const r = await state.client
+              .from("orders")
+              .select("id,buyer_id,order_status,delivery_address,created_at")
+              .eq("id", id)
+              .maybeSingle();
+            if (r.error) throw r.error;
+            return r.data;
+          }),
+        );
+        const buyers = new Map();
+        await Promise.all(
+          [...new Set(raw.filter(Boolean).map((o) => o.buyer_id))].map(
+            async (id) => {
+              const r = await state.client
+                .from("users")
+                .select("id,full_name")
+                .eq("id", id)
+                .maybeSingle();
+              if (r.data) buyers.set(id, r.data.full_name);
+            },
+          ),
+        );
+        state.orders = raw
+          .filter(Boolean)
+          .map((o) => {
+            const items = itemGroups.get(o.id) || [];
+            return {
+              ...o,
+              order_status: smap.get(o.id) || o.order_status,
+              buyerName: buyers.get(o.buyer_id) || "खरीदार",
+              items,
+              sellerAmount: items.reduce(
+                (a, i) =>
+                  a + Number(i.price_per_kg || 0) * Number(i.quantity_kg || 0),
+                0,
+              ),
+            };
+          })
+          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        render();
+        $("orderMessage").style.display = "none";
+      }
+      async function update(id, s) {
+        if (!confirm(`क्या आप ऑर्डर को “${status(s)}” करना चाहते हैं?`)) return;
+        const r = await state.client.from("seller_order_status").upsert({
+          id: `${id}_${state.userId}`,
+          order_id: id,
+          seller_id: state.userId,
+          status: s,
+        });
+        if (r.error) throw r.error;
+        await load();
+        showToast("✓ ऑर्डर स्थिति अपडेट हो गई");
+      }
+      function details(o) {
+        $("orderDetailsBody").innerHTML =
+          `<div style="display:grid;gap:10px"><p><b>ऑर्डर:</b> #${esc(String(o.id).slice(0, 8))}</p><p><b>खरीदार:</b> ${esc(o.buyerName)}</p><p><b>डिलीवरी पता:</b><br>${esc(o.delivery_address || "उपलब्ध नहीं")}</p><p><b>आपकी राशि:</b> ${money(o.sellerAmount)}</p></div>`;
+        $("orderDetails").showModal();
+      }
+      $("ordersList").addEventListener("click", async (e) => {
+        const b = e.target.closest("button[data-action]");
+        if (!b) return;
+        const o = state.orders.find((x) => x.id === b.dataset.id);
+        try {
+          b.dataset.action === "details"
+            ? details(o)
+            : await update(o.id, b.dataset.status);
+        } catch (err) {
+          showToast(`कार्रवाई पूरी नहीं हुई: ${err.message}`);
+        }
+      });
+      ["orderSearch", "statusFilter", "cropFilter"].forEach((id) =>
+        $(id).addEventListener(
+          id === "orderSearch" ? "input" : "change",
+          render,
+        ),
+      );
+      $("orderTabs").addEventListener("click", (e) => {
+        const b = e.target.closest("button[data-tab]");
+        if (!b) return;
+        state.tab = b.dataset.tab;
+        [...$("orderTabs").children].forEach((x) =>
+          x.classList.toggle("active", x === b),
+        );
+        render();
+      });
+      $("clearFilters").onclick = () => {
+        $("orderSearch").value = "";
+        $("statusFilter").value = "";
+        $("cropFilter").value = "";
+        state.tab = "";
+        [...$("orderTabs").children].forEach((x, i) =>
+          x.classList.toggle("active", i === 0),
+        );
+        render();
+      };
+      $("refreshOrders").onclick = () => load().catch(fail);
+      function fail(e) {
+        console.error(e);
+        setMessage(`ऑर्डर लोड नहीं हुए: ${e.message}`, "error");
+      }
+      (async () => {
+        try {
+          await window.firebaseScriptReady;
+          const { client, user } = await getCurrentUser();
+          if (!user) {
+            setMessage("ऑर्डर देखने के लिए पहले लॉग इन करें।", "warning");
+            $("emptyOrders").style.display = "none";
+            return;
+          }
+          state.client = client;
+          state.userId = user.id;
+          await load();
+        } catch (e) {
+          fail(e);
+        }
+      })();
+    </script>
+  </body>
+</html>

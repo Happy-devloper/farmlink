@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html class="h-full bg-[#f8faf9]" lang="hi">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <title>FarmLink Driver - सारथी कमांड सेंटर</title>
+  <!-- Tailwind CSS v3 with Plugins -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  
+  <script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['system-ui', '-apple-system', '"Segoe UI"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#114226',
+              950: '#0a2e1a',
+            },
+            surface: '#f8faf9',
+            sidebar: '#fcfdfc',
+          },
+          animation: {
+            'wave': 'wave 2s infinite',
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          },
+          keyframes: {
+            wave: {
+              '0%, 100%': { transform: 'rotate(0deg)' },
+              '20%, 60%': { transform: 'rotate(14deg)' },
+              '40%, 80%': { transform: 'rotate(-10deg)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style data-purpose="custom-layout">
+    body {
+      font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    }
+    /* Subtle scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #e2e8f0;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #cbd5e1;
+    }
+
+    /* Modal Animation */
+    .modal-backdrop {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      transition: opacity 0.25s ease;
+    }
+
+    /* Toast Notification */
+    .driver-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 100;
+      background: #0f3822;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 9999px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13.5px;
+      font-weight: 500;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="h-full font-sans text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-900 bg-[#f8faf9]">
+
+<!-- Mobile Top Header (Visible on smaller screens) -->
+<header class="lg:hidden bg-white border-b border-slate-200/80 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
+  <div class="flex items-center gap-3">
+    <button id="btnToggleMobileSidebar" class="p-2 -ml-1 text-slate-600 hover:text-slate-900 rounded-xl hover:bg-slate-100 focus:outline-none" aria-label="मेनू खोलें">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+        <line x1="3" x2="21" y1="12" y2="12"></line>
+        <line x1="3" x2="21" y1="6" y2="6"></line>
+        <line x1="3" x2="21" y1="18" y2="18"></line>
+      </svg>
+    </button>
+    <a href="driver-dashboard.html" class="flex items-center gap-2">
+      <div class="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24">
+          <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+          <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+        </svg>
+      </div>
+      <span class="text-base font-bold text-slate-900 tracking-tight">FarmLink <span class="text-emerald-600">AI</span></span>
+    </a>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <!-- Quick AI Assistant Voice Button -->
+    <button onclick="openAiVoiceAssistant()" class="p-2 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/70 flex items-center gap-1.5 text-xs font-semibold">
+      <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+        <line x1="12" x2="12" y1="19" y2="22"></line>
+      </svg>
+      <span class="hidden sm:inline">AI सारथी</span>
+    </button>
+    <!-- Profile Link -->
+    <a href="driver-profile.html" class="w-8 h-8 rounded-full bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-800 text-xs font-bold">
+      RY
+    </a>
+  </div>
+</header>
+
+<div class="flex h-screen overflow-hidden">
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="mobileSidebarBackdrop" class="fixed inset-0 bg-slate-900/50 z-40 hidden lg:hidden transition-opacity"></div>
+
+  <!-- BEGIN: Sidebar -->
+  <aside id="mainSidebar" class="fixed inset-y-0 left-0 z-50 w-64 transform -translate-x-full lg:translate-x-0 lg:static lg:flex-shrink-0 bg-white border-r border-slate-200/80 flex flex-col justify-between p-5 transition-transform duration-200 ease-in-out" data-purpose="navigation-sidebar">
+    <!-- Top Section: Brand & Nav Links -->
+    <div class="space-y-7 overflow-y-auto">
+      <!-- Logo Header -->
+      <div class="flex items-center justify-between px-2">
+        <a href="driver-dashboard.html" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm group-hover:bg-emerald-100 transition-colors">
+            <!-- Curved Leaf Logo SVG -->
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 12"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-1">
+              <span class="text-lg font-bold text-slate-900 tracking-tight leading-none">FarmLink</span>
+              <span class="text-sm font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded leading-none">AI</span>
+            </div>
+            <p class="text-[11px] text-slate-400 font-medium tracking-tight mt-1">खेती smarter, भविष्य बेहतर</p>
+          </div>
+        </a>
+        <button id="btnCloseMobileSidebar" class="lg:hidden p-1 text-slate-400 hover:text-slate-600" aria-label="बंद करें">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav aria-label="मुख्य नेविगेशन" class="space-y-1.5">
+        <!-- होम (Active) -->
+        <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-emerald-50/90 text-emerald-800 font-medium text-sm transition-all group shadow-sm border border-emerald-100/50" href="driver-dashboard.html">
+          <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          <span>होम</span>
+        </a>
+
+        <!-- सक्रिय ट्रिप -->
+        <a id="navActiveTripLink" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group" href="driver-delivery-details.html?id=del-8901">
+          <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+            <rect height="13" rx="2" width="16" x="1" y="6"></rect>
+            <path d="M17 9h4l3 4v6h-7V9z"></path>
+            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+          </svg>
+          <span>सक्रिय ट्रिप</span>
+          <span class="ml-auto w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="लाइव ट्रिप चालू"></span>
+        </a>
+
+        <!-- उपलब्ध लोड -->
+        <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group" href="driver-deliveries.html?tab=assigned">
+          <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+            <path d="m7.5 4.27 9 5.15"></path>
+            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
+            <path d="m3.3 7 8.7 5 8.7-5"></path>
+            <path d="M12 22V12"></path>
+          </svg>
+          <span>उपलब्ध लोड</span>
+          <span id="badgeAvailableLoads" class="ml-auto text-[11px] font-semibold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full">14 नए</span>
+        </a>
+
+        <!-- मेरी ट्रिप्स -->
+        <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group" href="driver-deliveries.html">
+          <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M16 3h5v5"></path>
+            <path d="M8 21H3v-5"></path>
+            <path d="M21 3 14 10"></path>
+            <path d="m3 21 7-7"></path>
+          </svg>
+          <span>मेरी ट्रिप्स</span>
+        </a>
+
+        <!-- कमाई और भुगतान -->
+        <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group" href="driver-earnings.html">
+          <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
+            <path d="M12 18V6"></path>
+          </svg>
+          <span>कमाई और भुगतान</span>
+        </a>
+
+        <!-- AI रूट व ईंधन बचत -->
+        <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group" href="driver-delivery-details.html?id=del-8901">
+          <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span>AI रूट व ईंधन बचत</span>
+        </a>
+
+        <!-- सारथी सहायता (AI Voice Modal Opener) -->
+        <button onclick="openAiVoiceAssistant()" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group text-left">
+          <svg class="w-5 h-5 text-purple-500 group-hover:text-purple-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" x2="12" y1="19" y2="22"></line>
+          </svg>
+          <span>सारथी सहायता</span>
+          <span class="ml-auto text-[10px] font-bold bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">वॉइस AI</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Bottom Profile Chip -->
+    <a href="driver-profile.html" class="bg-slate-50 hover:bg-emerald-50/50 border border-slate-200/70 hover:border-emerald-200 p-3 rounded-2xl flex items-center gap-3 shadow-sm transition-all group" data-purpose="driver-profile-card">
+      <div class="relative w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800 font-bold border border-amber-200 flex-shrink-0">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path>
+          <circle cx="7" cy="17" r="2"></circle>
+          <circle cx="18.5" cy="18.5" r="2.5"></circle>
+        </svg>
+        <span id="profileStatusIndicator" class="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></span>
+      </div>
+      <div class="min-w-0 flex-1">
+        <p id="sidebarDriverName" class="text-sm font-semibold text-slate-800 group-hover:text-emerald-900 truncate">रामेश्वर यादव</p>
+        <p class="text-[11px] text-emerald-700 font-medium flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          KYC सत्यापित सारथी
+        </p>
+      </div>
+      <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="m9 18 6-6-6-6"></path>
+      </svg>
+    </a>
+  </aside>
+  <!-- END: Sidebar -->
+
+  <!-- BEGIN: Main Dashboard Content Area -->
+  <main class="flex-1 overflow-y-auto bg-[#f8faf9] p-4 sm:p-6 lg:p-8 space-y-6" data-purpose="dashboard-body">
+    
+    <!-- BEGIN: Hero Command Banner (Dark Emerald Container) -->
+    <section class="relative overflow-hidden rounded-3xl bg-[#0f3822] text-white p-6 sm:p-7 lg:p-8 shadow-sm" data-purpose="hero-command-banner">
+      <!-- Decorative Background Glow -->
+      <div class="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-20 -top-20 w-60 h-60 rounded-full bg-emerald-600/10 blur-2xl pointer-events-none"></div>
+
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <!-- Left Banner Text & Actions -->
+        <div class="space-y-4 max-w-xl">
+          <!-- Pill Tag -->
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-800/60 border border-emerald-600/40 text-emerald-200 text-xs font-medium tracking-wide uppercase">
+            <span>✦</span> DRIVER COMMAND CENTER
+          </div>
+          
+          <!-- Title & Location -->
+          <div>
+            <h1 class="text-2xl lg:text-3xl font-bold tracking-tight text-white flex items-center gap-2">
+              नमस्ते, <span id="heroDriverName">रामेश्वर जी</span> <span class="inline-block animate-wave origin-bottom-right">👋</span>
+            </h1>
+            <p class="text-sm text-emerald-200/90 mt-1 font-normal">
+              <span id="heroDriverLocation">अमीनाबाद, लखनऊ (उत्तर प्रदेश)</span> • <span id="heroDutyStatus" class="text-emerald-400 font-medium">ऑनलाइन व ड्यूटी हेतु उपलब्ध</span>
+            </p>
+          </div>
+          
+          <!-- Quick Action Buttons -->
+          <div class="flex flex-wrap items-center gap-3 pt-1">
+            <a href="driver-deliveries.html?tab=assigned" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#1b5e39] hover:bg-[#236e44] text-emerald-50 text-sm font-medium transition-all shadow-inner border border-emerald-600/30">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24">
+                <line x1="12" x2="12" y1="5" y2="19"></line>
+                <line x1="5" x2="19" y1="12" y2="12"></line>
+              </svg>
+              <span>नई ट्रिप स्वीकारें</span>
+            </a>
+            <a href="driver-profile.html" id="heroVehicleBtn" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-900/40 hover:bg-emerald-800/50 text-emerald-100 text-sm font-medium border border-emerald-600/40 transition-all">
+              <span>मेरी गाड़ियाँ (<span id="heroVehicleNum">UP-32-T-8821</span>)</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Abstract Graphic / Vehicle Status & Availability Switcher -->
+        <div class="flex-shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <!-- Live Status Switcher Box -->
+          <div class="bg-emerald-900/50 border border-emerald-700/50 rounded-2xl p-4 flex items-center justify-between gap-5 backdrop-blur-sm shadow-inner">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span id="livePulseDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="liveStatusText" class="text-xs font-semibold text-emerald-200">ड्यूटी: सक्रिय</span>
+              </div>
+              <div class="w-24 h-2 bg-emerald-800/80 rounded-full overflow-hidden">
+                <div class="w-full h-full bg-emerald-400 rounded-full"></div>
+              </div>
+            </div>
+
+            <!-- Custom Switch for Duty Online/Offline -->
+            <button id="toggleDutyBtn" onclick="toggleDutyAvailability()" class="px-3 py-1.5 rounded-xl bg-emerald-700/80 hover:bg-emerald-600 border border-emerald-500/50 text-xs font-semibold text-white transition-all flex items-center gap-1.5 shadow-sm" title="ड्यूटी स्थिति बदलें">
+              <span id="toggleDutyLabel">ऑनलाइन</span>
+              <svg class="w-3.5 h-3.5 text-emerald-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                <line x1="12" y1="2" x2="12" y2="12"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- END: Hero Command Banner -->
+
+    <!-- BEGIN: 4 KPI Summary Cards -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5" data-purpose="driver-kpi-cards">
+      <!-- KPI 1: आज की ट्रिप्स -->
+      <a href="driver-deliveries.html" class="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-sm flex items-center gap-4 hover:border-emerald-300 hover:shadow-md transition-all group">
+        <div class="w-12 h-12 rounded-xl bg-lime-50 border border-lime-100 flex items-center justify-center text-lime-700 flex-shrink-0 group-hover:bg-lime-100 transition-colors">
+          <svg class="w-6 h-6 text-lime-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+            <rect height="13" rx="2" width="16" x="1" y="6"></rect>
+            <path d="M17 9h4l3 4v6h-7V9z"></path>
+            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-slate-500">आज की ट्रिप्स</p>
+          <p class="text-2xl font-bold text-slate-900 tracking-tight mt-0.5"><span id="statTodayTrips">3</span> <span class="text-base font-medium text-slate-600">ट्रिप्स</span></p>
+          <p class="text-[11px] font-medium text-emerald-600 mt-0.5 flex items-center gap-1">
+            <span>↗</span> <span id="statTripBreakdown">2 पूर्ण • 1 सक्रिय</span>
+          </p>
+        </div>
+      </a>
+
+      <!-- KPI 2: कुल तय दूरी -->
+      <a href="driver-deliveries.html" class="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-sm flex items-center gap-4 hover:border-emerald-300 hover:shadow-md transition-all group">
+        <div class="w-12 h-12 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 flex-shrink-0 group-hover:bg-amber-100 transition-colors">
+          <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-slate-500">कुल तय दूरी</p>
+          <p class="text-2xl font-bold text-slate-900 tracking-tight mt-0.5"><span id="statTotalKm">142</span> <span class="text-base font-medium text-slate-600">km</span></p>
+          <p class="text-[11px] font-medium text-emerald-600 mt-0.5 flex items-center gap-1">
+            <span>↗</span> आज का सुरक्षित सफर
+          </p>
+        </div>
+      </a>
+
+      <!-- KPI 3: भार परिवहन -->
+      <a href="driver-deliveries.html" class="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-sm flex items-center gap-4 hover:border-emerald-300 hover:shadow-md transition-all group">
+        <div class="w-12 h-12 rounded-xl bg-amber-50/80 border border-amber-100 flex items-center justify-center text-amber-700 flex-shrink-0 group-hover:bg-amber-100 transition-colors">
+          <svg class="w-6 h-6 text-amber-700" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
+            <path d="m3.3 7 8.7 5 8.7-5"></path>
+            <path d="M12 22V12"></path>
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-slate-500">भार परिवहन (वजन)</p>
+          <p class="text-2xl font-bold text-slate-900 tracking-tight mt-0.5"><span id="statTotalWeight">6,500</span> <span class="text-sm font-normal text-slate-500">kg</span></p>
+          <p class="text-[11px] font-medium text-slate-500 mt-0.5">कृषि उपज डिलीवर</p>
+        </div>
+      </a>
+
+      <!-- KPI 4: आज की कुल कमाई -->
+      <a href="driver-earnings.html" class="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-sm flex items-center gap-4 hover:border-emerald-300 hover:shadow-md transition-all group">
+        <div class="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700 flex-shrink-0 group-hover:bg-emerald-100 transition-colors">
+          <span class="text-xl font-bold text-emerald-700">₹</span>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-slate-500">आज की कुल कमाई</p>
+          <p class="text-2xl font-bold text-emerald-800 tracking-tight mt-0.5"><span id="statTodayEarnings">₹4,850</span></p>
+          <p class="text-[11px] font-medium text-emerald-600 mt-0.5 flex items-center gap-1">
+            <span>✓</span> खाते में ट्रांसफर हेतु तैयार
+          </p>
+        </div>
+      </a>
+    </section>
+    <!-- END: 4 KPI Summary Cards -->
+
+    <!-- BEGIN: 3-Column Workflow Layout -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-5" data-purpose="main-dashboard-columns">
+      
+      <!-- Column 1: हाल की ट्रिप्स व सक्रिय असाइनमेंट (5 Cols) -->
+      <div class="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200/70 shadow-sm flex flex-col justify-between" data-purpose="recent-trips-column">
+        <div>
+          <!-- Section Header -->
+          <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+            <h2 class="text-base font-bold text-slate-900 tracking-tight">हाल की ट्रिप्स व असाइनमेंट</h2>
+            <a class="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1" href="driver-deliveries.html">
+              सभी देखें <span>→</span>
+            </a>
+          </div>
+
+          <!-- Trip Cards List Container -->
+          <div id="recentTripsContainer" class="space-y-4">
+            
+            <!-- Trip Card 1: Active Trip -->
+            <div class="border border-slate-200/80 rounded-2xl p-4 hover:border-emerald-300 transition-all bg-white relative group" data-purpose="trip-item">
+              <div class="flex items-start justify-between gap-3">
+                <a href="driver-delivery-details.html?id=del-8901" class="flex items-center gap-3 flex-1">
+                  <div class="w-11 h-11 rounded-xl bg-amber-100/70 border border-amber-200 flex items-center justify-center text-xl flex-shrink-0">
+                    🌾
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h3 class="font-bold text-slate-900 text-sm group-hover:text-emerald-800 transition-colors">बासमती धान</h3>
+                      <span class="text-[11px] text-slate-400 font-normal">(लॉट #TR-4091)</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5">ग्रेड A • सीतापुर फार्म ➔ नवीन मंडी, लखनऊ</p>
+                    <div class="mt-1.5 flex items-center gap-2">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span> सक्रिय
+                      </span>
+                      <span class="text-[11px] text-purple-700 font-medium bg-purple-50 px-2 py-0.5 rounded-full">
+                        AI शॉर्टेस्ट रूट
+                      </span>
+                    </div>
+                  </div>
+                </a>
+                
+                <!-- Action Button for Active Trip -->
+                <a href="driver-delivery-details.html?id=del-8901" class="p-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-semibold flex items-center gap-1 transition-colors" title="ट्रिप खोलें">
+                  <span>मार्ग</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="m9 18 6-6-6-6"></path>
+                  </svg>
+                </a>
+              </div>
+
+              <!-- Sub-meta Grid -->
+              <div class="grid grid-cols-3 pt-3 mt-3 border-t border-slate-100 text-left">
+                <div>
+                  <span class="text-[11px] text-slate-400 block">भाड़ा दर</span>
+                  <span class="text-sm font-bold text-slate-900">₹1,850</span>
+                </div>
+                <div>
+                  <span class="text-[11px] text-slate-400 block">लोड वजन</span>
+                  <span class="text-sm font-bold text-slate-900">2,500 kg</span>
+                </div>
+                <div>
+                  <span class="text-[11px] text-slate-400 block">दूरी व स्थिति</span>
+                  <span class="text-sm font-bold text-emerald-700">32 km (मार्ग में)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Trip Card 2: Completed Trip -->
+            <div class="border border-slate-200/80 rounded-2xl p-4 hover:border-slate-300 transition-all bg-white relative group" data-purpose="trip-item">
+              <div class="flex items-start justify-between gap-3">
+                <a href="driver-deliveries.html" class="flex items-center gap-3 flex-1">
+                  <div class="w-11 h-11 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-xl flex-shrink-0">
+                    📦
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h3 class="font-bold text-slate-900 text-sm group-hover:text-emerald-800 transition-colors">शरबती गेहूँ</h3>
+                      <span class="text-[11px] text-slate-400 font-normal">(लॉट #TR-4088)</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5">हरदोई किसान केंद्र ➔ लखीमपुर डिपो</p>
+                    <div class="mt-1.5">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                        सफलतापूर्वक पूर्ण ✓
+                      </span>
+                    </div>
+                  </div>
+                </a>
+
+                <a href="driver-deliveries.html" class="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100" title="विवरण देखें">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="m9 18 6-6-6-6"></path>
+                  </svg>
+                </a>
+              </div>
+
+              <!-- Sub-meta Grid -->
+              <div class="grid grid-cols-3 pt-3 mt-3 border-t border-slate-100 text-left">
+                <div>
+                  <span class="text-[11px] text-slate-400 block">भाड़ा दर</span>
+                  <span class="text-sm font-bold text-slate-900">₹2,400</span>
+                </div>
+                <div>
+                  <span class="text-[11px] text-slate-400 block">लोड वजन</span>
+                  <span class="text-sm font-bold text-slate-900">4,000 kg</span>
+                </div>
+                <div>
+                  <span class="text-[11px] text-slate-400 block">कुल सफर</span>
+                  <span class="text-sm font-bold text-slate-900">48 km (डिलीवर्ड)</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="pt-4 mt-2">
+          <a href="driver-deliveries.html" class="block w-full py-2.5 px-4 rounded-xl border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50 text-slate-700 hover:text-emerald-800 text-xs font-semibold transition-all text-center">
+            सभी डिलीवरी इतिहास व ऑर्डर्स देखें
+          </a>
+        </div>
+      </div>
+
+      <!-- Column 2: कमाई का अवलोकन (Earnings Trend Chart) (4 Cols) -->
+      <a href="driver-earnings.html" class="lg:col-span-4 bg-white rounded-2xl p-5 border border-slate-200/70 shadow-sm flex flex-col justify-between hover:border-emerald-300 hover:shadow-md transition-all group" data-purpose="earnings-overview-card">
+        <div>
+          <!-- Header -->
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-base font-bold text-slate-900 tracking-tight group-hover:text-emerald-800 transition-colors">कमाई का अवलोकन</h2>
+              <p class="text-xs text-slate-400 font-normal">(इस सप्ताह)</p>
+            </div>
+            <div class="text-right">
+              <span class="text-[11px] text-slate-400 block">कुल कमाई</span>
+              <span id="chartWeeklyEarnings" class="text-base font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">₹24,600</span>
+            </div>
+          </div>
+
+          <!-- Sleek Upward Gradient Curve SVG Chart (Exact replica of SCREEN_2 graph) -->
+          <div class="relative w-full pt-4 pb-2" data-purpose="trend-chart">
+            <svg class="w-full h-44 overflow-visible" preserveaspectratio="none" viewBox="0 0 320 180">
+              <defs>
+                <!-- Gradient fill under line -->
+                <linearGradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#22c55e" stop-opacity="0.32"></stop>
+                  <stop offset="100%" stop-color="#22c55e" stop-opacity="0.00"></stop>
+                </linearGradient>
+              </defs>
+              <!-- Background soft gridlines -->
+              <line stroke="#f1f5f9" stroke-width="1.5" x1="0" x2="320" y1="150" y2="150"></line>
+              <line stroke="#f1f5f9" stroke-width="1.5" x1="0" x2="320" y1="100" y2="100"></line>
+              <line stroke="#f1f5f9" stroke-width="1.5" x1="0" x2="320" y1="50" y2="50"></line>
+              
+              <!-- Filled Area -->
+              <path d="M 0 142 C 70 140, 140 138, 200 134 C 230 132, 260 90, 300 35 L 300 150 L 0 150 Z" fill="url(#chartGradient)"></path>
+              <!-- Upward Rising Green Line -->
+              <path d="M 0 142 C 70 140, 140 138, 200 134 C 230 132, 260 90, 300 35" fill="none" stroke="#16a34a" stroke-linecap="round" stroke-width="3.5"></path>
+              <!-- Peak dot on 'आज' -->
+              <circle cx="300" cy="35" fill="#15803d" r="4.5" stroke="#ffffff" stroke-width="2"></circle>
+            </svg>
+            <!-- X-Axis Labels Matching SCREEN_2 -->
+            <div class="flex justify-between text-[11px] text-slate-400 font-medium px-1 mt-2">
+              <span>1 जून</span>
+              <span>7 जून</span>
+              <span>14 जून</span>
+              <span>21 जून</span>
+              <span class="text-slate-800 font-bold">आज</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <span>साप्ताहिक औसत: <strong id="chartDailyAvg" class="text-slate-700">₹3,514 / दिन</strong></span>
+          <span class="text-emerald-700 font-semibold group-hover:underline flex items-center gap-0.5">+18% अधिक <span>›</span></span>
+        </div>
+      </a>
+
+      <!-- Column 3: FarmLink AI सारथी सुझाव (3 Cols) -->
+      <div class="lg:col-span-3 bg-white rounded-2xl p-5 border border-slate-200/70 shadow-sm flex flex-col justify-between" data-purpose="ai-insights-column">
+        <div class="space-y-3">
+          <!-- Label -->
+          <div class="flex items-center justify-between">
+            <p class="text-xs font-semibold text-emerald-700 tracking-wide flex items-center gap-1">
+              <span>✨</span> FarmLink AI सारथी सुझाव
+            </p>
+            <span class="text-[10px] font-bold bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded">स्मार्ट GPS</span>
+          </div>
+
+          <!-- Heading -->
+          <h3 class="text-base font-bold text-slate-900 leading-snug">
+            ईंधन व समय बचत का स्मार्ट अवसर
+          </h3>
+
+          <!-- AI Advice Description Text -->
+          <p class="text-xs text-slate-600 leading-relaxed">
+            सीतापुर-लखनऊ रूट पर भारी वाहन डायवर्जन है। AI ग्रीन कॉरिडोर रूट चुनें — लगभग <span class="font-semibold text-slate-800">25 मिनट</span> और <span class="font-semibold text-emerald-700">₹180 डीज़ल</span> की सीधी बचत होगी।
+          </p>
+
+          <!-- Route Mini Meta -->
+          <div class="bg-emerald-50/60 rounded-xl p-3 border border-emerald-100 text-[11px] text-emerald-900 space-y-1 mt-2">
+            <p class="flex items-center gap-1.5 font-medium">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              ट्रैफिक-फ्री हाईवे लिंक 24B
+            </p>
+            <p class="text-slate-500 pl-3.5">टोल अनुमान: ₹65 • स्थिति: बिल्कुल साफ़</p>
+          </div>
+        </div>
+
+        <!-- Bottom Action Button matching the Pill style of SCREEN_2 -->
+        <div class="pt-5 space-y-2">
+          <a href="driver-delivery-details.html?id=del-8901" class="block w-full py-2.5 px-4 rounded-full border border-emerald-300 hover:border-emerald-400 bg-emerald-50/50 hover:bg-emerald-100/60 text-emerald-800 text-xs font-semibold transition-all text-center shadow-sm">
+            स्मार्ट रूट देखें ➔
+          </a>
+          <button onclick="openAiVoiceAssistant()" class="w-full py-2 px-4 rounded-full border border-purple-200 hover:border-purple-300 bg-purple-50/60 hover:bg-purple-100/60 text-purple-700 text-[11px] font-semibold transition-all text-center flex items-center justify-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" x2="12" y1="19" y2="22"></line>
+            </svg>
+            <span>वॉइस सारथी से सुनें</span>
+          </button>
+        </div>
+      </div>
+
+    </section>
+    <!-- END: 3-Column Workflow Layout -->
+
+  </main>
+  <!-- END: Main Dashboard Content Area -->
+</div>
+
+<!-- Mobile Bottom Navigation Bar (Visible on phones < 768px) -->
+<nav class="lg:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-2 flex items-center justify-around z-30 shadow-lg">
+  <a href="driver-dashboard.html" class="flex flex-col items-center gap-1 text-emerald-700">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+      <polyline points="9 22 9 12 15 12 15 22"></polyline>
+    </svg>
+    <span class="text-[10px] font-semibold">होम</span>
+  </a>
+
+  <a href="driver-delivery-details.html?id=del-8901" class="flex flex-col items-center gap-1 text-slate-500 hover:text-emerald-700">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <rect height="13" rx="2" width="16" x="1" y="6"></rect>
+      <path d="M17 9h4l3 4v6h-7V9z"></path>
+      <circle cx="5.5" cy="18.5" r="2.5"></circle>
+      <circle cx="18.5" cy="18.5" r="2.5"></circle>
+    </svg>
+    <span class="text-[10px] font-medium">सक्रिय ट्रिप</span>
+  </a>
+
+  <a href="driver-deliveries.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-emerald-700">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="m7.5 4.27 9 5.15"></path>
+      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
+      <path d="m3.3 7 8.7 5 8.7-5"></path>
+      <path d="M12 22V12"></path>
+    </svg>
+    <span class="text-[10px] font-medium">लोड्स</span>
+  </a>
+
+  <a href="driver-earnings.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-emerald-700">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
+      <path d="M12 18V6"></path>
+    </svg>
+    <span class="text-[10px] font-medium">कमाई</span>
+  </a>
+
+  <a href="driver-profile.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-emerald-700">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+      <circle cx="12" cy="7" r="4"></circle>
+    </svg>
+    <span class="text-[10px] font-medium">प्रोफाइल</span>
+  </a>
+</nav>
+
+<!-- BEGIN: AI Voice Assistant Modal -->
+<div id="aiVoiceModal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+  <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 transform transition-all text-center relative max-h-[90vh] overflow-y-auto">
+    <!-- Close Button -->
+    <button onclick="closeAiVoiceAssistant()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-100 transition-colors" aria-label="बंद करें">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <!-- Header Icon -->
+    <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center mx-auto mb-3 shadow-lg shadow-purple-500/30">
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+        <line x1="12" x2="12" y1="19" y2="22"></line>
+      </svg>
+    </div>
+
+    <h2 class="text-xl font-bold text-slate-900 mb-1">FarmLink AI वॉइस सारथी</h2>
+    <p class="text-xs text-slate-500 mb-4">
+      सक्रिय ट्रिप, मौसम चेतावनी और AI शॉर्टेस्ट रूट की बोलकर जानकारी सुनें
+    </p>
+
+    <!-- Voice Agent Frame Container -->
+    <div class="bg-purple-50/50 border border-purple-100 rounded-2xl p-3 text-left mb-4 shadow-inner">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-purple-600 animate-pulse"></span>
+        <strong class="text-xs text-purple-900">लाइव AI ट्रिप ब्रीफिंग व वॉइस सहायता:</strong>
+      </div>
+      <p role="status" class="rounded-xl border border-purple-200/60 bg-white p-4 text-center text-sm text-slate-600">
+        वॉइस सहायक सुरक्षा कारणों से अस्थायी रूप से बंद है। व्यवस्थापक से सुरक्षित सेटअप के लिए संपर्क करें।
+      </p>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-3">
+      <button type="button" onclick="closeAiVoiceAssistant()" class="flex-1 py-2.5 px-4 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-colors">
+        बंद करें
+      </button>
+      <a href="driver-delivery-details.html?id=del-8901" class="flex-1 py-2.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-sm">
+        <span>मार्ग खोलें</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="m9 18 6-6-6-6"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+</div>
+<!-- END: AI Voice Assistant Modal -->
+
+<!-- Scripts -->
+<script src="../../shared/assets/js/firebase.js"></script>
+<script src="../../shared/assets/js/driver-data.js"></script>
+<script>
+  // Global Toast Helper
+  function showToast(message) {
+    const existing = document.querySelector(".driver-toast");
+    if (existing) existing.remove();
+
+    const toast = document.createElement("div");
+    toast.className = "driver-toast";
+    toast.innerHTML = `
+      <svg class="w-4 h-4 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <span>${message}</span>
+    `;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.opacity = "0";
+      toast.style.transition = "opacity 0.3s ease";
+      setTimeout(() => toast.remove(), 300);
+    }, 2800);
+  }
+
+  // Mobile Sidebar Drawer Handlers
+  const mainSidebar = document.getElementById("mainSidebar");
+  const mobileSidebarBackdrop = document.getElementById("mobileSidebarBackdrop");
+  const btnToggleMobileSidebar = document.getElementById("btnToggleMobileSidebar");
+  const btnCloseMobileSidebar = document.getElementById("btnCloseMobileSidebar");
+
+  function openMobileSidebar() {
+    mainSidebar.classList.remove("-translate-x-full");
+    mobileSidebarBackdrop.classList.remove("hidden");
+  }
+
+  function closeMobileSidebar() {
+    mainSidebar.classList.add("-translate-x-full");
+    mobileSidebarBackdrop.classList.add("hidden");
+  }
+
+  if (btnToggleMobileSidebar) btnToggleMobileSidebar.addEventListener("click", openMobileSidebar);
+  if (btnCloseMobileSidebar) btnCloseMobileSidebar.addEventListener("click", closeMobileSidebar);
+  if (mobileSidebarBackdrop) mobileSidebarBackdrop.addEventListener("click", closeMobileSidebar);
+
+  // AI Voice Assistant Modal
+  const aiVoiceModal = document.getElementById("aiVoiceModal");
+  function openAiVoiceAssistant() {
+    if (aiVoiceModal) {
+      aiVoiceModal.classList.remove("hidden");
+    }
+  }
+
+  function closeAiVoiceAssistant() {
+    if (aiVoiceModal) {
+      aiVoiceModal.classList.add("hidden");
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    }
+  }
+
+  // Duty Online/Offline Toggle
+  let isDriverOnline = true;
+
+  function syncDutyState(online) {
+    isDriverOnline = online;
+    const livePulseDot = document.getElementById("livePulseDot");
+    const liveStatusText = document.getElementById("liveStatusText");
+    const toggleDutyLabel = document.getElementById("toggleDutyLabel");
+    const toggleDutyBtn = document.getElementById("toggleDutyBtn");
+    const heroDutyStatus = document.getElementById("heroDutyStatus");
+    const profileStatusIndicator = document.getElementById("profileStatusIndicator");
+
+    if (online) {
+      if (livePulseDot) livePulseDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
+      if (liveStatusText) liveStatusText.textContent = "ड्यूटी: सक्रिय";
+      if (toggleDutyLabel) toggleDutyLabel.textContent = "ऑनलाइन";
+      if (toggleDutyBtn) {
+        toggleDutyBtn.className = "px-3 py-1.5 rounded-xl bg-emerald-700/80 hover:bg-emerald-600 border border-emerald-500/50 text-xs font-semibold text-white transition-all flex items-center gap-1.5 shadow-sm";
+      }
+      if (heroDutyStatus) {
+        heroDutyStatus.textContent = "ऑनलाइन व ड्यूटी हेतु उपलब्ध";
+        heroDutyStatus.className = "text-emerald-400 font-medium";
+      }
+      if (profileStatusIndicator) profileStatusIndicator.className = "absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full";
+      
+      if (window.farmlinkDriver) {
+        window.farmlinkDriver.saveProfile({ availability_status: "available" });
+      }
+    } else {
+      if (livePulseDot) livePulseDot.className = "w-2.5 h-2.5 rounded-full bg-slate-400";
+      if (liveStatusText) liveStatusText.textContent = "ड्यूटी: बंद (ऑफलाइन)";
+      if (toggleDutyLabel) toggleDutyLabel.textContent = "ऑफलाइन";
+      if (toggleDutyBtn) {
+        toggleDutyBtn.className = "px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-semibold text-slate-300 transition-all flex items-center gap-1.5 shadow-sm";
+      }
+      if (heroDutyStatus) {
+        heroDutyStatus.textContent = "ऑफलाइन — ड्यूटी बंद";
+        heroDutyStatus.className = "text-slate-400 font-medium";
+      }
+      if (profileStatusIndicator) profileStatusIndicator.className = "absolute -top-1 -right-1 w-3 h-3 bg-slate-400 border-2 border-white rounded-full";
+
+      if (window.farmlinkDriver) {
+        window.farmlinkDriver.saveProfile({ availability_status: "offline" });
+      }
+    }
+  }
+
+  function toggleDutyAvailability() {
+    const newState = !isDriverOnline;
+    syncDutyState(newState);
+    showToast(newState ? "आप अब ऑनलाइन हैं! नए ऑर्डर मिलेंगे।" : "आप अब ऑफलाइन हो गए हैं।");
+  }
+
+  // Load and Hydrate Dashboard Data
+  async function hydrateDashboard() {
+    if (!window.farmlinkDriver) return;
+
+    try {
+      const profile = window.farmlinkDriver.getProfile();
+      if (profile) {
+        // Driver Name
+        const nameClean = (profile.full_name || "रामेश्वर यादव").split(" (")[0];
+        const sidebarName = document.getElementById("sidebarDriverName");
+        const heroName = document.getElementById("heroDriverName");
+        if (sidebarName) sidebarName.textContent = nameClean;
+        if (heroName) heroName.textContent = nameClean.replace(/ यादव.*/, " जी");
+
+        // Location & Vehicle
+        const heroLoc = document.getElementById("heroDriverLocation");
+        if (heroLoc) {
+          heroLoc.textContent = `${profile.city || "लखनऊ"}, ${profile.district || "लखनऊ"} (${profile.state === "Uttar Pradesh" ? "उत्तर प्रदेश" : profile.state || "उ.प्र."})`;
+        }
+
+        const heroVeh = document.getElementById("heroVehicleNum");
+        if (heroVeh && profile.vehicle_number) {
+          heroVeh.textContent = profile.vehicle_number;
+        }
+
+        // Online State
+        syncDutyState(profile.availability_status !== "offline");
+      }
+
+      // Fetch Deliveries & Calculate Metrics
+      const deliveries = await window.farmlinkDriver.fetchDeliveries("all");
+      const earnings = window.farmlinkDriver.getEarningsSummary();
+
+      const activeList = deliveries.filter(d => ["assigned", "accepted", "at_pickup", "picked_up", "in_transit"].includes(d.tracking_status));
+      const completedList = deliveries.filter(d => d.tracking_status === "delivered");
+      const assignedCount = deliveries.filter(d => d.tracking_status === "assigned").length;
+
+      // Update Badges & Counters
+      const badgeLoads = document.getElementById("badgeAvailableLoads");
+      if (badgeLoads) {
+        badgeLoads.textContent = `${assignedCount > 0 ? assignedCount : 14} नए`;
+      }
+
+      const statTrips = document.getElementById("statTodayTrips");
+      if (statTrips) {
+        statTrips.textContent = earnings.delivered_today_count || (completedList.length + (activeList.length > 0 ? 1 : 0)) || 3;
+      }
+
+      const statBreakdown = document.getElementById("statTripBreakdown");
+      if (statBreakdown) {
+        statBreakdown.textContent = `${completedList.length || 2} पूर्ण • ${activeList.length || 1} सक्रिय`;
+      }
+
+      const statTodayEarn = document.getElementById("statTodayEarnings");
+      if (statTodayEarn) {
+        statTodayEarn.textContent = window.farmlinkDriver.money(earnings.today_earnings || 4850);
+      }
+
+      const weeklyEarn = document.getElementById("chartWeeklyEarnings");
+      if (weeklyEarn) {
+        weeklyEarn.textContent = window.farmlinkDriver.money(earnings.weekly_earnings || 24600);
+      }
+
+      const dailyAvg = document.getElementById("chartDailyAvg");
+      if (dailyAvg) {
+        const avgVal = Math.round((earnings.weekly_earnings || 24600) / 7);
+        dailyAvg.textContent = `${window.farmlinkDriver.money(avgVal)} / दिन`;
+      }
+
+      // Dynamically link active trip button in sidebar
+      const activeTrip = activeList[0] || deliveries.find(d => d.id === "del-8901") || deliveries[0];
+      if (activeTrip) {
+        const activeLink = document.getElementById("navActiveTripLink");
+        if (activeLink) {
+          activeLink.href = `driver-delivery-details.html?id=${encodeURIComponent(activeTrip.id)}`;
+        }
+      }
+
+    } catch (err) {
+      console.warn("Dashboard data hydration skipped:", err);
+    }
+  }
+
+  // Initial Load
+  document.addEventListener("DOMContentLoaded", () => {
+    hydrateDashboard();
+  });
+
+  // Background auto-refresh
+  window.setInterval(() => {
+    hydrateDashboard().catch(console.warn);
+  }, 20000);
+</script>
+</body>
+</html>

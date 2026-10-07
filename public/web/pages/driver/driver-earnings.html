@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>FarmLink Driver — सारथी कमाई व भुगतान</title>
+    <link rel="stylesheet" href="../../shared/assets/css/driver.css" />
+  </head>
+  <body>
+    <div class="driver-app-frame">
+      <!-- Topbar Slot with Desktop Nav -->
+      <div id="driver-topbar-slot"></div>
+
+      <main class="driver-main">
+        <div class="card-title-row" style="margin-bottom: 8px">
+          <div>
+            <h1>कमाई और भुगतान (Earnings)</h1>
+            <p style="font-size: 13px; color: var(--ink-soft); margin: 0">
+              साप्ताहिक विवरण, पेआउट स्थिति व ट्रिप लेजर
+            </p>
+          </div>
+          <button
+            id="btnDownloadStatement"
+            class="btn btn-sm btn-lime"
+            style="width: auto"
+          >
+            <i data-lucide="download" style="width: 15px; height: 15px"></i>
+            <span>स्टेटमेंट डाउनलोड</span>
+          </button>
+        </div>
+
+        <!-- Responsive Two-Column Layout on Laptop/Desktop -->
+        <div class="responsive-two-col">
+          <!-- Left Column: Summary Card & Bank Info -->
+          <div style="display: flex; flex-direction: column; gap: 16px">
+            <!-- Big Hero Earnings Card -->
+            <div
+              class="active-trip-hero"
+              style="background: linear-gradient(135deg, #1c6b44, #0f4428)"
+            >
+              <div
+                style="
+                  font-size: 13px;
+                  color: rgba(255, 255, 255, 0.85);
+                  font-weight: 600;
+                  margin-bottom: 2px;
+                "
+              >
+                कुल साप्ताहिक कमाई (This Week's Earnings)
+              </div>
+              <div
+                style="
+                  font-size: 36px;
+                  font-weight: 800;
+                  font-family: var(--font-display);
+                  color: var(--lime);
+                  line-height: 1.2;
+                  margin-bottom: 14px;
+                "
+                id="dispWeeklyTotal"
+              >
+                ₹14,600
+              </div>
+
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 10px;
+                  background: rgba(0, 0, 0, 0.25);
+                  border-radius: var(--radius-md);
+                  padding: 12px 14px;
+                  font-size: 13px;
+                "
+              >
+                <div>
+                  <span style="color: rgba(255, 255, 255, 0.7)"
+                    >आज की कमाई:</span
+                  >
+                  <div
+                    style="font-weight: 700; font-size: 16px; color: #fff"
+                    id="dispTodayEarning"
+                  >
+                    ₹2,850
+                  </div>
+                </div>
+                <div>
+                  <span style="color: rgba(255, 255, 255, 0.7)"
+                    >आगामी भुगतान (Pending):</span
+                  >
+                  <div
+                    style="font-weight: 700; font-size: 16px; color: #fed7aa"
+                    id="dispPendingPayout"
+                  >
+                    ₹1,850
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bank / UPI Account Payout Info -->
+            <div class="driver-card" style="padding: 16px">
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  margin-bottom: 8px;
+                "
+              >
+                <div style="display: flex; align-items: center; gap: 10px">
+                  <div
+                    style="
+                      width: 38px;
+                      height: 38px;
+                      border-radius: 50%;
+                      background: var(--primary-tint);
+                      color: var(--primary);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    "
+                  >
+                    <i
+                      data-lucide="wallet"
+                      style="width: 20px; height: 20px"
+                    ></i>
+                  </div>
+                  <div>
+                    <strong style="font-size: 14px"
+                      >प्राथमिक भुगतान खाता (UPI Payout)</strong
+                    >
+                    <p
+                      class="mono"
+                      style="
+                        font-size: 12.5px;
+                        color: var(--ink-soft);
+                        margin: 0;
+                      "
+                    >
+                      sunil.yadav@oksbi
+                    </p>
+                  </div>
+                </div>
+                <span class="badge badge-approved">सक्रिय ✓</span>
+              </div>
+              <p style="font-size: 12px; color: var(--ink-muted); margin: 0">
+                भुगतान प्रतिदिन शाम 8:00 बजे सीधे बैंक खाते में जमा किया जाता
+                है।
+              </p>
+            </div>
+          </div>
+
+          <!-- Right Column: Trip Earnings History Ledger -->
+          <div style="display: flex; flex-direction: column; gap: 12px">
+            <div class="card-title-row" style="margin-bottom: 0">
+              <h2 style="font-size: 17px">ट्रिप भुगतान विवरण (Trip History)</h2>
+              <span
+                style="font-size: 12.5px; color: var(--ink-soft)"
+                id="totalTripsCount"
+                >कुल: 18 ट्रिप</span
+              >
+            </div>
+
+            <div
+              id="earningsHistoryList"
+              style="display: flex; flex-direction: column; gap: 10px"
+            >
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Printable/Downloadable Statement Modal -->
+      <div id="statementModal" class="driver-modal-scrim">
+        <div class="driver-modal-sheet">
+          <div class="modal-drag-handle"></div>
+          <div
+            style="
+              border-bottom: 2px dashed var(--line);
+              padding-bottom: 12px;
+              margin-bottom: 16px;
+              text-align: center;
+            "
+          >
+            <h2 style="font-size: 20px; color: var(--primary)">
+              FarmLink AI — ई-भुगतान रसीद
+            </h2>
+            <p style="font-size: 13px; color: var(--ink-soft)">
+              सारथी डिलीवरी पार्टनर साप्ताहिक विवरण
+            </p>
+            <span
+              class="mono"
+              style="font-size: 11.5px; color: var(--ink-muted)"
+              >दिनांक: 01 सितम्बर 2026</span
+            >
+          </div>
+
+          <div
+            style="
+              font-size: 13.5px;
+              display: flex;
+              flex-direction: column;
+              gap: 10px;
+              margin-bottom: 18px;
+            "
+          >
+            <div style="display: flex; justify-content: space-between">
+              <span style="color: var(--ink-soft)">सारथी नाम:</span>
+              <strong>सुनील यादव (UP32 AB 4521)</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between">
+              <span style="color: var(--ink-soft)">कुल पूर्ण ट्रिप:</span>
+              <strong id="stmtTrips">18 ट्रिप</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between">
+              <span style="color: var(--ink-soft)">मूल किराया राशि:</span>
+              <span>₹12,200</span>
+            </div>
+            <div style="display: flex; justify-content: space-between">
+              <span style="color: var(--ink-soft)"
+                >AI रूट ईंधन प्रोत्साहन:</span
+              >
+              <span style="color: var(--success); font-weight: 700"
+                >+ ₹1,800</span
+              >
+            </div>
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                border-top: 1px solid var(--line);
+                padding-top: 10px;
+                font-size: 16px;
+              "
+            >
+              <strong>कुल देय भुगतान:</strong>
+              <strong style="color: var(--primary)" id="stmtTotal"
+                >₹14,600</strong
+              >
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 10px">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              id="btnCloseStmt"
+              style="flex: 1"
+            >
+              बंद करें
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="window.print()"
+              style="flex: 1"
+            >
+              <i data-lucide="printer" style="width: 16px; height: 16px"></i>
+              <span>प्रिंट / PDF सेव</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../shared/assets/js/firebase.js"></script>
+    <script src="../../shared/assets/js/driver-data.js"></script>
+    <script src="../../shared/assets/js/driver-shell.js"></script>
+    <script defer src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      window.driverShell.init("earnings", "कमाई व भुगतान");
+
+      function renderEarnings() {
+        const data = window.farmlinkDriver.getEarningsSummary();
+
+        document.getElementById("dispWeeklyTotal").textContent =
+          window.farmlinkDriver.money(data.weekly_earnings);
+        document.getElementById("dispTodayEarning").textContent =
+          window.farmlinkDriver.money(data.today_earnings);
+        document.getElementById("dispPendingPayout").textContent =
+          window.farmlinkDriver.money(data.pending_payout);
+        document.getElementById("totalTripsCount").textContent =
+          `कुल: ${data.completed_deliveries_count} ट्रिप`;
+
+        document.getElementById("stmtTotal").textContent =
+          window.farmlinkDriver.money(data.weekly_earnings);
+        document.getElementById("stmtTrips").textContent =
+          `${data.completed_deliveries_count} ट्रिप`;
+
+        const list = document.getElementById("earningsHistoryList");
+        list.innerHTML = data.history
+          .map(
+            (item) => `
+          <div class="driver-card" style="padding:16px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+              <span class="mono" style="font-size:12.5px;font-weight:700;color:var(--ink-soft);">#${item.order_id || "ORD-TRIP"}</span>
+              <span class="badge ${item.status === "paid" ? "badge-delivered" : "badge-at_pickup"}">
+                ${item.status === "paid" ? "खाते में जमा ✓" : "आगामी पेआउट"}
+              </span>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+              <strong style="font-size:14.5px;color:var(--ink);">${item.crop_name}</strong>
+              <strong style="font-size:17px;color:var(--primary);">${window.farmlinkDriver.money(item.amount)}</strong>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--ink-muted);">
+              <span>${item.distance_km || 25} km · पूर्ण</span>
+              <span>${window.farmlinkDriver.formatDateTime(item.created_at)}</span>
+            </div>
+          </div>
+        `,
+          )
+          .join("");
+
+        lucide.createIcons();
+      }
+
+      // Download Statement Modal
+      document
+        .getElementById("btnDownloadStatement")
+        .addEventListener("click", () => {
+          document.getElementById("statementModal").classList.add("open");
+        });
+
+      document.getElementById("btnCloseStmt").addEventListener("click", () => {
+        document.getElementById("statementModal").classList.remove("open");
+      });
+
+      renderEarnings();
+    </script>
+  </body>
+</html>

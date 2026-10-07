@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ऑर्डर · KisanMandi</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+  </head>
+  <body>
+    <div id="app-shell">
+      <div class="main-col">
+        <div id="topbar-slot"></div>
+        <main class="content">
+          <h1 style="margin-bottom: 4px">मेरे ऑर्डर</h1>
+          <p style="margin-bottom: 18px">
+            अपने खरीद इतिहास और सक्रिय ऑर्डर देखें
+          </p>
+
+          <div class="tabs">
+            <a href="#" class="active">सभी (4)</a><a href="#">सक्रिय (2)</a
+            ><a href="#">पूर्ण (2)</a>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ऑर्डर ID</th>
+                  <th>विक्रेता</th>
+                  <th>फसल</th>
+                  <th>राशि</th>
+                  <th>तिथि</th>
+                  <th>स्थिति</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="ordersTableBody"></tbody>
+            </table>
+          </div>
+
+          <div class="row-card">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 6px;
+              "
+            >
+              <strong class="mono">#ORD-2291</strong
+              ><span class="pill pill-info">रास्ते में</span>
+            </div>
+            <div class="rc-row">
+              <span class="rc-label">विक्रेता</span><span>रामेश कुमार</span>
+            </div>
+            <div class="rc-row">
+              <span class="rc-label">फसल</span><span>गेहूं · 20 क्विंटल</span>
+            </div>
+            <div class="rc-row">
+              <span class="rc-label">राशि</span
+              ><span class="mono">₹43,600</span>
+            </div>
+            <a
+              href="buyer-order-tracking.html"
+              class="btn btn-secondary btn-sm btn-block"
+              style="margin-top: 10px"
+              >ट्रैक करें</a
+            >
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/buyer-data.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script>
+      initShell("buyer", "orders", "मेरे ऑर्डर");
+
+      async function loadOrders() {
+        try {
+          const orders = await window.farmlinkBuyerData.fetchBuyerOrders();
+          const body = document.getElementById("ordersTableBody");
+
+          if (!orders.length) {
+            body.innerHTML =
+              '<tr><td colspan="7">कोई ऑर्डर नहीं मिला।</td></tr>';
+            return;
+          }
+
+          body.innerHTML = orders
+            .map(
+              (order) => `
+              <tr>
+                <td class="mono">#${String(order.id).slice(0, 8)}</td>
+                <td>सत्यापित किसान</td>
+                <td>फसल ${String(order.id).slice(0, 4)}</td>
+                <td class="mono">${window.farmlinkBuyerData.money(order.total_amount || 0)}</td>
+                <td>${window.farmlinkBuyerData.shortDate(order.created_at)}</td>
+                <td>${window.farmlinkBuyerData.orderStatusBadge(order.order_status)}</td>
+                <td><div style="display:flex;gap:6px;flex-wrap:wrap"><a href="buyer-order-tracking.html?id=${order.id}" class="btn btn-secondary btn-sm">ट्रैक करें</a><button class="btn btn-secondary btn-sm" data-action="invoice" data-id="${order.id}">इनवॉइस</button>${["pending","accepted","picking"].includes(order.order_status) ? `<button class="btn btn-danger btn-sm" data-action="cancel" data-id="${order.id}">रद्द करें</button>` : ""}</div></td>
+              </tr>
+            `,
+            )
+            .join("");
+        } catch (error) {
+          console.error("Orders load failed", error);
+          document.getElementById("ordersTableBody").innerHTML =
+            '<tr><td colspan="7">ऑर्डर डेटा उपलब्ध नहीं है।</td></tr>';
+        }
+      }
+
+      function downloadInvoice(order) {
+        const invoice = [`FarmLink Prototype Invoice`, `Order: #${String(order.id).slice(0, 8)}`, `Date: ${window.farmlinkBuyerData.shortDate(order.created_at)}`, `Amount: ${window.farmlinkBuyerData.money(order.total_amount || 0)}`, `Payment: ${order.payment_status || "paid"}`, `Status: ${order.order_status || "pending"}`].join("\n");
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(new Blob([invoice], { type: "text/plain;charset=utf-8" }));
+        link.download = `farmlink-invoice-${String(order.id).slice(0, 8)}.txt`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+      }
+      document.getElementById("ordersTableBody").addEventListener("click", async (event) => {
+        const button = event.target.closest("button[data-action]"); if (!button) return;
+        const orders = await window.farmlinkBuyerData.fetchBuyerOrders();
+        const order = orders.find((entry) => entry.id === button.dataset.id); if (!order) return;
+        if (button.dataset.action === "invoice") return downloadInvoice(order);
+        if (!window.confirm("क्या आप यह ऑर्डर रद्द करना चाहते हैं?")) return;
+        try { await window.farmlinkBuyerData.cancelBuyerOrder(order.id); showToast("✓ ऑर्डर रद्द हो गया"); loadOrders(); }
+        catch (error) { showToast(`ऑर्डर रद्द नहीं हुआ: ${error.message}`); }
+      });
+
+      loadOrders();
+    </script>
+  </body>
+</html>

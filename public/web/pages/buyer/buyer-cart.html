@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>कार्ट · KisanMandi</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+  </head>
+  <body>
+    <div id="app-shell">
+      <div class="main-col">
+        <div id="topbar-slot"></div>
+        <main class="content" style="max-width: 900px">
+          <h1 style="margin-bottom: 18px">कार्ट</h1>
+
+          <div class="grid grid-2" style="align-items: start">
+            <div id="cartItemsContainer"></div>
+            <div class="card" id="cartSummaryCard">
+              <h2 style="margin-bottom: 14px">ऑर्डर सारांश</h2>
+              <div
+                id="cartSummary"
+                style="display: flex; flex-direction: column; gap: 8px"
+              ></div>
+              <div class="divider"></div>
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  padding: 4px 0;
+                  font-weight: 700;
+                  font-size: 16px;
+                "
+              >
+                <span>कुल</span><span class="mono" id="cartTotal">₹0</span>
+              </div>
+              <a
+                href="buyer-checkout.html"
+                class="btn btn-primary btn-block"
+                style="margin-top: 16px"
+                >चेकआउट करें</a
+              >
+            </div>
+          </div>
+
+          <!-- empty cart state -->
+          <div class="empty-state" style="display: none">
+            <div class="icon">🛒</div>
+            <h3>आपका कार्ट खाली है</h3>
+            <p>बाज़ार से फसलें जोड़ें और यहाँ अपना ऑर्डर तैयार करें।</p>
+            <a
+              href="buyer-marketplace.html"
+              class="btn btn-accent"
+              style="margin-top: 12px"
+              >बाज़ार देखें</a
+            >
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/buyer-data.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script>
+      initShell("buyer", "cart", "कार्ट");
+
+      function renderCart() {
+        const cart = window.farmlinkBuyerData.getBuyerCart();
+        const container = document.getElementById("cartItemsContainer");
+        const summary = document.getElementById("cartSummary");
+        const totalEl = document.getElementById("cartTotal");
+
+        if (!cart.length) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="icon">🛒</div>
+              <h3>आपका कार्ट खाली है</h3>
+              <p>बाज़ार से फसलें जोड़ें और यहाँ अपना ऑर्डर तैयार करें।</p>
+              <a href="buyer-marketplace.html" class="btn btn-accent" style="margin-top: 12px">बाज़ार देखें</a>
+            </div>`;
+          summary.innerHTML = "<div>कार्ट खाली</div>";
+          totalEl.textContent = "₹0";
+          return;
+        }
+
+        container.innerHTML = cart
+          .map(
+            (item) => `
+              <div class="card" style="display: flex; gap: 12px; margin-bottom: 12px">
+                <div class="crop-thumb" style="width: 70px; height: 70px; flex-shrink: 0">${item.emoji || "🌾"}</div>
+                <div style="flex: 1">
+                  <div style="display: flex; justify-content: space-between">
+                    <strong>${item.title} · ${item.grade || "Grade A"}</strong>
+                    <button class="btn btn-ghost btn-sm" aria-label="Remove" data-remove-id="${item.listingId}">✕</button>
+                  </div>
+                  <p style="margin: 2px 0 8px; font-size: 12.5px">विक्रेता: ${item.seller || "सत्यापित किसान"} · ${item.location || "स्थान"}</p>
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 8px">
+                      <button class="btn btn-secondary btn-sm" data-adjust="-100" data-listing-id="${item.listingId}">−</button>
+                      <input type="number" value="${Math.round((item.quantityKg || 100) / 100)}" style="width: 52px; text-align: center" min="1" data-qty-id="${item.listingId}" />
+                      <button class="btn btn-secondary btn-sm" data-adjust="100" data-listing-id="${item.listingId}">+</button>
+                      <span style="font-size: 12px; color: var(--ink-soft)">क्विंटल</span>
+                    </div>
+                    <span class="mono" style="font-weight: 600">${window.farmlinkBuyerData.money((item.pricePerKg || 0) * (item.quantityKg || 100))}</span>
+                  </div>
+                </div>
+              </div>
+            `,
+          )
+          .join("");
+
+        const subtotal = cart.reduce(
+          (sum, item) =>
+            sum + (item.pricePerKg || 0) * (item.quantityKg || 100),
+          0,
+        );
+        const delivery = subtotal > 0 ? 450 : 0;
+        const fee = subtotal > 0 ? 110 : 0;
+        const total = subtotal + delivery + fee;
+
+        summary.innerHTML = `
+          <div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 13.5px;"><span>उप-योग</span><span class="mono">${window.farmlinkBuyerData.money(subtotal)}</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 13.5px;"><span>डिलीवरी शुल्क</span><span class="mono">${window.farmlinkBuyerData.money(delivery)}</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 13.5px;"><span>प्लेटफ़ॉर्म शुल्क</span><span class="mono">${window.farmlinkBuyerData.money(fee)}</span></div>
+        `;
+        totalEl.textContent = window.farmlinkBuyerData.money(total);
+
+        document.querySelectorAll("[data-remove-id]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const updated = cart.filter(
+              (item) => String(item.listingId) !== button.dataset.removeId,
+            );
+            window.farmlinkBuyerData.saveBuyerCart(updated);
+            renderCart();
+          });
+        });
+
+        document.querySelectorAll("[data-adjust]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const listingId = button.dataset.listingId;
+            const updated = cart.map((item) => {
+              if (String(item.listingId) !== String(listingId)) return item;
+              const nextQty = Math.max(
+                100,
+                Number(item.quantityKg || 100) +
+                  Number(button.dataset.adjust || 0),
+              );
+              return { ...item, quantityKg: nextQty };
+            });
+            window.farmlinkBuyerData.saveBuyerCart(updated);
+            renderCart();
+          });
+        });
+      }
+
+      renderCart();
+    </script>
+  </body>
+</html>

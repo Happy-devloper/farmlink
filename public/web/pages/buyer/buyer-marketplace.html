@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>बाज़ार · KisanMandi</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+  </head>
+  <body>
+    <div id="app-shell">
+      <div class="main-col">
+        <div id="topbar-slot"></div>
+        <main class="content">
+          <h1 style="margin-bottom: 4px">बाज़ार</h1>
+          <p style="margin-bottom: 18px">सत्यापित किसानों से सीधे फसल खरीदें</p>
+
+          <div class="card" style="margin-bottom: 18px">
+            <div
+              style="
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+                align-items: center;
+              "
+            >
+              <input
+                type="text"
+                placeholder="🔍 फसल या स्थान खोजें..."
+                style="flex: 1; min-width: 200px"
+              />
+              <select style="max-width: 160px">
+                <option>फसल प्रकार</option>
+                <option>अनाज</option>
+                <option>तिलहन</option>
+                <option>सब्ज़ियाँ</option>
+              </select>
+              <select style="max-width: 160px">
+                <option>मूल्य सीमा</option>
+                <option>₹0–2000</option>
+                <option>₹2000–5000</option>
+                <option>₹5000+</option>
+              </select>
+              <select style="max-width: 160px">
+                <option>स्थान</option>
+                <option>25 किमी</option>
+                <option>50 किमी</option>
+                <option>100 किमी</option>
+              </select>
+              <select style="max-width: 160px">
+                <option>ग्रेड</option>
+                <option>Grade A</option>
+                <option>Grade B</option>
+                <option>Grade C</option>
+              </select>
+              <select style="max-width: 170px">
+                <option>डिलीवरी उपलब्धता</option>
+                <option>पिकअप</option>
+                <option>डिलीवरी</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="listingGrid" class="grid grid-3"></div>
+        </main>
+      </div>
+    </div>
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/buyer-data.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script>
+      initShell("buyer", "marketplace", "बाज़ार");
+
+      async function loadMarketplace() {
+        const listingGrid = document.getElementById("listingGrid");
+        try {
+          const listings = await window.farmlinkBuyerData.fetchBuyerListings();
+          sessionStorage.setItem("farmlink_marketplace_listings", JSON.stringify(listings));
+          if (!listings.length) {
+            listingGrid.innerHTML = `
+              <div class="card" style="grid-column: 1 / -1;">
+                <h3>कोई फसल उपलब्ध नहीं है</h3>
+                <p>अभी सक्रिय लिस्टिंग नहीं मिली।</p>
+              </div>`;
+            return;
+          }
+
+          listingGrid.innerHTML = listings
+            .map(
+              (item) => `
+                <a href="buyer-product-details.html?id=${item.id}" class="card" style="cursor: pointer">
+                  <div class="crop-thumb" style="margin-bottom: 10px">${item.emoji}</div>
+                  <div style="display: flex; justify-content: space-between">
+                    <h3>${item.title} · ${item.grade}</h3>
+                    <span class="badge-verified">✓ सत्यापित</span>
+                  </div>
+                  <p style="margin: 2px 0 8px; font-size: 12.5px">
+                    📍 ${item.location} · ${item.quantityQuintalLabel} उपलब्ध
+                  </p>
+                  <div class="mono" style="font-size: 17px; font-weight: 600; margin-bottom: 8px">
+                    ${window.farmlinkBuyerData.money(item.pricePerKg * 100)}<span style="font-size: 12px; color: var(--ink-soft); font-weight: 400;">/क्विंटल</span>
+                  </div>
+                  <span class="pill pill-info">🚚 डिलीवरी उपलब्ध</span>
+                </a>
+              `,
+            )
+            .join("");
+        } catch (error) {
+          console.error("Marketplace load failed", error);
+          listingGrid.innerHTML = `
+            <div class="card" style="grid-column: 1 / -1;">
+              <h3>बाज़ार लोड नहीं हुआ</h3>
+              <p>${error.message || "Firebase में डेटा उपलब्ध नहीं है"}</p>
+            </div>`;
+        }
+      }
+
+      loadMarketplace();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FarmLink AI — खाता सक्रिय</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+  </head>
+  <body>
+    <!-- Top Header Bar -->
+    <header class="auth-header">
+      <div class="header-left">
+        <div class="logo-wrap">
+          <span class="logo-icon"><i data-lucide="leaf"></i></span>
+          <div class="logo-text">
+            <span class="brand-title"
+              >FarmLink <span class="ai-text">AI</span></span
+            >
+            <span class="brand-sub">सीधी किसान सेवा</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Centered Card Container -->
+    <div class="auth-centered-layout">
+      <div
+        class="auth-centered-card"
+        style="max-width: 460px; text-align: center"
+      >
+        <div
+          style="
+            width: 66px;
+            height: 66px;
+            border-radius: 50%;
+            background: #eaf7ed;
+            color: #10b981;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin: 10px auto 20px;
+          "
+        >
+          ✓
+        </div>
+
+        <h1
+          style="
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #0f172a;
+          "
+        >
+          आपका खाता सक्रिय है!
+        </h1>
+        <p
+          style="
+            margin-bottom: 24px;
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.5;
+          "
+        >
+          Your seller account is active. अब आप अपनी फसल की लिस्टिंग शुरू कर सकते
+          हैं और खरीदारों तक पहुँच सकते हैं।
+        </p>
+
+        <div
+          class="grid grid-2"
+          style="
+            gap: 12px;
+            margin-bottom: 28px;
+            text-align: left;
+            grid-template-columns: 1fr 1fr;
+          "
+        >
+          <div
+            class="stat"
+            style="
+              background: #fafaf9;
+              border: 1px solid #f1f5f9;
+              border-radius: 14px;
+              padding: 16px;
+            "
+          >
+            <div
+              class="label"
+              style="font-size: 11px; color: #94a3b8; font-weight: 700"
+            >
+              पहचान
+            </div>
+            <div
+              class="pill pill-success"
+              style="
+                margin-top: 8px;
+                background: #eaf7ed;
+                color: #10b981;
+                border: 1px solid #bbf7d0;
+              "
+            >
+              <span class="dot" style="background: #10b981"></span>सत्यापित
+            </div>
+          </div>
+          <div
+            class="stat"
+            style="
+              background: #fafaf9;
+              border: 1px solid #f1f5f9;
+              border-radius: 14px;
+              padding: 16px;
+            "
+          >
+            <div
+              class="label"
+              style="font-size: 11px; color: #94a3b8; font-weight: 700"
+            >
+              भुगतान
+            </div>
+            <div
+              class="pill pill-success"
+              style="
+                margin-top: 8px;
+                background: #eaf7ed;
+                color: #10b981;
+                border: 1px solid #bbf7d0;
+              "
+            >
+              <span class="dot" style="background: #10b981"></span>सत्यापित
+            </div>
+          </div>
+        </div>
+
+        <a
+          href="../seller/seller-dashboard.html"
+          class="btn-auth-submit"
+          style="text-decoration: none"
+        >
+          डैशबोर्ड पर जाएँ &nbsp;&rarr;
+        </a>
+      </div>
+    </div>
+
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script>
+      // Load Lucide Icons
+      if (!window.lucide) {
+        const lucideScript = document.createElement("script");
+        lucideScript.src = "https://unpkg.com/lucide@latest";
+        lucideScript.onload = () => {
+          if (window.lucide) window.lucide.createIcons();
+        };
+        document.head.appendChild(lucideScript);
+      } else {
+        window.lucide.createIcons();
+      }
+    </script>
+  </body>
+</html>

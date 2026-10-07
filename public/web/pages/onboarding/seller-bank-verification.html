@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FarmLink AI — बैंक/UPI सत्यापन</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+  </head>
+  <body>
+    <!-- Top Header Bar -->
+    <header class="auth-header">
+      <div class="header-left">
+        <div class="logo-wrap">
+          <span class="logo-icon"><i data-lucide="leaf"></i></span>
+          <div class="logo-text">
+            <span class="brand-title"
+              >FarmLink <span class="ai-text">AI</span></span
+            >
+            <span class="brand-sub">सीधी किसान सेवा</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Centered Card Container -->
+    <div class="auth-centered-layout">
+      <div class="auth-centered-card" style="max-width: 520px">
+        <!-- Stepper Navigation -->
+        <div class="stepper" style="margin-bottom: 24px">
+          <div class="step done">
+            <div
+              class="circ"
+              style="background: #10b981; border-color: #10b981; color: #fff"
+            >
+              ✓
+            </div>
+            <div class="lbl">पहचान</div>
+          </div>
+          <div class="bar" style="background: #10b981"></div>
+          <div class="step current">
+            <div
+              class="circ"
+              style="background: #10b981; border-color: #10b981"
+            >
+              2
+            </div>
+            <div class="lbl">बैंक / UPI</div>
+          </div>
+        </div>
+
+        <h1
+          style="
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            text-align: center;
+          "
+        >
+          भुगतान व दस्तावेज़
+        </h1>
+        <p
+          style="
+            margin-bottom: 24px;
+            text-align: center;
+            color: #64748b;
+            font-size: 14px;
+          "
+        >
+          भुगतान पाने के लिए बैंक विवरण या UPI ID जोड़ें
+        </p>
+
+        <!-- Unified Tab Navigation -->
+        <div class="tabs-new" id="payTabs">
+          <a href="#" class="active" data-tab="bank">बैंक खाता</a>
+          <a href="#" data-tab="upi">UPI</a>
+        </div>
+
+        <form id="bankForm" novalidate>
+          <div id="bankTab">
+            <div class="field" style="text-align: left">
+              <label for="acname">खाताधारक का नाम</label>
+              <input
+                type="text"
+                id="acname"
+                placeholder="बैंक पासबुक अनुसार नाम"
+                required
+                style="border: 1.5px solid #cbd5e1"
+              />
+            </div>
+            <div class="field" style="text-align: left">
+              <label for="acnum">खाता संख्या</label>
+              <input
+                type="text"
+                id="acnum"
+                inputmode="numeric"
+                placeholder="खाता संख्या"
+                required
+                style="border: 1.5px solid #cbd5e1"
+              />
+            </div>
+            <div class="field" style="text-align: left">
+              <label for="ifsc">IFSC कोड</label>
+              <input
+                type="text"
+                id="ifsc"
+                placeholder="जैसे SBIN0001234"
+                required
+                style="border: 1.5px solid #cbd5e1"
+              />
+            </div>
+          </div>
+          <div id="upiTab" style="display: none">
+            <div class="field" style="text-align: left">
+              <label for="upiid">UPI ID</label>
+              <input
+                type="text"
+                id="upiid"
+                placeholder="name@bank"
+                style="border: 1.5px solid #cbd5e1"
+              />
+            </div>
+          </div>
+
+          <div class="field" style="text-align: left">
+            <label>पासबुक / रद्द चेक अपलोड करें</label>
+            <label
+              class="upload-box"
+              for="bankDoc"
+              style="border: 2px dashed #cbd5e1; background: #fafaf9"
+            >
+              <div class="icon">⬆</div>
+              <div style="font-weight: 600; font-size: 13.5px; color: #1e293b">
+                दस्तावेज़ फ़ाइल की आवश्यकता नहीं है
+              </div>
+              <div class="hint">बैंक या UPI विवरण सीधे Firebase Database में सुरक्षित होगा</div>
+              <span class="hint">फाइल अपलोड बंद है</span>
+            </label>
+            <div
+              class="hint"
+              id="fileName"
+              style="margin-top: 8px; font-weight: 600; color: #10b981"
+            ></div>
+          </div>
+
+          <div
+            class="alert alert-info"
+            style="
+              border-radius: 12px;
+              font-size: 13px;
+              margin-bottom: 24px;
+              background: #e0f2fe;
+              border-color: #bae6fd;
+              color: #0369a1;
+            "
+          >
+            🔒 आपका बैंक विवरण एन्क्रिप्टेड है और केवल भुगतान हेतु उपयोग होगा।
+          </div>
+
+          <button type="submit" class="btn-auth-submit">
+            सत्यापन पूरा करें &nbsp;&rarr;
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script>
+      document.querySelectorAll("#payTabs a").forEach((tab) => {
+        tab.addEventListener("click", (e) => {
+          e.preventDefault();
+          document
+            .querySelectorAll("#payTabs a")
+            .forEach((t) => t.classList.remove("active"));
+          tab.classList.add("active");
+          const which = tab.dataset.tab;
+          document.getElementById("bankTab").style.display =
+            which === "bank" ? "block" : "none";
+          document.getElementById("upiTab").style.display =
+            which === "upi" ? "block" : "none";
+        });
+      });
+      document
+        .getElementById("bankForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const isBank =
+            document.querySelector("#payTabs a.active").dataset.tab === "bank";
+          const requiredIds = isBank ? ["acname", "acnum", "ifsc"] : ["upiid"];
+          const valid = requiredIds.every((id) => {
+            const input = document.getElementById(id);
+            const missing = !input.value.trim();
+            input.classList.toggle("invalid", missing);
+            return !missing;
+          });
+          if (!valid) return;
+
+          const submitButton = this.querySelector('button[type="submit"]');
+          submitButton.disabled = true;
+          try {
+            const { client, user } = await getCurrentUser();
+            if (!user) throw new Error("पहले Firebase में लॉग इन करें।");
+            const { error: bankError } = await client
+              .from("bank_verifications")
+              .insert({
+                user_id: user.id,
+                account_holder_name: isBank
+                  ? document.getElementById("acname").value.trim()
+                  : null,
+                account_number: isBank
+                  ? document.getElementById("acnum").value.trim()
+                  : null,
+                ifsc: isBank
+                  ? document.getElementById("ifsc").value.trim()
+                  : null,
+                upi_id: isBank
+                  ? null
+                  : document.getElementById("upiid").value.trim(),
+                document_file_url: null,
+                status: "approved",
+              });
+            if (bankError) throw bankError;
+
+            const { error: completionError } = await client
+              .from("farmer_profiles")
+              .update({ bank_verified: true })
+              .eq("user_id", user.id);
+            if (completionError) throw completionError;
+
+            window.location.href = "../seller/seller-dashboard.html";
+          } catch (error) {
+            console.error("Bank verification save failed:", error);
+            showToast(`बैंक विवरण सेव नहीं हुआ: ${error.message}`);
+            submitButton.disabled = false;
+          }
+        });
+
+      // Load Lucide Icons
+      if (!window.lucide) {
+        const lucideScript = document.createElement("script");
+        lucideScript.src = "https://unpkg.com/lucide@latest";
+        lucideScript.onload = () => {
+          if (window.lucide) window.lucide.createIcons();
+        };
+        document.head.appendChild(lucideScript);
+      } else {
+        window.lucide.createIcons();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1334 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI बाजार पूर्वानुमान · KisanMandi</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="https://unpkg.com/lucide@latest"></script>
+    <style>
+      :root {
+        --color-primary-main: #064e3b;
+        --color-bg-light: #f8fafc;
+      }
+      body {
+        background-color: var(--color-bg-light);
+        font-family: "Outfit", "Inter", sans-serif;
+      }
+      .content {
+        max-width: 1400px;
+        padding: 32px;
+      }
+      .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 28px;
+      }
+      .date-badge {
+        background: #fff;
+        border: 1px solid var(--line);
+        padding: 10px 18px;
+        border-radius: 14px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+      }
+      .discovery-section {
+        margin-bottom: 28px;
+      }
+      .crop-carousel {
+        display: flex;
+        gap: 16px;
+        overflow-x: auto;
+        padding-bottom: 12px;
+        scrollbar-width: none;
+      }
+      .crop-carousel::-webkit-scrollbar {
+        display: none;
+      }
+      .crop-card {
+        min-width: 170px;
+        background: #fff;
+        border-radius: 20px;
+        padding: 18px;
+        border: 2px solid transparent;
+        transition: all 0.2s;
+        cursor: pointer;
+        box-shadow: var(--shadow-sm);
+      }
+      .crop-card.active {
+        border-color: var(--primary);
+        background: var(--primary-bg);
+      }
+      .crop-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+      }
+      .crop-card .name {
+        font-weight: 800;
+        font-size: 15px;
+      }
+      .crop-card .price {
+        font-weight: 800;
+        font-size: 19px;
+        color: var(--color-primary-main);
+        margin-top: 4px;
+      }
+      .search-bar {
+        background: #fff;
+        border-radius: 20px;
+        padding: 20px 24px;
+        border: 1px solid var(--line);
+        display: grid;
+        grid-template-columns: 1fr 1fr 0.8fr auto;
+        gap: 16px;
+        align-items: flex-end;
+        margin-bottom: 24px;
+      }
+      .search-field {
+        position: relative;
+      }
+      .search-field label {
+        display: block;
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--ink-soft);
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .search-field input,
+      .search-field select {
+        width: 100%;
+        padding: 10px 12px 10px 40px;
+        border: 1.5px solid var(--line);
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        background: white;
+      }
+      .search-field i {
+        position: absolute;
+        left: 14px;
+        bottom: 12px;
+        color: var(--ink-soft);
+        font-style: normal;
+      }
+      .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 24px;
+      }
+      .card {
+        background: #fff;
+        border-radius: 24px;
+        border: 1px solid var(--line);
+        padding: 24px;
+        box-shadow: var(--shadow-sm);
+      }
+      .advice-bar {
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        border-radius: 18px;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      .advice-icon {
+        background: #fef3c7;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent);
+      }
+      .chart-container {
+        height: 350px;
+        margin-top: 20px;
+      }
+      .market-enablement {
+        grid-column: 1 / -1;
+        padding: 24px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        box-shadow: var(--shadow-sm);
+      }
+      .enablement-heading,
+      .enablement-title,
+      .market-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+      }
+      .enablement-heading {
+        align-items: flex-start;
+        margin-bottom: 18px;
+      }
+      .enablement-heading h2 {
+        margin: 0;
+        font-size: 20px;
+      }
+      .enablement-heading p {
+        margin: 4px 0 0;
+        color: var(--ink-soft);
+        font-size: 13px;
+      }
+      .arrival-chip {
+        flex: 0 0 auto;
+        padding: 7px 10px;
+        border: 1px solid #dbe7df;
+        border-radius: 8px;
+        background: #f6faf7;
+        color: #315541;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .enablement-grid {
+        display: grid;
+        grid-template-columns: 1.25fr 0.75fr;
+        gap: 20px;
+      }
+      .enablement-block {
+        min-width: 0;
+      }
+      .enablement-title {
+        justify-content: flex-start;
+        margin-bottom: 12px;
+      }
+      .enablement-title h3 {
+        margin: 0;
+        font-size: 15px;
+      }
+      .signal-label {
+        margin-left: auto;
+        color: #816013;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+      .buyer-signals {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+      .buyer-signal {
+        padding: 13px;
+        border: 1px solid #e5ece7;
+        border-radius: 10px;
+        background: #fbfcfb;
+      }
+      .buyer-signal strong {
+        display: block;
+        font-size: 13px;
+      }
+      .buyer-signal p {
+        margin: 6px 0;
+        color: var(--ink-soft);
+        font-size: 11px;
+        line-height: 1.5;
+      }
+      .signal-score {
+        color: var(--primary);
+        font-size: 12px;
+        font-weight: 800;
+      }
+      .lot-controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .lot-controls label {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--ink-soft);
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .lot-controls input,
+      .lot-controls select {
+        width: 100%;
+        min-height: 40px;
+        padding: 8px 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+      }
+      .lot-estimate {
+        margin: 12px 0;
+        padding: 12px;
+        background: #f1f8f2;
+        border-left: 3px solid var(--primary);
+      }
+      .lot-estimate small {
+        display: block;
+        color: var(--ink-soft);
+        font-size: 11px;
+      }
+      .lot-estimate strong {
+        display: block;
+        margin-top: 2px;
+        font-size: 20px;
+      }
+      .coordination-strip {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 16px;
+      }
+      .coordination-item {
+        padding: 12px;
+        border-top: 1px solid var(--line);
+      }
+      .coordination-item strong {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12px;
+      }
+      .coordination-item p {
+        margin: 5px 0 0;
+        color: var(--ink-soft);
+        font-size: 11px;
+      }
+      .market-actions {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px solid var(--line);
+      }
+      .market-actions a {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--primary);
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .market-note {
+        margin: 12px 0 0;
+        color: var(--ink-soft);
+        font-size: 11px;
+      }
+      .hidden {
+        display: none;
+      }
+      .skeleton {
+        background: linear-gradient(
+          90deg,
+          #f1f5f9 25%,
+          #e2e8f0 50%,
+          #f1f5f9 75%
+        );
+        background-size: 200% 100%;
+        animation: skel 1.5s infinite;
+      }
+      @keyframes skel {
+        0% {
+          background-position: 100% 0;
+        }
+        100% {
+          background-position: -100% 0;
+        }
+      }
+      @media (max-width: 900px) {
+        .detail-grid {
+          grid-template-columns: 1fr;
+        }
+        .enablement-grid {
+          grid-template-columns: 1fr;
+        }
+        .search-bar {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 600px) {
+        .content {
+          padding: 20px 14px;
+        }
+        .header-row {
+          align-items: flex-start;
+          gap: 12px;
+        }
+        .date-badge {
+          padding: 8px;
+          font-size: 11px;
+        }
+        .market-enablement {
+          padding: 16px;
+        }
+        .enablement-heading {
+          display: block;
+        }
+        .arrival-chip {
+          display: inline-block;
+          margin-top: 10px;
+        }
+        .buyer-signals {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app-shell">
+      <div class="main-col">
+        <div id="topbar-slot"></div>
+        <main class="content">
+          <div class="header-row">
+            <div>
+              <h1 style="font-size: 28px; letter-spacing: -0.02em">
+                AI बाजार पूर्वानुमान
+              </h1>
+              <p>आज की प्रमुख फसलें और उनका विश्लेषण</p>
+            </div>
+            <div class="date-badge">
+              <i data-lucide="calendar"></i>
+              <span id="current-date">-- -- ----</span>
+            </div>
+          </div>
+          <div class="discovery-section">
+            <div class="search-bar">
+              <div class="search-field">
+                <label for="input-commodity">फसल चुनें</label>
+                <i
+                  data-lucide="leaf"
+                  style="
+                    position: absolute;
+                    left: 14px;
+                    bottom: 12px;
+                    width: 18px;
+                  "
+                ></i>
+                <input
+                  type="text"
+                  id="input-commodity"
+                  value="Wheat"
+                  placeholder="जैसे Wheat"
+                />
+              </div>
+              <div class="search-field">
+                <label for="input-market">मंडी / स्थान</label>
+                <i
+                  data-lucide="map-pin"
+                  style="
+                    position: absolute;
+                    left: 14px;
+                    bottom: 12px;
+                    width: 18px;
+                  "
+                ></i>
+                <input
+                  type="text"
+                  id="input-market"
+                  value="Lucknow"
+                  placeholder="जैसे Lucknow"
+                />
+              </div>
+              <div class="search-field">
+                <label for="input-duration">अवधि (Days)</label>
+                <i
+                  data-lucide="calendar-days"
+                  style="
+                    position: absolute;
+                    left: 14px;
+                    bottom: 12px;
+                    width: 18px;
+                  "
+                ></i>
+                <select id="input-duration">
+                  <option value="7">Next 7 Days</option>
+                  <option value="15">Next 15 Days</option>
+                  <option value="30" selected>Next 30 Days</option>
+                </select>
+              </div>
+              <button
+                id="btn-search"
+                class="btn btn-primary"
+                style="height: 44px; border-radius: 12px; padding: 0 30px"
+              >
+                <i data-lucide="search"></i> खोजें
+              </button>
+            </div>
+            <div class="crop-carousel" id="crops-carousel">
+              <div class="crop-card skeleton" style="height: 100px"></div>
+              <div class="crop-card skeleton" style="height: 100px"></div>
+              <div class="crop-card skeleton" style="height: 100px"></div>
+            </div>
+          </div>
+          <div id="status-display" class="alert alert-info hidden"></div>
+
+          <div id="detail-view" class="detail-grid hidden">
+            <div class="card">
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: flex-start;
+                  margin-bottom: 24px;
+                "
+              >
+                <div>
+                  <h2
+                    id="view-name"
+                    style="
+                      font-size: 24px;
+                      font-weight: 800;
+                      display: flex;
+                      align-items: center;
+                      gap: 10px;
+                    "
+                  >
+                    <i data-lucide="sprout"></i> <span>गेहूं</span>
+                  </h2>
+                  <p
+                    id="view-location"
+                    style="
+                      color: var(--ink-soft);
+                      font-size: 14px;
+                      margin-top: 4px;
+                    "
+                  ></p>
+                </div>
+                <div style="text-align: right">
+                  <div
+                    id="view-price"
+                    style="
+                      font-size: 30px;
+                      font-weight: 800;
+                      color: var(--primary);
+                    "
+                  >
+                    ₹ --
+                  </div>
+                  <div style="font-size: 12px; color: var(--ink-soft)">
+                    प्रति क्विंटल · आज का भाव
+                  </div>
+                </div>
+              </div>
+              <div class="advice-bar">
+                <div class="advice-icon"><i data-lucide="megaphone"></i></div>
+                <div>
+                  <h4
+                    id="advice-title"
+                    style="
+                      margin: 0;
+                      font-size: 16px;
+                      font-weight: 800;
+                      color: #92400e;
+                    "
+                  >
+                    AI सलाह
+                  </h4>
+                  <p
+                    id="advice-desc"
+                    style="margin: 4px 0 0; font-size: 14px; color: #b45309"
+                  ></p>
+                </div>
+              </div>
+
+              <!-- AI Processing Progress -->
+              <div
+                id="ai-progress-container"
+                class="hidden"
+                style="margin-bottom: 20px"
+              >
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    font-size: 12px;
+                    margin-bottom: 6px;
+                    font-weight: 700;
+                    color: var(--primary);
+                  "
+                >
+                  <span>🤖 AI Deep Analysis (2023-2026 Weather Trends)</span>
+                  <span id="ai-progress-text">In Progress...</span>
+                </div>
+                <div
+                  style="
+                    height: 8px;
+                    background: #e2e8f0;
+                    border-radius: 10px;
+                    overflow: hidden;
+                  "
+                >
+                  <div
+                    id="ai-progress-bar"
+                    style="
+                      height: 100%;
+                      background: linear-gradient(90deg, #059669, #34d399);
+                      width: 10%;
+                      transition: width 0.5s ease;
+                    "
+                  ></div>
+                </div>
+                <p
+                  style="
+                    font-size: 11px;
+                    color: var(--ink-soft);
+                    margin-top: 6px;
+                  "
+                >
+                  Fetching 3 years of market residuals and historical climate
+                  correlations. Chart will update automatically.
+                </p>
+              </div>
+
+              <div class="chart-container">
+                <div
+                  id="chart-loader"
+                  class="hidden"
+                  style="
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: rgba(255, 255, 255, 0.8);
+                    z-index: 2;
+                    border-radius: 24px;
+                  "
+                >
+                  <div style="text-align: center">
+                    <div
+                      class="spinner-border text-primary"
+                      role="status"
+                    ></div>
+                    <p
+                      style="
+                        margin-top: 10px;
+                        font-weight: 600;
+                        color: var(--primary);
+                      "
+                    >
+                      Analyzing history...
+                    </p>
+                  </div>
+                </div>
+                <canvas id="trendChart"></canvas>
+              </div>
+            </div>
+            <aside class="card" style="padding: 20px">
+              <h3 style="margin-top: 0; font-size: 16px; font-weight: 800">
+                अगले 7 दिन की मांग
+              </h3>
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 12px;
+                  margin: 12px 0;
+                "
+              >
+                <div
+                  id="demand-val"
+                  style="
+                    font-size: 28px;
+                    font-weight: 800;
+                    color: var(--primary);
+                  "
+                >
+                  --/100
+                </div>
+                <p
+                  id="demand-outlook"
+                  style="font-size: 12px; color: var(--ink-soft); margin: 0"
+                >
+                  फसल मांग संकेत लोड हो रहे हैं
+                </p>
+              </div>
+              <div
+                style="
+                  height: 6px;
+                  background: #f1f5f9;
+                  border-radius: 10px;
+                  overflow: hidden;
+                "
+              >
+                <div
+                  id="demand-bar"
+                  style="height: 100%; background: var(--primary); width: 0%"
+                ></div>
+              </div>
+              <p id="demand-description" class="market-note">
+                नमूना मांग अनुमान, लाइव खरीदार ऑर्डर नहीं।
+              </p>
+
+              <!-- Nearby Markets Section -->
+              <div
+                id="live-rates-section"
+                class="hidden"
+                style="
+                  margin-top: 32px;
+                  border-top: 1px solid var(--line);
+                  padding-top: 24px;
+                "
+              >
+                <h3
+                  style="
+                    margin-top: 0;
+                    font-size: 15px;
+                    font-weight: 800;
+                    color: var(--primary);
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                  "
+                >
+                  <span>आस-पास की मंडियां</span>
+                  <span
+                    id="live-badge"
+                    style="
+                      font-size: 9px;
+                      background: #eaf7ed;
+                      color: #2e7d32;
+                      padding: 2px 6px;
+                      border-radius: 4px;
+                      text-transform: uppercase;
+                    "
+                    >Pulse</span
+                  >
+                </h3>
+                <div
+                  id="live-rates-container"
+                  style="
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
+                    margin-top: 16px;
+                  "
+                >
+                  <!-- Rates injected via JS -->
+                </div>
+                <div
+                  style="
+                    margin-top: 16px;
+                    padding: 12px;
+                    background: #f8fafc;
+                    border-radius: 12px;
+                    border: 1px dashed var(--line);
+                  "
+                >
+                  <div
+                    style="
+                      font-size: 11px;
+                      font-weight: 700;
+                      color: #64748b;
+                      margin-bottom: 4px;
+                    "
+                  >
+                    AI IMPACT ANALYSIS
+                  </div>
+                  <p
+                    id="weather-impact-summary"
+                    style="
+                      font-size: 12px;
+                      color: var(--ink-soft);
+                      margin: 0;
+                      line-height: 1.4;
+                    "
+                  ></p>
+                </div>
+              </div>
+            </aside>
+            <section
+              class="market-enablement"
+              aria-labelledby="market-actions-title"
+            >
+              <div class="enablement-heading">
+                <div>
+                  <h2 id="market-actions-title">अगला बेहतर सौदा</h2>
+                  <p id="sale-window-summary">
+                    भाव, मांग और बिक्री की तैयारी एक जगह
+                  </p>
+                </div>
+                <span class="arrival-chip" id="arrival-volume"
+                  >आगमन मात्रा उपलब्ध नहीं</span
+                >
+              </div>
+              <div class="enablement-grid">
+                <div class="enablement-block">
+                  <div class="enablement-title">
+                    <i data-lucide="store" aria-hidden="true"></i>
+                    <h3>खरीदार मांग संकेत</h3>
+                    <span class="signal-label">डेमो संकेत</span>
+                  </div>
+                  <div class="buyer-signals" id="buyer-signals"></div>
+                </div>
+                <div class="enablement-block">
+                  <div class="enablement-title">
+                    <i data-lucide="package-check" aria-hidden="true"></i>
+                    <h3>लॉट और गुणवत्ता तैयारी</h3>
+                  </div>
+                  <div class="lot-controls">
+                    <div>
+                      <label for="lot-quantity">उपलब्ध मात्रा</label>
+                      <input
+                        id="lot-quantity"
+                        type="number"
+                        min="1"
+                        value="20"
+                        inputmode="decimal"
+                      />
+                    </div>
+                    <div>
+                      <label for="lot-grade">गुणवत्ता ग्रेड</label>
+                      <select id="lot-grade">
+                        <option>Grade A</option>
+                        <option>Grade B</option>
+                        <option>Grade C</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="lot-estimate">
+                    <small id="lot-price-label"
+                      >पूर्वानुमान भाव पर अनुमानित सकल राशि</small
+                    >
+                    <strong id="lot-proceeds">₹--</strong>
+                  </div>
+                  <p class="market-note">
+                    ऑफ़र से पहले नमी, सफाई, किस्म और तौल की जाँच करें। ग्रेड
+                    खरीदार की शर्तों के अनुसार बदल सकता है।
+                  </p>
+                </div>
+              </div>
+              <div class="coordination-strip">
+                <div class="coordination-item">
+                  <strong
+                    ><i data-lucide="truck" aria-hidden="true"></i
+                    >परिवहन</strong
+                  >
+                  <p>
+                    लिस्टिंग में पिकअप विकल्प चुनें; ऑर्डर और ड्राइवर मिलने के
+                    बाद यहाँ डिलीवरी स्थिति देखें।
+                  </p>
+                </div>
+                <div class="coordination-item">
+                  <strong
+                    ><i data-lucide="warehouse" aria-hidden="true"></i
+                    >भंडारण</strong
+                  >
+                  <p>
+                    लाइव गोदाम उपलब्धता अभी नहीं जुड़ी है। बिक्री से पहले जगह,
+                    अवधि, शुल्क और फसल-सुरक्षा की पुष्टि करें।
+                  </p>
+                </div>
+              </div>
+              <div class="market-actions">
+                <a href="seller-add-listing.html"
+                  ><i data-lucide="plus-circle"></i> इस फसल की लिस्टिंग बनाएँ</a
+                >
+                <a href="pickup-route-tracking.html"
+                  ><i data-lucide="truck"></i> पिकअप स्थिति</a
+                >
+                <a href="seller-orders.html"
+                  ><i data-lucide="receipt-text"></i> ऑफ़र और भुगतान</a
+                >
+                <a href="help-center.html"
+                  ><i data-lucide="messages-square"></i> समस्या दर्ज करें</a
+                >
+              </div>
+              <p class="market-note">
+                खरीदार मांग कार्ड संकेतात्मक डेमो हैं, सत्यापित खरीदार ऑफ़र
+                नहीं। भुगतान या बिक्री तय करने से पहले खरीदार की पहचान, गुणवत्ता
+                शर्तें, परिवहन लागत और भुगतान समय की पुष्टि करें।
+              </p>
+            </section>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script>
+      initShell("seller", "ai", "AI बाजार सुझाव");
+      if (window.lucide) window.lucide.createIcons();
+      const API_BASE = "https://farmlink-retell-api.vercel.app/api/market";
+      let trendChart = null;
+      let userProfileData = null;
+      let pollingInterval = null;
+
+      document.getElementById("current-date").innerText =
+        new Date().toLocaleDateString("hi-IN", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+      const icons = {
+        Wheat: "wheat",
+        Mustard: "sprout",
+        Potato: "sprout",
+        Tomato: "sprout",
+        Onion: "sprout",
+        Rice: "wheat",
+        Gram: "sprout",
+      };
+      const localMarketSeed = {
+        Wheat: { price: 2690, demand: 72, change: 2.4 },
+        Mustard: { price: 5850, demand: 64, change: 1.8 },
+        Potato: { price: 1850, demand: 58, change: -0.7 },
+        Tomato: { price: 3200, demand: 81, change: 4.1 },
+        Maize: { price: 2250, demand: 67, change: 1.2 },
+        Rice: { price: 3100, demand: 70, change: 2.1 },
+        Gram: { price: 6200, demand: 61, change: 0.25 },
+        Onion: { price: 2800, demand: 69, change: 0.5 },
+      };
+      const demandChannels = [
+        { name: "FPO / संग्रह केंद्र", grade: "A / B ग्रेड", adjustment: 0 },
+        {
+          name: "स्थानीय प्रोसेसर",
+          grade: "साफ़, समान गुणवत्ता",
+          adjustment: 1.5,
+        },
+        {
+          name: "संस्थागत खरीदार",
+          grade: "तौल और बैच रिकॉर्ड",
+          adjustment: 2.5,
+        },
+      ];
+      function localForecast(commodity, days) {
+        const seed = localMarketSeed[commodity] || localMarketSeed.Wheat;
+        const today = new Date();
+        const history = Array.from({ length: 14 }, (_, index) => {
+          const day = new Date(today);
+          day.setDate(today.getDate() - (13 - index));
+          return {
+            date: day.toISOString().slice(0, 10),
+            price: Math.round(
+              seed.price * (1 + ((index - 13) * seed.change) / 1000),
+            ),
+          };
+        });
+        const forecast = Array.from(
+          { length: Math.min(Number(days) || 7, 30) },
+          (_, index) => {
+            const day = new Date(today);
+            day.setDate(today.getDate() + index + 1);
+            return {
+              date: day.toISOString().slice(0, 10),
+              predicted_price: Math.round(
+                seed.price * (1 + ((seed.change / 100) * (index + 1)) / 30),
+              ),
+            };
+          },
+        );
+        return {
+          commodity,
+          market: "Demo regional mandi",
+          latest_price: seed.price,
+          history,
+          forecast,
+          trend: seed.change >= 0 ? "Upward" : "Downward",
+          accuracy: "Demand trend model",
+          demand_score: seed.demand,
+          advice: {
+            recommendation: seed.demand >= 70 ? "Sell" : "Hold",
+            reasoning: `${seed.demand}% estimated demand from recent market movement.`,
+          },
+          live_rates: [],
+        };
+      }
+      async function jsonResponse(response) {
+        const contentType = response.headers.get("content-type") || "";
+        if (!contentType.includes("application/json"))
+          throw new Error(`Market API returned ${response.status}`);
+        return response.json();
+      }
+
+      async function loadUserProfile() {
+        try {
+          await window.firebaseScriptReady;
+          const { client, user } = await getCurrentUser();
+          if (user) {
+            const { data } = await client
+              .from("farmer_profiles")
+              .select("state, district, village")
+              .eq("user_id", user.id)
+              .maybeSingle();
+            if (data) {
+              userProfileData = data;
+              document.getElementById("input-market").value =
+                data.village || data.district || "Lucknow";
+              return data;
+            }
+          }
+        } catch (e) {
+          console.warn("Profile failed", e);
+        }
+        return null;
+      }
+      async function loadDiscovery(state = "Uttar Pradesh", district = "") {
+        try {
+          const params = new URLSearchParams({ state, district });
+          const resp = await fetch(`${API_BASE}/major-crops?${params}`);
+          const data = await jsonResponse(resp);
+          if (data.ok && data.crops?.length) {
+            const container = document.getElementById("crops-carousel");
+            container.innerHTML = data.crops
+              .map(
+                (c) => `
+              <div class="crop-card" onclick="quickSearch('${c.commodity}')">
+                <div style="font-size: 24px; color: var(--primary)"><i data-lucide="${icons[c.commodity] || "leaf"}"></i></div>
+                <div class="name">${c.commodity}</div>
+                <div class="price">₹${c.price.toLocaleString("en-IN")}</div>
+                <div class="trend" style="color: ${c.trend === "up" ? "#16a34a" : "#dc2626"}">
+                  ${c.trend === "up" ? "↗" : "↘"} ${c.change}%
+                </div>
+              </div>
+            `,
+              )
+              .join("");
+            if (window.lucide) window.lucide.createIcons();
+            if (data.crops.length > 0) quickSearch(data.crops[0].commodity);
+          } else {
+            throw new Error(data.message || "कोई मंडी रिकॉर्ड उपलब्ध नहीं है।");
+          }
+        } catch (e) {
+          console.warn("Discovery failed", e);
+          const container = document.getElementById("crops-carousel");
+          container.innerHTML = Object.entries(localMarketSeed)
+            .map(
+              ([commodity, seed]) =>
+                `<div class="crop-card" onclick="quickSearch('${commodity}')"><div style="font-size:24px;color:var(--primary)"><i data-lucide="${icons[commodity] || "leaf"}"></i></div><div class="name">${commodity}</div><div class="price">₹${seed.price.toLocaleString("en-IN")}</div><div class="trend">Demand ${seed.demand}%</div></div>`,
+            )
+            .join("");
+          if (window.lucide) window.lucide.createIcons();
+          quickSearch(Object.keys(localMarketSeed)[0]);
+        }
+      }
+      loadDiscovery();
+      loadUserProfile().then((profile) => {
+        if (profile?.state || profile?.district) {
+          loadDiscovery(
+            profile.state || "Uttar Pradesh",
+            profile.district || "",
+          );
+        }
+      });
+      function quickSearch(commodity) {
+        document.getElementById("input-commodity").value = commodity;
+        startSearch();
+      }
+      document
+        .getElementById("btn-search")
+        .addEventListener("click", startSearch);
+      async function startSearch() {
+        if (pollingInterval) clearInterval(pollingInterval);
+        const commodity = document.getElementById("input-commodity").value;
+        const market = document.getElementById("input-market").value;
+        const days = document.getElementById("input-duration").value;
+        const status = document.getElementById("status-display");
+        const detail = document.getElementById("detail-view");
+        const progress = document.getElementById("ai-progress-container");
+
+        status.classList.remove("hidden");
+        status.className = "alert alert-info";
+        status.innerText = "⌛ ताज़ा भाव खोजे जा रहे हैं...";
+        detail.classList.add("hidden");
+        progress.classList.add("hidden");
+
+        try {
+          const params = new URLSearchParams({ commodity, market, days });
+          const requestUrl = `${API_BASE}/details?${params.toString()}`;
+
+          const resp = await fetch(requestUrl);
+          const data = await jsonResponse(resp);
+
+          if (data.ok) {
+            status.classList.add("hidden");
+            detail.classList.remove("hidden");
+            renderUI(data.details);
+
+            // Check if AI Forecast is still processing
+            if (data.forecast_status === "pending") {
+              progress.classList.remove("hidden");
+              document.getElementById("ai-progress-bar").style.width = "20%";
+              document.getElementById("ai-progress-text").innerText =
+                "Analyzing 3-year trends...";
+              startPolling(commodity, market, days);
+            } else {
+              progress.classList.add("hidden");
+            }
+          } else {
+            status.className = "alert alert-warn";
+            status.innerText = "❌ " + data.message;
+          }
+        } catch (e) {
+          console.error("AI Insight Error:", e);
+          status.className = "alert alert-info";
+          status.innerText =
+            "लाइव सेवा उपलब्ध नहीं है — स्थानीय मांग पूर्वानुमान दिखाया जा रहा है।";
+          detail.classList.remove("hidden");
+          renderUI(localForecast(commodity, days));
+        }
+      }
+
+      function startPolling(commodity, market, days) {
+        let attempts = 0;
+        pollingInterval = setInterval(async () => {
+          attempts++;
+          const params = new URLSearchParams({ commodity, market, days });
+          try {
+            const resp = await fetch(
+              `${API_BASE}/forecast-status?${params.toString()}`,
+            );
+            const data = await resp.json();
+
+            const bar = document.getElementById("ai-progress-bar");
+            bar.style.width = Math.min(20 + attempts * 10, 90) + "%";
+
+            if (data.status === "ready") {
+              clearInterval(pollingInterval);
+              document.getElementById("ai-progress-text").innerText =
+                "Complete!";
+              bar.style.width = "100%";
+              setTimeout(
+                () =>
+                  document
+                    .getElementById("ai-progress-container")
+                    .classList.add("hidden"),
+                2000,
+              );
+
+              // Fetch the final results with full forecast
+              const finalResp = await fetch(
+                `${API_BASE}/details?${params.toString()}`,
+              );
+              const finalData = await finalResp.json();
+              if (finalData.ok) renderUI(finalData.details);
+            } else if (data.status === "error" || attempts > 20) {
+              clearInterval(pollingInterval);
+              document.getElementById("ai-progress-text").innerText =
+                "AI Analysis Skipped (Limited History)";
+              bar.style.backgroundColor = "#94a3b8";
+            }
+          } catch (e) {
+            console.warn("Polling failed", e);
+          }
+        }, 3000);
+      }
+      function renderUI(d) {
+        const liveRates = Array.isArray(d.live_rates) ? d.live_rates : [];
+        const firstRate = liveRates[0] || {};
+        const latestPrice = Number.isFinite(Number(d.latest_price))
+          ? Number(d.latest_price)
+          : Number(firstRate.Modal_Price || firstRate.modal_price || 0) / 100;
+        const advice = d.advice || {
+          recommendation: "डेटा उपलब्ध",
+          reasoning: "सरकारी मंडी डेटा के आधार पर जानकारी उपलब्ध है।",
+        };
+        const history = Array.isArray(d.history) ? d.history : [];
+        const forecast = Array.isArray(d.forecast) ? d.forecast : [];
+        renderMarketActions(d, firstRate, latestPrice, forecast);
+        document.getElementById("view-name").querySelector("span").innerText =
+          d.commodity || firstRate.Commodity || firstRate.commodity || "फसल";
+        document.getElementById("view-location").innerText =
+          `${d.market || firstRate.Market || firstRate.market || "क्षेत्रीय"} मंडी`;
+        document.getElementById("view-price").innerText =
+          "₹" + latestPrice.toLocaleString("en-IN");
+        document.getElementById("advice-title").innerText =
+          "AI सलाह: " + advice.recommendation;
+        document.getElementById("advice-desc").innerText = advice.reasoning;
+
+        const commodity =
+          d.commodity || firstRate.Commodity || firstRate.commodity || "Wheat";
+        const demandSeed =
+          Object.entries(localMarketSeed).find(
+            ([name]) => name.toLowerCase() === String(commodity).toLowerCase(),
+          )?.[1] || localMarketSeed.Wheat;
+        const demandScore = demandSeed.demand;
+        const demandOutlook =
+          demandScore >= 75
+            ? "उच्च मांग का संकेत"
+            : demandScore >= 65
+              ? "स्थिर मांग का संकेत"
+              : "मध्यम मांग का संकेत";
+        document.getElementById("demand-val").innerText = `${demandScore}/100`;
+        document.getElementById("demand-outlook").innerText = demandOutlook;
+        document.getElementById("demand-bar").style.width = `${demandScore}%`;
+        document.getElementById("demand-description").innerText =
+          `${commodity} के लिए hardcoded संकेतात्मक मांग अनुमान। यह verified buyer orders नहीं है।`;
+
+        // Render Nearby Markets
+        const liveSection = document.getElementById("live-rates-section");
+        const liveContainer = document.getElementById("live-rates-container");
+        const liveBadge = document.getElementById("live-badge");
+        const weatherSummary = document.getElementById(
+          "weather-impact-summary",
+        );
+
+        if (liveRates.length > 0) {
+          liveSection.classList.remove("hidden");
+          liveBadge.innerText = d.live_level || "Live data";
+          weatherSummary.innerText = d.weather
+            ? d.weather.description ||
+              "Historical trends suggest stable prices."
+            : "Weather data sync pending.";
+
+          const hindiMap = {
+            Wheat: "गेहूं",
+            Rice: "चावल",
+            Potato: "आलू",
+            Onion: "प्याज",
+            Mustard: "सरसों",
+            Tomato: "टमाटर",
+            "Paddy(Dhan)(Common)": "धान",
+          };
+
+          liveContainer.innerHTML = liveRates
+            .slice(0, 5)
+            .map((item) => {
+              const comm = item.Commodity || item.commodity || "Unknown";
+              const market = item.Market || item.market || "Regional";
+              const price = (
+                parseFloat(item.Modal_Price || item.modal_price || 0) / 100
+              ).toFixed(2);
+              return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">
+                        <div>
+                            <div style="font-size: 13px; font-weight: 700;">${hindiMap[comm] || comm} <small style="font-weight:400; color:#64748b">(${market})</small></div>
+                            <div style="font-size: 10px; color: #94a3b8;">${item.Arrival_Date || item.arrival_date}</div>
+                        </div>
+                        <div style="font-weight: 800; color: var(--primary); font-size: 14px;">₹${price}/kg</div>
+                    </div>
+                `;
+            })
+            .join("");
+        }
+
+        const loader = document.getElementById("chart-loader");
+        if (forecast.length > 0) {
+          loader.classList.add("hidden");
+          renderChart(history, forecast);
+        } else {
+          loader.classList.remove("hidden");
+          // Show only history if forecast not ready
+          renderChart(history, []);
+        }
+      }
+      function renderMarketActions(data, firstRate, latestPrice, forecast) {
+        const commodity =
+          data.commodity ||
+          firstRate.Commodity ||
+          firstRate.commodity ||
+          "Wheat";
+        const seed = localMarketSeed[commodity] || localMarketSeed.Wheat;
+        const projectedPrice =
+          Number(forecast.at(-1)?.predicted_price) || latestPrice;
+        const arrival =
+          firstRate.Arrival_Quantity ||
+          firstRate.arrival_quantity ||
+          firstRate.Arrival ||
+          firstRate.arrivals;
+        const arrivalLabel =
+          arrival && Number.isFinite(Number(arrival))
+            ? `मंडी आगमन: ${Number(arrival).toLocaleString("en-IN")} ${firstRate.Arrival_Unit || firstRate.arrival_unit || "MT"}`
+            : "आगमन मात्रा उपलब्ध नहीं";
+        document.getElementById("arrival-volume").textContent = arrivalLabel;
+        document.getElementById("sale-window-summary").textContent =
+          `${data.advice?.recommendation || "भाव देखें"} संकेत · अगले ${forecast.length || document.getElementById("input-duration").value} दिनों का अनुमानित भाव ₹${projectedPrice.toLocaleString("en-IN")}/क्विंटल`;
+        document.getElementById("buyer-signals").innerHTML = demandChannels
+          .map(
+            (channel) => `
+          <article class="buyer-signal">
+            <strong>${channel.name}</strong>
+            <p>संकेतात्मक मांग ${seed.demand}/100 · अपेक्षित गुणवत्ता: ${channel.grade}</p>
+            <span class="signal-score">संदर्भ मूल्य ₹${Math.round(projectedPrice * (1 + channel.adjustment / 100)).toLocaleString("en-IN")}/क्विंटल</span>
+          </article>`,
+          )
+          .join("");
+        const quantityInput = document.getElementById("lot-quantity");
+        const proceeds = document.getElementById("lot-proceeds");
+        const updateEstimate = () => {
+          const quantity = Math.max(0, Number(quantityInput.value) || 0);
+          proceeds.textContent = `₹${Math.round(quantity * projectedPrice).toLocaleString("en-IN")}`;
+        };
+        quantityInput.oninput = updateEstimate;
+        updateEstimate();
+        if (window.lucide) window.lucide.createIcons();
+      }
+      function renderChart(history, forecast) {
+        history = Array.isArray(history) ? history : [];
+        forecast = Array.isArray(forecast) ? forecast : [];
+        const canvas = document.getElementById("trendChart");
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+        if (trendChart) trendChart.destroy();
+
+        const labels = [...history.map((h) => formatDate(h.date))];
+        if (forecast.length > 0)
+          labels.push(...forecast.map((f) => formatDate(f.date)));
+
+        const histData = [...history.map((h) => h.price)];
+        if (forecast.length > 0)
+          histData.push(...Array(forecast.length).fill(null));
+
+        let foreData = [];
+        if (forecast.length > 0) {
+          foreData = [
+            ...Array(history.length - 1).fill(null),
+            history[history.length - 1].price,
+            ...forecast.map((f) => f.predicted_price),
+          ];
+        }
+
+        trendChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "वास्तविक",
+                data: histData,
+                borderColor: "#1C6B44",
+                tension: 0.3,
+                fill: false,
+                pointRadius: 4,
+              },
+              {
+                label: `${forecast.length}-दिन अनुमान`,
+                data: foreData,
+                borderColor: "#f59e0b",
+                borderDash: [5, 5],
+                tension: 0.3,
+                fill: false,
+                pointRadius: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { ticks: { callback: (v) => "₹" + v } } },
+          },
+        });
+      }
+      function formatDate(dStr) {
+        const d = new Date(dStr);
+        return d.toLocaleDateString("hi-IN", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+      }
+    </script>
+  </body>
+</html>

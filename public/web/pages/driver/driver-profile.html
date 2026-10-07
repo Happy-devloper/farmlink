@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>FarmLink Driver — सारथी प्रोफाइल व सहायता</title>
+    <link rel="stylesheet" href="../../shared/assets/css/driver.css" />
+  </head>
+  <body>
+    <div class="driver-app-frame">
+      <!-- Topbar Slot with Desktop Nav -->
+      <div id="driver-topbar-slot"></div>
+
+      <main class="driver-main">
+        <!-- Responsive Two Column Grid on Laptop/Desktop -->
+        <div class="responsive-two-col">
+          <!-- Left Column: Profile Card & Quick Actions -->
+          <div style="display: flex; flex-direction: column; gap: 16px">
+            <!-- Driver Profile Header Card -->
+            <div
+              class="driver-card"
+              style="text-align: center; padding: 24px 20px"
+            >
+              <div
+                style="
+                  position: relative;
+                  width: 80px;
+                  height: 80px;
+                  margin: 0 auto 12px;
+                "
+              >
+                <div
+                  style="
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    background: linear-gradient(
+                      135deg,
+                      var(--primary),
+                      #0f4428
+                    );
+                    color: var(--lime);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 32px;
+                    font-weight: 800;
+                    box-shadow: var(--shadow-md);
+                  "
+                >
+                  SY
+                </div>
+                <span
+                  style="
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 50%;
+                    background: var(--success);
+                    border: 2px solid #fff;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #fff;
+                    font-size: 12px;
+                  "
+                >
+                  ✓
+                </span>
+              </div>
+
+              <h2 id="profDispName" style="font-size: 20px; margin-bottom: 2px">
+                सुनील यादव
+              </h2>
+              <p
+                class="mono"
+                id="profDispPhone"
+                style="
+                  font-size: 13.5px;
+                  color: var(--ink-soft);
+                  margin-bottom: 10px;
+                "
+              >
+                +91 98765 43210
+              </p>
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 8px;
+                "
+              >
+                <span class="badge badge-approved" id="profVerifBadge"
+                  >केवाईसी सत्यापित ✓</span
+                >
+                <span
+                  class="badge"
+                  style="background: var(--surface); color: var(--ink)"
+                  >⭐ 4.9 रेटिंग</span
+                >
+              </div>
+            </div>
+
+            <!-- Verification Link Card -->
+            <div
+              class="driver-card"
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 16px;
+              "
+            >
+              <div>
+                <strong style="font-size: 14px"
+                  >दस्तावेज़ सत्यापन स्थिति</strong
+                >
+                <p style="font-size: 12.5px; color: var(--ink-soft); margin: 0">
+                  DL और गाड़ी RC फाइलें देखें
+                </p>
+              </div>
+              <a
+                href="driver-verification.html"
+                class="btn btn-sm btn-secondary"
+                style="width: auto"
+                >देखें &rsaquo;</a
+              >
+            </div>
+
+            <!-- Logout Card -->
+            <div class="driver-card" style="padding: 16px">
+              <button
+                type="button"
+                class="btn btn-danger-outline"
+                id="btnLogout"
+              >
+                <i data-lucide="log-out" style="width: 16px; height: 16px"></i>
+                <span>लॉग आउट करें (Sign Out)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Column: Profile Edit vs 24x7 Help Desk -->
+          <div style="display: flex; flex-direction: column; gap: 16px">
+            <!-- Tab Selector: Profile Edit vs Help & Support -->
+            <div class="tabs-nav" id="profileTabs">
+              <button class="tab-btn active" data-tab="details">
+                <i data-lucide="user" style="width: 15px; height: 15px"></i>
+                <span>प्रोफाइल संपादन</span>
+              </button>
+              <button class="tab-btn" data-tab="support" id="tabSupportBtn">
+                <i
+                  data-lucide="life-buoy"
+                  style="width: 15px; height: 15px"
+                ></i>
+                <span>24x7 सहायता (SOS)</span>
+              </button>
+            </div>
+
+            <!-- Section 1: Profile & Vehicle Details -->
+            <div id="sectionDetails">
+              <form id="profileEditForm" class="driver-card">
+                <h3
+                  style="
+                    font-size: 15px;
+                    color: var(--primary);
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    margin-bottom: 14px;
+                    border-bottom: 1px solid var(--line);
+                    padding-bottom: 8px;
+                  "
+                >
+                  व्यक्तिगत व वाहन विवरण
+                </h3>
+
+                <div
+                  style="
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 12px;
+                  "
+                >
+                  <div class="form-field">
+                    <label class="form-label" for="editName">पूरा नाम *</label>
+                    <input
+                      type="text"
+                      id="editName"
+                      class="form-input"
+                      required
+                    />
+                  </div>
+
+                  <div class="form-field">
+                    <label class="form-label" for="editPhone"
+                      >मोबाइल नंबर</label
+                    >
+                    <input
+                      type="text"
+                      id="editPhone"
+                      class="form-input"
+                      readonly
+                      style="background: var(--surface)"
+                    />
+                  </div>
+                </div>
+
+                <div
+                  style="
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 12px;
+                  "
+                >
+                  <div class="form-field">
+                    <label class="form-label" for="editState">राज्य *</label>
+                    <input
+                      type="text"
+                      id="editState"
+                      class="form-input"
+                      required
+                    />
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="editCity"
+                      >शहर / ज़िला *</label
+                    >
+                    <input
+                      type="text"
+                      id="editCity"
+                      class="form-input"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div
+                  style="
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 12px;
+                  "
+                >
+                  <div class="form-field">
+                    <label class="form-label" for="editVehNum"
+                      >गाड़ी नंबर (RC) *</label
+                    >
+                    <input
+                      type="text"
+                      id="editVehNum"
+                      class="form-input mono"
+                      style="text-transform: uppercase"
+                      required
+                    />
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="editCapacity"
+                      >क्षमता (kg) *</label
+                    >
+                    <input
+                      type="number"
+                      id="editCapacity"
+                      class="form-input"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div class="form-field">
+                  <label class="form-label" for="editDl"
+                    >ड्राइविंग लाइसेंस (DL No.) *</label
+                  >
+                  <input
+                    type="text"
+                    id="editDl"
+                    class="form-input mono"
+                    style="text-transform: uppercase"
+                    required
+                  />
+                </div>
+
+                <div class="form-field">
+                  <label class="form-label" for="editEmergency"
+                    >आपातकालीन संपर्क</label
+                  >
+                  <input type="text" id="editEmergency" class="form-input" />
+                </div>
+
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  id="btnSaveProfile"
+                  style="margin-top: 10px"
+                >
+                  <span>परिवर्तन सहेजें (Save Changes)</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- Section 2: 24/7 Driver Support & SOS -->
+            <div
+              id="sectionSupport"
+              style="display: none; flex-direction: column; gap: 16px"
+            >
+              <!-- Emergency SOS Callout -->
+              <div
+                class="driver-card"
+                style="background: #fef2f2; border: 1.5px solid #fca5a5"
+              >
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    margin-bottom: 10px;
+                  "
+                >
+                  <div
+                    style="
+                      width: 40px;
+                      height: 40px;
+                      border-radius: 50%;
+                      background: #ef4444;
+                      color: #fff;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 20px;
+                    "
+                  >
+                    🚨
+                  </div>
+                  <div>
+                    <strong style="font-size: 15px; color: #991b1b"
+                      >आपातकालीन SOS सहायता</strong
+                    >
+                    <p style="font-size: 12px; color: #b91c1c; margin: 0">
+                      दुर्घटना या गंभीर आपात स्थिति में तुरंत अलर्ट भेजें
+                    </p>
+                  </div>
+                </div>
+                <a
+                  href="tel:112"
+                  class="btn btn-sm btn-primary"
+                  style="background: #dc2626; border: none"
+                >
+                  <i
+                    data-lucide="phone-call"
+                    style="width: 15px; height: 15px"
+                  ></i>
+                  <span>112 / एम्बुलेंस को कॉल करें</span>
+                </a>
+              </div>
+
+              <!-- FarmLink 24x7 Help Desk Call -->
+              <div
+                class="driver-card"
+                style="
+                  background: var(--primary-tint);
+                  border: 1px solid var(--primary);
+                "
+              >
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 10px;
+                  "
+                >
+                  <div style="display: flex; align-items: center; gap: 8px">
+                    <i
+                      data-lucide="headphones"
+                      style="width: 22px; height: 22px; color: var(--primary)"
+                    ></i>
+                    <strong style="font-size: 15px; color: var(--primary-dark)"
+                      >FarmLink सारथी हेल्पलाइन</strong
+                    >
+                  </div>
+                  <span class="badge badge-approved">24x7 उपलब्ध</span>
+                </div>
+                <p
+                  style="
+                    font-size: 13px;
+                    color: var(--primary-dark);
+                    margin-bottom: 14px;
+                  "
+                >
+                  रूट मार्गदर्शन, भुगतान समस्या, या मंडी प्रवेश सहायता के लिए
+                  निशुल्क कॉल करें।
+                </p>
+                <a href="tel:1800FARMLINK" class="btn btn-primary">
+                  <i data-lucide="phone" style="width: 18px; height: 18px"></i>
+                  <span>1800-FARMLINK पर कॉल करें</span>
+                </a>
+              </div>
+
+              <!-- Quick Interactive Troubleshooting Guides -->
+              <div class="driver-card">
+                <h3
+                  style="
+                    font-size: 14.5px;
+                    color: var(--ink-soft);
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    margin-bottom: 12px;
+                  "
+                >
+                  अक्सर पूछे जाने वाले समाधान (Troubleshooting)
+                </h3>
+
+                <div
+                  style="
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    font-size: 13.5px;
+                  "
+                >
+                  <details
+                    style="
+                      background: var(--surface);
+                      padding: 12px 14px;
+                      border-radius: var(--radius-md);
+                      border: 1px solid var(--line);
+                      cursor: pointer;
+                    "
+                  >
+                    <summary style="font-weight: 700; color: var(--ink)">
+                      📦 फसल खराब / भीग गई है, क्या करें?
+                    </summary>
+                    <p
+                      style="
+                        font-size: 12.5px;
+                        color: var(--ink-soft);
+                        margin-top: 6px;
+                      "
+                    >
+                      ट्रिप पेज पर 'समस्या रिपोर्ट' बटन दबाएं और फोटो खींचें।
+                      खरीदार व सपोर्ट टीम तुरंत निर्णय लेगी।
+                    </p>
+                  </details>
+
+                  <details
+                    style="
+                      background: var(--surface);
+                      padding: 12px 14px;
+                      border-radius: var(--radius-md);
+                      border: 1px solid var(--line);
+                      cursor: pointer;
+                    "
+                  >
+                    <summary style="font-weight: 700; color: var(--ink)">
+                      🏢 खरीदार गोदाम पर मौजूद नहीं है / फोन नहीं उठ रहा?
+                    </summary>
+                    <p
+                      style="
+                        font-size: 12.5px;
+                        color: var(--ink-soft);
+                        margin-top: 6px;
+                      "
+                    >
+                      10 मिनट प्रतीक्षा करें। फिर 'खरीदार अनुपलब्ध' रिपोर्ट दर्ज
+                      करें। 20 मिनट बाद रिटर्न भत्ता स्वतः लागू होगा।
+                    </p>
+                  </details>
+
+                  <details
+                    style="
+                      background: var(--surface);
+                      padding: 12px 14px;
+                      border-radius: var(--radius-md);
+                      border: 1px solid var(--line);
+                      cursor: pointer;
+                    "
+                  >
+                    <summary style="font-weight: 700; color: var(--ink)">
+                      🛞 रास्ते में गाड़ी खराब या पंचर हो गई?
+                    </summary>
+                    <p
+                      style="
+                        font-size: 12.5px;
+                        color: var(--ink-soft);
+                        margin-top: 6px;
+                      "
+                    >
+                      हेल्पलाइन पर कॉल करें। पास के अन्य उपलब्ध सारथी को फसल
+                      ट्रांसफर हेतु भेजा जा सकता है।
+                    </p>
+                  </details>
+
+                  <details
+                    style="
+                      background: var(--surface);
+                      padding: 12px 14px;
+                      border-radius: var(--radius-md);
+                      border: 1px solid var(--line);
+                      cursor: pointer;
+                    "
+                  >
+                    <summary style="font-weight: 700; color: var(--ink)">
+                      💰 दैनिक कमाई खाते में कब जमा होती है?
+                    </summary>
+                    <p
+                      style="
+                        font-size: 12.5px;
+                        color: var(--ink-soft);
+                        margin-top: 6px;
+                      "
+                    >
+                      हर रात 8:00 बजे दिन भर की पूर्ण डिलीवरी का UPI ट्रांसफर
+                      स्वतः कर दिया जाता है।
+                    </p>
+                  </details>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../shared/assets/js/firebase.js"></script>
+    <script src="../../shared/assets/js/driver-data.js"></script>
+    <script src="../../shared/assets/js/driver-shell.js"></script>
+    <script defer src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      window.driverShell.init("profile", "प्रोफाइल व सहायता");
+
+      const profile = window.farmlinkDriver.getProfile();
+
+      function loadProfile() {
+        document.getElementById("profDispName").textContent = profile.full_name;
+        document.getElementById("profDispPhone").textContent =
+          profile.phone_number;
+        document.getElementById("profVerifBadge").textContent =
+          profile.verification_status === "approved"
+            ? "सत्यापित ✓"
+            : "लंबित (Pending)";
+
+        document.getElementById("editName").value = profile.full_name || "";
+        document.getElementById("editPhone").value = profile.phone_number || "";
+        document.getElementById("editState").value =
+          profile.state || "Uttar Pradesh";
+        document.getElementById("editCity").value = profile.city || "Lucknow";
+        document.getElementById("editVehNum").value =
+          profile.vehicle_number || "UP32 AB 4521";
+        document.getElementById("editCapacity").value =
+          profile.capacity_kg || 2500;
+        document.getElementById("editDl").value =
+          profile.licence_number || "UP-3220190048123";
+        document.getElementById("editEmergency").value =
+          profile.emergency_contact || "";
+      }
+
+      // Tabs switching
+      document.querySelectorAll("#profileTabs .tab-btn").forEach((btn) => {
+        btn.addEventListener("click", function () {
+          document
+            .querySelectorAll("#profileTabs .tab-btn")
+            .forEach((b) => b.classList.remove("active"));
+          this.classList.add("active");
+          const tab = this.dataset.tab;
+          if (tab === "details") {
+            document.getElementById("sectionDetails").style.display = "block";
+            document.getElementById("sectionSupport").style.display = "none";
+          } else {
+            document.getElementById("sectionDetails").style.display = "none";
+            document.getElementById("sectionSupport").style.display = "flex";
+          }
+        });
+      });
+
+      // Check hash for #support direct jump
+      if (window.location.hash === "#support") {
+        document.getElementById("tabSupportBtn").click();
+      }
+
+      // Save Profile Form
+      document
+        .getElementById("profileEditForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const updated = {
+            full_name: document.getElementById("editName").value.trim(),
+            state: document.getElementById("editState").value.trim(),
+            city: document.getElementById("editCity").value.trim(),
+            vehicle_number: document
+              .getElementById("editVehNum")
+              .value.trim()
+              .toUpperCase(),
+            capacity_kg: Number(document.getElementById("editCapacity").value),
+            licence_number: document
+              .getElementById("editDl")
+              .value.trim()
+              .toUpperCase(),
+            emergency_contact: document
+              .getElementById("editEmergency")
+              .value.trim(),
+          };
+
+          window.farmlinkDriver.saveProfile(updated);
+          window.driverShell.showToast("प्रोफाइल सफलतापूर्वक अपडेट हुई!");
+          loadProfile();
+        });
+
+      // Logout
+      document.getElementById("btnLogout").addEventListener("click", () => {
+        if (confirm("क्या आप लॉग आउट करना चाहते हैं?")) {
+          sessionStorage.removeItem("farmlink_phone");
+          sessionStorage.removeItem("farmlink_mock_user_id");
+          window.location.href = "../../login.html";
+        }
+      });
+
+      loadProfile();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ऑर्डर ट्रैकिंग · KisanMandi</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      crossorigin=""
+    />
+  </head>
+  <body>
+    <div id="app-shell">
+      <div class="main-col">
+        <div id="topbar-slot"></div>
+        <main class="content" style="max-width: 980px">
+          <div class="breadcrumb">
+            <a href="buyer-orders.html">मेरे ऑर्डर</a> / ट्रैकिंग
+          </div>
+
+          <div id="trackingSummary" style="margin-bottom: 12px">
+            <h1 style="margin-bottom: 4px">ऑर्डर ट्रैकिंग</h1>
+            <p style="margin-bottom: 0">ऑर्डर जानकारी लोड हो रही है…</p>
+          </div>
+
+          <div
+            class="card"
+            style="margin-bottom: 18px; padding: 0; overflow: hidden"
+          >
+            <div
+              id="map"
+              style="height: 320px; width: 100%; background: #eaf2ec"
+            ></div>
+          </div>
+
+          <div class="grid grid-2" style="align-items: start">
+            <div class="card">
+              <h2 style="margin-bottom: 14px">डिलीवरी स्थिति</h2>
+              <div
+                id="trackingSteps"
+                style="display: flex; flex-direction: column"
+              ></div>
+            </div>
+
+            <div class="card">
+              <h2 style="margin-bottom: 14px">डिलीवरी विवरण</h2>
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 12px;
+                  margin-bottom: 14px;
+                "
+              >
+                <div
+                  class="avatar"
+                  style="background: var(--soil-tint); color: var(--soil)"
+                >
+                  SY
+                </div>
+                <div>
+                  <strong id="driverName">ड्राइवर जानकारी</strong>
+                  <p id="driverVehicle" style="margin: 0; font-size: 12.5px">
+                    वाहन: अभी तैनात नहीं
+                  </p>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <p style="font-size: 13px; margin-bottom: 2px">
+                <strong>पिकअप पता</strong>
+              </p>
+              <p id="pickupLocation" style="font-size: 13px">
+                फसल कृषि केन्द्र
+              </p>
+              <p style="font-size: 13px; margin-bottom: 2px; margin-top: 12px">
+                <strong>डिलीवरी पता</strong>
+              </p>
+              <p id="deliveryLocation" style="font-size: 13px">बायर्स एड्रेस</p>
+              <div style="display: flex; gap: 8px; margin-top: 12px">
+                <button class="btn btn-secondary btn-sm" style="flex: 1">
+                  📞 डिलीवरी को कॉल करें
+                </button>
+                <a
+                  href="../seller/help-center.html"
+                  class="btn btn-secondary btn-sm"
+                  style="flex: 1"
+                  >सहायता</a
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top: 18px">
+            <h2 style="margin-bottom: 12px">रूट डिसीजन</h2>
+            <div id="routeDecisionSummary"></div>
+          </div>
+
+          <div
+            class="alert alert-success"
+            style="display: none; margin-top: 16px"
+          >
+            ✓ ऑर्डर सफलतापूर्वक डिलीवर हो गया — विक्रेता को रेट करें
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/buyer-data.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script>
+      initShell("buyer", "orders", "ऑर्डर ट्रैकिंग");
+
+      const routeApiBase = window.FARMLINK_ROUTE_API || "http://localhost:8000";
+      const demoRoute = {
+        pickup: {
+          name: "Sitapur pickup",
+          latitude: 27.5619,
+          longitude: 80.6827,
+          elevation_m: 120,
+          state_code: "UP",
+        },
+        delivery: {
+          name: "Mumbai APMC mandi",
+          latitude: 19.076,
+          longitude: 73.012,
+          elevation_m: 10,
+          state_code: "MH",
+        },
+      };
+      const defaultDepot = {
+        name: "Warehouse",
+        latitude: 19.8762,
+        longitude: 75.3433,
+        elevation_m: 450,
+        state_code: "MH",
+      };
+      let map = null;
+
+      function normalizeAddress(value) {
+        return String(value || "")
+          .replace(/\s+/g, " ")
+          .trim();
+      }
+
+      async function geocodeAddress(address) {
+        const query = normalizeAddress(address);
+        if (!query) return null;
+
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(query)}`,
+            {
+              headers: { Accept: "application/json" },
+            },
+          );
+
+          if (!response.ok) return null;
+          const results = await response.json();
+          const point = results?.[0];
+          if (!point) return null;
+
+          const latitude = Number(point.lat);
+          const longitude = Number(point.lon);
+          if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+            return null;
+          }
+
+          return { latitude, longitude };
+        } catch (error) {
+          console.warn("Geocoding failed for address:", query, error);
+          return null;
+        }
+      }
+
+      async function resolveOrderRouteCoordinates(order) {
+        return {
+          depot: defaultDepot,
+          pickup: { ...demoRoute.pickup },
+          delivery: { ...demoRoute.delivery },
+        };
+      }
+
+      function setupMap() {
+        if (!window.L) return;
+        if (!map) {
+          map = L.map("map").setView([23.5, 78.96], 5);
+          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 18,
+            attribution: "&copy; OpenStreetMap contributors",
+          }).addTo(map);
+        }
+      }
+
+      async function fetchDrivingRouteSegment(start, end) {
+        const startLngLat = `${start[1]},${start[0]}`;
+        const endLngLat = `${end[1]},${end[0]}`;
+        const url = `https://router.project-osrm.org/route/v1/driving/${startLngLat};${endLngLat}?overview=full&geometries=geojson&steps=false`;
+
+        try {
+          const response = await fetch(url, { mode: "cors" });
+          if (!response.ok) throw new Error("OSRM route unavailable");
+          const data = await response.json();
+          const routeGeometry =
+            data?.routes?.[0]?.geometry?.coordinates || null;
+          if (!routeGeometry || !routeGeometry.length) return [start, end];
+          return routeGeometry.map(([lng, lat]) => [lat, lng]);
+        } catch (error) {
+          console.warn("Falling back to direct line route", error);
+          return [start, end];
+        }
+      }
+
+      async function renderMap(routePoints, optimizedGeometry = []) {
+        if (!window.L || !map) {
+          setupMap();
+        }
+        if (!window.L || !map) return;
+
+        map.eachLayer((layer) => {
+          if (
+            layer instanceof L.Polyline ||
+            layer instanceof L.Marker ||
+            layer instanceof L.CircleMarker
+          ) {
+            map.removeLayer(layer);
+          }
+        });
+
+        let safeRoute = optimizedGeometry.length ? optimizedGeometry : [];
+        if (!safeRoute.length) {
+          const fullRoute = [];
+          for (let i = 0; i < routePoints.length - 1; i += 1) {
+            const segment = await fetchDrivingRouteSegment(
+              routePoints[i],
+              routePoints[i + 1],
+            );
+            if (i > 0 && segment.length) {
+              segment.shift();
+            }
+            fullRoute.push(...segment);
+          }
+          safeRoute = fullRoute.length ? fullRoute : routePoints;
+        }
+        const bounds = L.latLngBounds(safeRoute);
+        map.fitBounds(bounds.pad(0.25), { animate: false });
+        setTimeout(() => map.invalidateSize(), 150);
+
+        const markers = routePoints.map((coords, index) => ({
+          label:
+            index === 0
+              ? "पिकअप"
+              : index === routePoints.length - 1
+                ? "डिलीवरी"
+                : "स्टॉप",
+          coords,
+          color:
+            index === 0
+              ? "#d97706"
+              : index === routePoints.length - 1
+                ? "#2563eb"
+                : "#1c7a44",
+        }));
+
+        markers.forEach((item) => {
+          const marker = L.marker(item.coords).addTo(map);
+          marker.bindPopup(
+            `<strong>${item.label}</strong><br>${item.coords[0].toFixed(4)}, ${item.coords[1].toFixed(4)}`,
+          );
+        });
+
+        const polyline = L.polyline(safeRoute, {
+          color: "#1c7a44",
+          weight: 4,
+          opacity: 0.9,
+          lineCap: "round",
+          lineJoin: "round",
+        }).addTo(map);
+        polyline.bindPopup("डिलीवरी ट्रैकिंग रूट");
+        map.invalidateSize();
+      }
+
+      function renderTrackingSteps(stageIndex) {
+        const steps = [
+          { label: "ऑर्डर दिया गया", done: true },
+          { label: "विक्रेता द्वारा पुष्टि", done: true },
+          { label: "पिकअप", done: stageIndex >= 2 },
+          { label: "रास्ते में", done: stageIndex >= 3 },
+          { label: "डिलीवर", done: stageIndex >= 4 },
+        ];
+
+        document.getElementById("trackingSteps").innerHTML = steps
+          .map(
+            (step, index) => `
+            <div style="display: flex; gap: 12px">
+              <div style="display: flex; flex-direction: column; align-items: center;">
+                <div style="width: 22px; height: 22px; border-radius: 50%; background: ${step.done ? "var(--success)" : "var(--line)"}; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px;">${step.done ? "✓" : index + 1}</div>
+                ${index < steps.length - 1 ? '<div style="width: 2px; flex: 1; background: var(--success); min-height: 20px;"></div>' : ""}
+              </div>
+              <div style="padding-bottom: 14px;">
+                <strong style="font-size: 13.5px">${step.label}</strong>
+                <p style="margin: 2px 0 0; font-size: 12px">${step.done ? "पूरा" : "लंबित"}</p>
+              </div>
+            </div>
+          `,
+          )
+          .join("");
+      }
+
+      function formatInr(value) {
+        const amount = Number(value || 0);
+        return new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+          maximumFractionDigits: 0,
+        }).format(amount);
+      }
+
+      function renderDecisionSummary(routeData) {
+        const panel = document.getElementById("routeDecisionSummary");
+        if (!routeData || !routeData.summary) {
+          panel.innerHTML = "<p>रूट डेटा उपलब्ध नहीं है।</p>";
+          return;
+        }
+
+        const route = routeData.routes?.[0];
+        const priority = routeData.ai_priorities?.[0];
+        const clusters = routeData.delivery_clusters || [];
+        const priceBreakdown = routeData.pricing_breakdown || [];
+        const priceSummary = routeData.price_summary || {};
+
+        const clustersHtml = clusters.length
+          ? `<div style="display:flex; flex-wrap:wrap; gap:8px; margin-top: 8px;">${clusters
+              .map(
+                (cluster) => `
+                  <span class="pill pill-info">
+                    ${cluster.matched_logistics_partner || "Local transport"} · ${cluster.order_count || 0} ऑर्डर
+                  </span>
+                `,
+              )
+              .join("")}</div>`
+          : "";
+
+        const pricingHtml = priceBreakdown.length
+          ? `<div style="display:grid; gap:8px; margin-top: 10px;">
+              ${priceBreakdown
+                .map(
+                  (item) => `
+                    <div style="display:grid; grid-template-columns: 1.2fr repeat(4, minmax(80px, 1fr)); gap:8px; font-size: 12px; align-items:center; border-top:1px solid var(--line); padding-top:8px;">
+                      <strong>${item.crop || "फसल"}</strong>
+                      <span>${formatInr(item.farmer_earnings_inr)}</span>
+                      <span>${formatInr(item.transport_cost_inr)}</span>
+                      <span>${formatInr(item.platform_fee_inr)}</span>
+                      <span>${formatInr(item.buyer_price_inr)}</span>
+                    </div>
+                  `,
+                )
+                .join("")}
+              <div style="display:grid; grid-template-columns: 1.2fr repeat(4, minmax(80px, 1fr)); gap:8px; font-size: 12px; font-weight: 700; margin-top: 6px;">
+                <strong>कुल</strong>
+                <span>${formatInr(priceSummary.total_farmer_earnings_inr || 0)}</span>
+                <span>${formatInr(priceSummary.total_transport_cost_inr || 0)}</span>
+                <span>${formatInr(priceSummary.total_platform_fee_inr || 0)}</span>
+                <span>${formatInr(priceSummary.total_buyer_value_inr || 0)}</span>
+              </div>
+            </div>`
+          : "";
+
+        panel.innerHTML = `
+          <div style="display:grid; gap:12px;">
+            <div class="grid grid-3">
+              <div class="pill pill-info">दूरी: ${routeData.summary.total_distance_km || 0} km</div>
+              <div class="pill pill-warn">समय: ${routeData.summary.weather_adjusted_minutes || 0} min</div>
+              <div class="pill pill-success">रूट: ${route?.overall_risk || "safe"}</div>
+              <div class="pill pill-neutral">परिवहन: ${formatInr(route?.operating_cost_inr || 0)}</div>
+            </div>
+            <p style="margin:0; font-size:13.5px; color: var(--ink-soft);">${route?.driver_instructions || "रूट अपडेट तैयार है"}</p>
+            <p style="margin:0; font-size:11px; color: var(--ink-soft);">डेटा: ${route?.route_source || routeData.data_sources?.routing || "fallback"} · अपडेट: ${route?.live_data_at ? new Date(route.live_data_at).toLocaleTimeString("hi-IN") : "स्थानीय"}</p>
+            <div class="divider"></div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <span class="pill pill-info">प्राथमिकता: ${priority?.priority_score || 0}</span>
+              <span class="pill pill-neutral">फसल: ${priority?.crop || "उपलब्ध"}</span>
+              <span class="pill pill-neutral">कारण: ${priority?.reason || "सामान्य"}</span>
+            </div>
+            ${clustersHtml ? `<div class="divider"></div><div><strong>ग्रुपेड डिलीवरी</strong>${clustersHtml}</div>` : ""}
+            ${pricingHtml ? `<div class="divider"></div><div><strong>मूल्य विभाजन</strong><div style="margin-top:8px; font-size: 11px; color: var(--ink-soft); display:grid; grid-template-columns: 1.2fr repeat(4, minmax(80px, 1fr)); gap:8px;"> <span>फसल</span> <span>कृषक आय</span> <span>परिवहन</span> <span>प्लेटफ़ॉर्म</span> <span>खरीदार मूल्य</span></div>${pricingHtml}</div>` : ""}
+          </div>
+        `;
+      }
+
+      async function loadRouteDecision(order) {
+        const routeCoords = await resolveOrderRouteCoordinates(order);
+        if (!routeCoords.pickup || !routeCoords.delivery) {
+          throw new Error("Pickup or delivery address could not be located.");
+        }
+        const orderPayload = {
+          id: order?.id || "order-1",
+          crop: order?.crop_name || order?.items?.[0]?.product_name || "गेहूं",
+          quantity_kg: Number(
+            order?.total_quantity || order?.quantity_kg || 200,
+          ),
+          perishability: 3,
+          storage_temp_c: 12,
+          pickup: {
+            name: order?.seller_name || "कृषक",
+            latitude: routeCoords.pickup.latitude,
+            longitude: routeCoords.pickup.longitude,
+            elevation_m: routeCoords.pickup.elevation_m || 420,
+            state_code: routeCoords.pickup.state_code || "MH",
+          },
+          delivery: {
+            name: order?.buyer_name || "खरीदार",
+            latitude: routeCoords.delivery.latitude,
+            longitude: routeCoords.delivery.longitude,
+            elevation_m: routeCoords.delivery.elevation_m || 120,
+            state_code: routeCoords.delivery.state_code || "UP",
+          },
+          promised_delivery_hours: 72,
+        };
+
+        const payload = {
+          depot: routeCoords.pickup,
+          vehicles: [
+            { id: "truck-1", capacity_kg: 1200, max_route_minutes: 4320 },
+          ],
+          orders: [orderPayload],
+        };
+
+        try {
+          const response = await fetch(`${routeApiBase}/optimize`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          if (!response.ok)
+            throw new Error(`Route API unavailable (${response.status})`);
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error("Route optimization unavailable:", error);
+          return {
+            summary: null,
+            routes: [
+              {
+                overall_risk: "unavailable",
+                driver_instructions: "लाइव रूट सेवा उपलब्ध नहीं है।",
+                stops: [
+                  {
+                    ...routeCoords.pickup,
+                    kind: "pickup",
+                    stop: routeCoords.pickup.name,
+                  },
+                  {
+                    ...routeCoords.delivery,
+                    kind: "delivery",
+                    stop: routeCoords.delivery.name,
+                  },
+                ],
+              },
+            ],
+            data_sources: { routing: "unavailable" },
+            route_unavailable: true,
+          };
+        }
+      }
+
+      async function loadOrderTracking() {
+        const params = new URLSearchParams(window.location.search);
+        const orderId = params.get("id");
+        const summary = document.getElementById("trackingSummary");
+
+        try {
+          const order = orderId
+            ? await window.farmlinkBuyerData.fetchBuyerOrderById(orderId)
+            : null;
+
+          if (!order) {
+            summary.innerHTML =
+              "<h1>ऑर्डर ट्रैकिंग</h1><p>ऑर्डर जानकारी उपलब्ध नहीं है।</p>";
+            return;
+          }
+
+          const routeData = await loadRouteDecision(order);
+          const route = routeData?.routes?.[0] || { stops: [] };
+
+          const routePoints = route.stops.map((stop) => [
+            stop.latitude,
+            stop.longitude,
+          ]);
+          renderMap(routePoints, route.geometry || []);
+
+          const statusIndex = [
+            "pending",
+            "accepted",
+            "picking",
+            "shipped",
+            "delivered",
+          ].indexOf(order.order_status || "shipped");
+          const safeIndex = Math.max(0, statusIndex >= 0 ? statusIndex : 2);
+          renderTrackingSteps(safeIndex);
+          renderDecisionSummary(routeData);
+
+          const displayStatus = order.order_status || "shipped";
+          summary.innerHTML = `
+            <h1 style="margin-bottom: 4px">ऑर्डर ट्रैकिंग</h1>
+            <p style="margin-bottom: 0">
+              ऑर्डर <span class="mono">#${String(order.id).slice(0, 8)}</span> · ${window.farmlinkBuyerData.money(order.total_amount || 0)} · स्थिति: ${displayStatus}
+            </p>
+          `;
+
+          document.getElementById("driverName").textContent = "सुनील यादव";
+          document.getElementById("driverVehicle").textContent =
+            "वाहन: UP32 AB 4521";
+          document.getElementById("pickupLocation").textContent =
+            `फसल कृषि केन्द्र, ${order.seller_name || "रामेश कुमार"}`;
+          document.getElementById("deliveryLocation").textContent =
+            `बायर्स एड्रेस, ${order.delivery_address || "लखनऊ"}`;
+
+          const successAlert = document.querySelector(".alert-success");
+          if (displayStatus === "delivered")
+            successAlert.style.display = "block";
+        } catch (error) {
+          console.error("Order tracking failed", error);
+          document.getElementById("trackingSummary").innerHTML =
+            "<h1>ऑर्डर ट्रैकिंग</h1><p>ऑर्डर ट्रैकिंग डेटा उपलब्ध नहीं है।</p>";
+        }
+      }
+
+      setupMap();
+      loadOrderTracking();
+    </script>
+  </body>
+</html>

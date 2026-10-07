@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>सहायता केंद्र · KisanMandi</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+  </head>
+  <body>
+    <div id="app-shell">
+      <div class="main-col">
+        <div id="topbar-slot"></div>
+        <main class="content" style="max-width: 820px">
+          <h1 style="margin-bottom: 4px">सहायता केंद्र</h1>
+          <p style="margin-bottom: 18px">हम आपकी मदद के लिए यहाँ हैं</p>
+
+          <div style="position: relative; width: 100%; max-width: 500px; margin: 0 auto 24px;">
+              <input
+                type="text"
+                placeholder="अपनी समस्या खोजें..."
+                class="form-input"
+                style="padding-left: 44px"
+              />
+              <i data-lucide="search" style="position: absolute; left: 14px; top: 14px; color: var(--ink-soft); width: 18px"></i>
+          </div>
+
+          <div class="grid grid-3" style="margin-bottom: 22px">
+            <a
+              href="tel:18001234567"
+              class="card"
+              style="text-align: center; cursor: pointer"
+            >
+              <div style="font-size: 22px; margin-bottom: 6px">📞</div>
+              <h3>कॉल करें</h3>
+              <p style="margin: 0; font-size: 12.5px">1800-123-4567</p>
+            </a>
+            <div class="card" style="text-align: center; cursor: pointer">
+              <div style="font-size: 22px; margin-bottom: 6px">💬</div>
+              <h3>चैट करें</h3>
+              <p style="margin: 0; font-size: 12.5px">सुबह 8 – रात 8 बजे तक</p>
+            </div>
+            <a
+              href="seller-voice-assistant.html"
+              class="card"
+              style="text-align: center; cursor: pointer"
+            >
+              <div style="font-size: 22px; margin-bottom: 6px">◉</div>
+              <h3>वॉइस सहायक</h3>
+              <p style="margin: 0; font-size: 12.5px">बोलकर पूछें</p>
+            </a>
+          </div>
+
+          <h2 style="margin-bottom: 10px">अक्सर पूछे जाने वाले प्रश्न</h2>
+          <div class="card" style="padding: 0">
+            <details
+              style="
+                padding: 14px 18px;
+                border-bottom: 1px solid var(--line-soft);
+              "
+            >
+              <summary style="font-weight: 600; cursor: pointer">
+                मुझे भुगतान कब मिलेगा?
+              </summary>
+              <p style="margin-top: 8px">
+                पिकअप पूर्ण होने के 2–3 कार्यदिवसों में भुगतान आपके बैंक खाते या
+                UPI में भेज दिया जाता है।
+              </p>
+            </details>
+            <details
+              style="
+                padding: 14px 18px;
+                border-bottom: 1px solid var(--line-soft);
+              "
+            >
+              <summary style="font-weight: 600; cursor: pointer">
+                मैं नई फसल कैसे जोड़ूं?
+              </summary>
+              <p style="margin-top: 8px">
+                "मेरी लिस्टिंग" पेज पर जाकर "+ नई फसल जोड़ें" बटन दबाएँ और फॉर्म
+                भरें।
+              </p>
+            </details>
+            <details style="padding: 14px 18px">
+              <summary style="font-weight: 600; cursor: pointer">
+                KYC सत्यापन में कितना समय लगता है?
+              </summary>
+              <p style="margin-top: 8px">
+                आमतौर पर सत्यापन तुरंत या 24 घंटे के भीतर पूरा हो जाता है।
+              </p>
+            </details>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script>
+      const cameFromBuyer = document.referrer.includes("buyer-");
+      initShell(cameFromBuyer ? "buyer" : "seller", "help", "सहायता केंद्र");
+    </script>
+  </body>
+</html>

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>खरीद प्रस्ताव · FarmLink</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+    <style>
+      .bids-page { max-width: 1000px; margin-inline: auto; }
+      .bids-page > p { color: var(--ink-soft); }
+      .bids-list { display: grid; gap: 12px; }
+      .bid-card { padding: 18px; }
+      .bid-head, .bid-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .bid-card h2 { margin: 0; font-size: 18px; }
+      .bid-status { padding: 5px 10px; border-radius: 99px; background: #fff4d8; color: #805900; font-size: 12px; font-weight: 750; }
+      .bid-status.accepted { background: #e7f6ea; color: #176042; }
+      .bid-status.rejected { background: #fff0ef; color: #a32b25; }
+      .bid-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+      .bid-details span { display: block; color: var(--ink-soft); font-size: 12px; }
+      .bid-details strong { display: block; margin-top: 3px; font-size: 16px; }
+      .bid-actions { justify-content: flex-start; }
+      .bids-note, .bids-message { margin: 14px 0; }
+      .bids-empty { padding: 25px; text-align: center; }
+      @media (max-width: 600px) {
+        .bid-head, .bid-actions { align-items: flex-start; flex-direction: column; }
+        .bid-details { grid-template-columns: 1fr; gap: 8px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app-shell">
+      <div class="main-col">
+        <div id="topbar-slot"></div>
+        <main class="content bids-page">
+          <h1>खरीद प्रस्ताव</h1>
+          <p>आपकी फसलों पर खरीदारों की बोलियाँ यहाँ दिखेंगी। कीमत और मात्रा देखकर जवाब दें।</p>
+          <div id="bidsMessage" class="alert alert-info bids-message" role="status">बोलियाँ लोड हो रही हैं…</div>
+          <section id="bidsList" class="bids-list" aria-live="polite"></section>
+          <aside class="alert alert-info bids-note">
+            बोली स्वीकार करने से ऑर्डर या भुगतान अपने-आप नहीं बनता। खरीदार से शर्तें पक्की करके अलग से ऑर्डर की पुष्टि करें।
+          </aside>
+        </main>
+      </div>
+    </div>
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script src="../../shared/assets/js/bids.js"></script>
+    <script>
+      initShell("seller", "bids", "खरीद प्रस्ताव");
+      const list = document.getElementById("bidsList");
+      const message = document.getElementById("bidsMessage");
+      let bids = [];
+
+      function renderBids() {
+        if (!bids.length) {
+          list.innerHTML = '<div class="card bids-empty"><h2>अभी कोई बोली नहीं</h2><p>आपकी सक्रिय लिस्टिंग पर खरीदार की बोली आने पर यहाँ दिखेगी।</p><a class="btn btn-secondary" href="seller-listings.html">मेरी लिस्टिंग देखें</a></div>';
+          return;
+        }
+        list.innerHTML = bids.map((bid) => {
+          const status = window.farmlinkBids.escapeHtml(bid.status);
+          const pending = bid.status === "pending";
+          const buyerCode = String(bid.buyer_id || "").slice(-6).toUpperCase();
+          return `<article class="card bid-card">
+            <div class="bid-head"><h2>${window.farmlinkBids.escapeHtml(bid.listing_title || "फसल")} पर प्रस्ताव</h2><span class="bid-status ${status}">${window.farmlinkBids.statusLabel(bid.status)}</span></div>
+            <div class="bid-details">
+              <div><span>खरीदार</span><strong>खरीदार · ${window.farmlinkBids.escapeHtml(buyerCode)}</strong></div>
+              <div><span>प्रस्तावित कीमत</span><strong>${window.farmlinkBids.money(bid.offer_price_per_quintal)} / क्विंटल</strong></div>
+              <div><span>मात्रा</span><strong>${(Number(bid.quantity_kg || 0) / 100).toLocaleString("hi-IN")} क्विंटल</strong></div>
+            </div>
+            <div class="bid-actions">${pending ? `<button class="btn btn-primary" data-bid-action="accepted" data-id="${window.farmlinkBids.escapeHtml(bid.id)}">बोली स्वीकारें</button><button class="btn btn-secondary" data-bid-action="rejected" data-id="${window.farmlinkBids.escapeHtml(bid.id)}">अस्वीकार करें</button>` : `<small>प्रस्ताव ${window.farmlinkBids.escapeHtml(window.farmlinkBids.statusLabel(bid.status))} किया गया।</small>`}</div>
+          </article>`;
+        }).join("");
+      }
+
+      async function loadBids() {
+        message.textContent = "बोलियाँ लोड हो रही हैं…";
+        message.className = "alert alert-info bids-message";
+        try {
+          bids = await window.farmlinkBids.fetchMyBids("farmer");
+          renderBids();
+          message.style.display = "none";
+        } catch (error) {
+          console.error("Farmer bids could not be loaded:", error);
+          message.textContent = `बोलियाँ लोड नहीं हो सकीं: ${error.message}`;
+          message.className = "alert alert-danger bids-message";
+        }
+      }
+
+      list.addEventListener("click", async (event) => {
+        const button = event.target.closest("button[data-bid-action]");
+        if (!button) return;
+        button.disabled = true;
+        try {
+          await window.farmlinkBids.respondToBid(button.dataset.id, button.dataset.bidAction);
+          await loadBids();
+          showToast(button.dataset.bidAction === "accepted" ? "✓ बोली स्वीकार हुई" : "बोली अस्वीकार की गई");
+        } catch (error) {
+          console.error("Bid response failed:", error);
+          showToast(`जवाब सेव नहीं हुआ: ${error.message}`);
+          button.disabled = false;
+        }
+      });
+
+      void loadBids();
+    </script>
+  </body>
+</html>

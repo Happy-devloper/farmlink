@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>मेरी बोलियाँ · FarmLink</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+    <style>
+      .bids-page { max-width: 1000px; margin-inline: auto; }
+      .bids-page > p { color: var(--ink-soft); }
+      .bids-list { display: grid; gap: 12px; }
+      .bid-card { padding: 18px; }
+      .bid-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .bid-card h2 { margin: 0; font-size: 18px; }
+      .bid-status { padding: 5px 10px; border-radius: 99px; background: #fff4d8; color: #805900; font-size: 12px; font-weight: 750; }
+      .bid-status.accepted { background: #e7f6ea; color: #176042; }
+      .bid-status.rejected { background: #fff0ef; color: #a32b25; }
+      .bid-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
+      .bid-details span { display: block; color: var(--ink-soft); font-size: 12px; }
+      .bid-details strong { display: block; margin-top: 3px; font-size: 16px; }
+      .bids-message, .bids-note { margin: 14px 0; }
+      .bids-empty { padding: 25px; text-align: center; }
+      @media (max-width: 600px) {
+        .bid-head { align-items: flex-start; flex-direction: column; }
+        .bid-details { grid-template-columns: 1fr; gap: 8px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app-shell">
+      <div class="main-col">
+        <div id="topbar-slot"></div>
+        <main class="content bids-page">
+          <h1>मेरी बोलियाँ</h1>
+          <p>आपके खरीद प्रस्ताव और किसानों के जवाब यहाँ दिखेंगे।</p>
+          <div id="bidsMessage" class="alert alert-info bids-message" role="status">बोलियाँ लोड हो रही हैं…</div>
+          <section id="bidsList" class="bids-list" aria-live="polite"></section>
+          <aside class="alert alert-info bids-note">स्वीकृत बोली के बाद ऑर्डर और भुगतान की शर्तें किसान से अलग से पक्की करें।</aside>
+        </main>
+      </div>
+    </div>
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script src="../../shared/assets/js/bids.js"></script>
+    <script>
+      initShell("buyer", "bids", "मेरी बोलियाँ");
+      const list = document.getElementById("bidsList");
+      const message = document.getElementById("bidsMessage");
+      async function loadBids() {
+        try {
+          const bids = await window.farmlinkBids.fetchMyBids("buyer");
+          list.innerHTML = bids.length ? bids.map((bid) => {
+            const status = window.farmlinkBids.escapeHtml(bid.status);
+            const date = new Date(bid.created_at);
+            const dateLabel = Number.isNaN(date.valueOf())
+              ? "—"
+              : date.toLocaleDateString("hi-IN");
+            return `<article class="card bid-card">
+              <div class="bid-head"><h2>${window.farmlinkBids.escapeHtml(bid.listing_title || "फसल")}</h2><span class="bid-status ${status}">${window.farmlinkBids.statusLabel(bid.status)}</span></div>
+              <div class="bid-details">
+                <div><span>आपकी कीमत</span><strong>${window.farmlinkBids.money(bid.offer_price_per_quintal)} / क्विंटल</strong></div>
+                <div><span>मात्रा</span><strong>${(Number(bid.quantity_kg || 0) / 100).toLocaleString("hi-IN")} क्विंटल</strong></div>
+                <div><span>प्रस्ताव की तारीख</span><strong>${window.farmlinkBids.escapeHtml(dateLabel)}</strong></div>
+              </div>
+            </article>`;
+          }).join("") : '<div class="card bids-empty"><h2>अभी कोई बोली नहीं</h2><p>बाज़ार में फसल चुनकर अपनी कीमत का प्रस्ताव भेजें।</p><a class="btn btn-primary" href="buyer-marketplace.html">बाज़ार देखें</a></div>';
+          message.style.display = "none";
+        } catch (error) {
+          console.error("Buyer bids could not be loaded:", error);
+          message.textContent = `बोलियाँ लोड नहीं हो सकीं: ${error.message}`;
+          message.className = "alert alert-danger bids-message";
+        }
+      }
+      void loadBids();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FarmLink AI — किसान पंजीकरण</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+  </head>
+  <body>
+    <!-- Top Header Bar -->
+    <header class="auth-header">
+      <div class="header-left">
+        <div class="logo-wrap">
+          <span class="logo-icon"><i data-lucide="leaf"></i></span>
+          <div class="logo-text">
+            <span class="brand-title"
+              >FarmLink <span class="ai-text">AI</span></span
+            >
+            <span class="brand-sub">सीधी किसान सेवा</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Centered Card Container -->
+    <div class="auth-centered-layout">
+      <div class="auth-centered-card" style="max-width: 520px">
+        <h1
+          style="
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 4px;
+            font-weight: 700;
+          "
+        >
+          किसान पंजीकरण
+        </h1>
+        <p
+          style="
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: #64748b;
+          "
+        >
+          Tell us a little about your farm
+        </p>
+
+        <form id="regForm" novalidate>
+          <div class="field">
+            <label for="fname">पूरा नाम · Full name</label>
+            <input
+              type="text"
+              id="fname"
+              placeholder="जैसे रमेश कुमार"
+              required
+              style="border: 1.5px solid #cbd5e1"
+            />
+          </div>
+
+          <div
+            class="grid grid-2"
+            style="gap: 12px; grid-template-columns: 1fr 1fr"
+          >
+            <div class="field">
+              <label for="state">राज्य · State</label>
+              <select id="state" required style="border: 1.5px solid #cbd5e1">
+                <option value="">चुनें</option>
+                <option>Uttar Pradesh</option>
+                <option>Punjab</option>
+                <option>Haryana</option>
+                <option>Madhya Pradesh</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="dist">ज़िला · District</label>
+              <input
+                type="text"
+                id="dist"
+                placeholder="जैसे लखनऊ"
+                required
+                style="border: 1.5px solid #cbd5e1"
+              />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="subdistrict">तहसील / ब्लॉक · Sub-district</label>
+            <input
+              type="text"
+              id="subdistrict"
+              placeholder="जैसे मोहनलालगंज"
+              required
+              style="border: 1.5px solid #cbd5e1"
+            />
+          </div>
+
+          <div class="field">
+            <label for="village">गाँव / पता · Village / Address</label>
+            <input
+              type="text"
+              id="village"
+              placeholder="गाँव, तहसील"
+              required
+              style="border: 1.5px solid #cbd5e1"
+            />
+          </div>
+          <div class="field">
+            <label for="land"
+              >खेती का क्षेत्रफल (एकड़) · Land size (acres)</label
+            >
+            <input
+              type="number"
+              id="land"
+              placeholder="जैसे 3.5"
+              min="0"
+              step="0.1"
+              required
+              style="border: 1.5px solid #cbd5e1"
+            />
+          </div>
+          <div class="field">
+            <label for="crops">मुख्य फसलें · Primary crops</label>
+            <input
+              type="text"
+              id="crops"
+              placeholder="जैसे गेहूं, धान, सरसों"
+              style="border: 1.5px solid #cbd5e1"
+            />
+          </div>
+
+          <button type="submit" class="btn-auth-submit" style="margin-top: 8px">
+            आगे बढ़ें &nbsp;&rarr;
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script src="../../shared/assets/js/up-post-office.js"></script>
+    <script>
+      document
+        .getElementById("regForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          let ok = true;
+          ["fname", "state", "dist", "village", "land"].forEach((id) => {
+            const el = document.getElementById(id);
+            const bad = !el || !String(el.value || "").trim();
+            el?.classList.toggle("invalid", bad);
+            if (bad) ok = false;
+          });
+          const pincode = document.getElementById("pincode");
+          if (pincode && !String(pincode.value || "").trim()) {
+            pincode.classList.add("invalid");
+            ok = false;
+          }
+          if (!ok) return;
+
+          const submitButton = this.querySelector('button[type="submit"]');
+          submitButton.disabled = true;
+          try {
+            await window.firebaseScriptReady;
+            const { client, user } = await getCurrentUser();
+            if (!user) throw new Error("पहले Firebase में लॉग इन करें।");
+
+            // Upsert, rather than update: legacy sessions may have
+            // an Auth user but no matching public.users row yet.
+            const { error: userError } = await client.from("users").upsert(
+              {
+                id: user.id,
+                phone_number:
+                  user.phone || sessionStorage.getItem("farmlink_phone"),
+                full_name: document.getElementById("fname").value.trim(),
+                role: "farmer",
+                verified: true,
+              },
+              { onConflict: "id" },
+            );
+            if (userError) throw userError;
+
+            const { error: profileError } = await client
+              .from("farmer_profiles")
+              .upsert(
+                {
+                  user_id: user.id,
+                  state: document.getElementById("state").value,
+                  district: document.getElementById("dist").value.trim(),
+                  sub_district: document
+                    .getElementById("subdistrict")
+                    .value.trim(),
+                  village: document.getElementById("village").value.trim(),
+                  land_size_acres: Number(
+                    document.getElementById("land").value,
+                  ),
+                  postal_code: pincode?.value.trim() || "",
+                  primary_crops: document.getElementById("crops").value.trim(),
+                },
+                { onConflict: "user_id" },
+              );
+            if (profileError) throw profileError;
+            window.location.href = "../seller/seller-dashboard.html";
+          } catch (error) {
+            const errorMessage = formatFirebaseError(error);
+            console.error("Farmer registration failed:", errorMessage, error);
+            showToast(`पंजीकरण सेव नहीं हुआ: ${errorMessage}`);
+          } finally {
+            submitButton.disabled = false;
+          }
+        });
+
+      // Load Lucide Icons
+      if (!window.lucide) {
+        const lucideScript = document.createElement("script");
+        lucideScript.src = "https://unpkg.com/lucide@latest";
+        lucideScript.onload = () => {
+          if (window.lucide) window.lucide.createIcons();
+        };
+        document.head.appendChild(lucideScript);
+      } else {
+        window.lucide.createIcons();
+      }
+    </script>
+  </body>
+</html>

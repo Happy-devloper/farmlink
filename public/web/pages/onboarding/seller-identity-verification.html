@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FarmLink AI — पहचान सत्यापन</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+  </head>
+  <body>
+    <!-- Top Header Bar -->
+    <header class="auth-header">
+      <div class="header-left">
+        <div class="logo-wrap">
+          <span class="logo-icon"><i data-lucide="leaf"></i></span>
+          <div class="logo-text">
+            <span class="brand-title"
+              >FarmLink <span class="ai-text">AI</span></span
+            >
+            <span class="brand-sub">सीधी किसान सेवा</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Centered Card Container -->
+    <div class="auth-centered-layout">
+      <div class="auth-centered-card" style="max-width: 520px">
+        <!-- Stepper Navigation -->
+        <div class="stepper" style="margin-bottom: 24px">
+          <div class="step done">
+            <div
+              class="circ"
+              style="background: #10b981; border-color: #10b981; color: #fff"
+            >
+              ✓
+            </div>
+            <div class="lbl">पहचान</div>
+          </div>
+          <div class="bar" style="background: #10b981"></div>
+          <div class="step">
+            <div class="circ">2</div>
+            <div class="lbl">बैंक / UPI</div>
+          </div>
+        </div>
+
+        <h1
+          style="
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            text-align: center;
+          "
+        >
+          पहचान सत्यापन
+        </h1>
+        <p
+          style="
+            margin-bottom: 24px;
+            text-align: center;
+            color: #64748b;
+            font-size: 14px;
+          "
+        >
+          Aadhaar या PAN में से कोई एक चुनें
+        </p>
+
+        <!-- Unified Tab Navigation -->
+        <div class="tabs-new" id="idTabs">
+          <a href="#" class="active" data-tab="aadhaar">Aadhaar</a>
+          <a href="#" data-tab="pan">PAN कार्ड</a>
+        </div>
+
+        <form id="idForm" novalidate>
+          <div id="aadhaarTab">
+            <div class="field" style="text-align: left">
+              <label for="aadhaar">आधार नंबर · Aadhaar number</label>
+              <input
+                type="text"
+                id="aadhaar"
+                maxlength="12"
+                inputmode="numeric"
+                placeholder="XXXX XXXX XXXX"
+                required
+                style="border: 1.5px solid #cbd5e1"
+              />
+            </div>
+          </div>
+          <div id="panTab" style="display: none">
+            <div class="field" style="text-align: left">
+              <label for="pan">PAN नंबर</label>
+              <input
+                type="text"
+                id="pan"
+                maxlength="10"
+                placeholder="ABCDE1234F"
+                style="border: 1.5px solid #cbd5e1"
+              />
+            </div>
+          </div>
+
+          <div class="field" style="text-align: left">
+            <label>दस्तावेज़ अपलोड करें · Upload document</label>
+            <label
+              class="upload-box"
+              for="docUpload"
+              style="border: 2px dashed #cbd5e1; background: #fafaf9"
+            >
+              <div class="icon">⬆</div>
+              <div style="font-weight: 600; font-size: 13.5px; color: #1e293b">
+                दस्तावेज़ फ़ाइल की आवश्यकता नहीं है
+              </div>
+              <div class="hint">दस्तावेज़ नंबर सीधे Firebase Database में सुरक्षित होगा</div>
+              <span class="hint">फाइल अपलोड बंद है</span>
+            </label>
+            <div
+              class="hint"
+              id="fileName"
+              style="margin-top: 8px; font-weight: 600; color: #10b981"
+            ></div>
+          </div>
+
+          <div
+            class="alert alert-info"
+            style="
+              border-radius: 12px;
+              font-size: 13px;
+              margin-bottom: 24px;
+              background: #e0f2fe;
+              border-color: #bae6fd;
+              color: #0369a1;
+            "
+          >
+            🔒 सुरक्षित रूप से एन्क्रिप्ट होकर संग्रहीत — केवल सत्यापन हेतु
+            उपयोग।
+          </div>
+
+          <button type="submit" class="btn-auth-submit">
+            आगे बढ़ें &nbsp;&rarr;
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script>
+      document.querySelectorAll("#idTabs a").forEach((tab) => {
+        tab.addEventListener("click", (e) => {
+          e.preventDefault();
+          document
+            .querySelectorAll("#idTabs a")
+            .forEach((t) => t.classList.remove("active"));
+          tab.classList.add("active");
+          const which = tab.dataset.tab;
+          document.getElementById("aadhaarTab").style.display =
+            which === "aadhaar" ? "block" : "none";
+          document.getElementById("panTab").style.display =
+            which === "pan" ? "block" : "none";
+        });
+      });
+      document
+        .getElementById("idForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const isAadhaar =
+            document.querySelector("#idTabs a.active").dataset.tab ===
+            "aadhaar";
+          const numberInput = document.getElementById(
+            isAadhaar ? "aadhaar" : "pan",
+          );
+          const valid = isAadhaar
+            ? /^\d{12}$/.test(numberInput.value.trim())
+            : /^[A-Z]{5}\d{4}[A-Z]$/.test(
+                numberInput.value.trim().toUpperCase(),
+              );
+          numberInput.classList.toggle("invalid", !valid);
+          if (!valid) return;
+
+          const submitButton = this.querySelector('button[type="submit"]');
+          submitButton.disabled = true;
+          try {
+            const { client, user } = await getCurrentUser();
+            if (!user) throw new Error("पहले Firebase में लॉग इन करें।");
+            const { error: profileError } = await client
+              .from("farmer_profiles")
+              .select("user_id")
+              .eq("user_id", user.id)
+              .single();
+            if (profileError) throw profileError;
+
+            const { error: kycError } = await client
+              .from("kyc_verifications")
+              .insert({
+                farmer_profile_id: user.id,
+                status: "approved",
+                document_type: isAadhaar ? "aadhaar" : "pan",
+                document_number: numberInput.value.trim().toUpperCase(),
+                document_file_url: null,
+              });
+            if (kycError) throw kycError;
+
+            const { error: completionError } = await client
+              .from("farmer_profiles")
+              .update({ identity_verified: true })
+              .eq("user_id", user.id);
+            if (completionError) throw completionError;
+
+            window.location.href = "seller-bank-verification.html";
+          } catch (error) {
+            console.error("Identity verification save failed:", error);
+            showToast(`दस्तावेज़ सेव नहीं हुआ: ${error.message}`);
+            submitButton.disabled = false;
+          }
+        });
+
+      // Load Lucide Icons
+      if (!window.lucide) {
+        const lucideScript = document.createElement("script");
+        lucideScript.src = "https://unpkg.com/lucide@latest";
+        lucideScript.onload = () => {
+          if (window.lucide) window.lucide.createIcons();
+        };
+        document.head.appendChild(lucideScript);
+      } else {
+        window.lucide.createIcons();
+      }
+    </script>
+  </body>
+</html>

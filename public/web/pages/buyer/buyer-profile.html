@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>प्रोफाइल · KisanMandi</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+  </head>
+  <body>
+    <div id="app-shell">
+      <div class="main-col">
+        <div id="topbar-slot"></div>
+        <main class="content" style="max-width: 760px">
+          <h1 style="margin-bottom: 4px">प्रोफाइल</h1>
+          <p style="margin-bottom: 18px">
+            अपनी व्यक्तिगत व व्यापार जानकारी प्रबंधित करें
+          </p>
+
+          <div
+            class="card"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 16px;
+              margin-bottom: 18px;
+            "
+          >
+            <div
+              class="avatar"
+              style="width: 58px; height: 58px; font-size: 20px"
+              id="profileInitials"
+            >
+              AT
+            </div>
+            <div style="flex: 1">
+              <h2 style="margin-bottom: 2px" id="profileName">
+                अग्रवाल ट्रेडर्स
+              </h2>
+              <p style="margin: 0; font-size: 13px" id="profileMeta">
+                +91 91234 56789 · लखनऊ, उत्तर प्रदेश
+              </p>
+            </div>
+            <span class="badge-verified">✓ सत्यापित खरीदार</span>
+          </div>
+
+          <div class="card" style="margin-bottom: 16px">
+            <h2 style="margin-bottom: 14px">व्यक्तिगत जानकारी</h2>
+            <div class="grid grid-2">
+              <div class="field">
+                <label>व्यवसाय / नाम</label>
+                <input
+                  id="buyerNameInput"
+                  type="text"
+                  value="अग्रवाल ट्रेडर्स"
+                />
+              </div>
+              <div class="field">
+                <label>मोबाइल नंबर</label>
+                <input
+                  id="buyerPhoneInput"
+                  type="text"
+                  value="+91 91234 56789"
+                  disabled
+                />
+              </div>
+              <div class="field">
+                <label>ईमेल</label>
+                <input
+                  id="buyerEmailInput"
+                  type="email"
+                  placeholder="you@example.com"
+                />
+              </div>
+              <div class="field">
+                <label>व्यवसाय प्रकार</label>
+                <select id="buyerBusinessType">
+                  <option>थोक व्यापारी</option>
+                  <option>खुदरा विक्रेता</option>
+                  <option>FPO</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>पिनकोड</label>
+                <input
+                  id="buyerPinInput"
+                  type="text"
+                  inputmode="numeric"
+                  maxlength="6"
+                  placeholder="जैसे 226001"
+                />
+              </div>
+              <div class="field" style="grid-column: 1 / -1">
+                <label>डिलीवरी पता</label>
+                <textarea
+                  id="buyerAddressInput"
+                  placeholder="दुकान/गोदाम का पूरा पता"
+                ></textarea>
+              </div>
+            </div>
+            <button class="btn btn-primary" id="saveProfileBtn">
+              बदलाव सहेजें
+            </button>
+          </div>
+
+          <div class="card">
+            <h2 style="margin-bottom: 10px">खाता कार्रवाई</h2>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap">
+              <button id="logoutButton" type="button" class="btn btn-secondary">
+                लॉग आउट
+              </button>
+              <button class="btn btn-danger">खाता निष्क्रिय करें</button>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/buyer-data.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script>
+      initShell("buyer", "profile", "प्रोफाइल");
+
+      async function loadBuyerProfile() {
+        try {
+          const { user, profile } =
+            await window.farmlinkBuyerData.fetchBuyerProfile();
+          const name = user.full_name || "Buyer";
+          document.getElementById("profileName").textContent = name;
+          document.getElementById("buyerNameInput").value = name;
+          document.getElementById("buyerPhoneInput").value =
+            user.phone_number || "+91 00000 00000";
+          document.getElementById("profileMeta").textContent =
+            `${user.phone_number || "+91 00000 00000"} · ${profile.pin_code || "लखनऊ"}, उत्तर प्रदेश`;
+          document.getElementById("profileInitials").textContent = name
+            .split(" ")
+            .slice(0, 2)
+            .map((part) => part[0])
+            .join("")
+            .toUpperCase();
+          document.getElementById("buyerEmailInput").value = user.email || "";
+          document.getElementById("buyerPinInput").value =
+            profile.pin_code || "";
+          document.getElementById("buyerAddressInput").value =
+            profile.delivery_address || "";
+          if (profile.delivery_address) {
+            document.getElementById("buyerBusinessType").value = "थोक व्यापारी";
+          }
+        } catch (error) {
+          console.error("Buyer profile load failed", error);
+        }
+      }
+
+      document
+        .getElementById("saveProfileBtn")
+        .addEventListener("click", async function () {
+          try {
+            const { user } = await window.farmlinkBuyerData.fetchBuyerProfile();
+            const client = await window.firebaseReady;
+            const name = document.getElementById("buyerNameInput").value.trim();
+            const { error } = await client
+              .from("users")
+              .update({ full_name: name })
+              .eq("id", user.id);
+            if (error) throw error;
+            const { error: profileError } = await client
+              .from("buyer_profiles")
+              .upsert({
+                id: user.id,
+                user_id: user.id,
+                delivery_address: document
+                  .getElementById("buyerAddressInput")
+                  .value.trim(),
+                pin_code: document.getElementById("buyerPinInput").value.trim(),
+                business_type:
+                  document.getElementById("buyerBusinessType").value,
+              });
+            if (profileError) throw profileError;
+            showToast("✓ प्रोफ़ाइल अपडेट हुई");
+          } catch (error) {
+            showToast(`प्रोफ़ाइल सेव नहीं हुई: ${error.message}`);
+          }
+        });
+
+      document
+        .getElementById("logoutButton")
+        .addEventListener("click", async () => {
+          const button = document.getElementById("logoutButton");
+          button.disabled = true;
+          try {
+            const client = await window.firebaseReady;
+            await client.auth.signOut();
+            window.location.href = "../../../login.html";
+          } catch (error) {
+            button.disabled = false;
+            showToast(`लॉग आउट नहीं हुआ: ${error.message}`);
+          }
+        });
+
+      loadBuyerProfile();
+    </script>
+  </body>
+</html>

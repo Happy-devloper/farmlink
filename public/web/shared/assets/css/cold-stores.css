@@ -1,0 +1,391 @@
+.cold-stores-page {
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
+.cold-stores-heading,
+.cold-stores-results-heading,
+.cold-stores-map-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cold-stores-heading {
+  margin-bottom: 18px;
+}
+
+.cold-stores-heading h1 {
+  margin: 4px 0;
+  font-size: clamp(24px, 4vw, 32px);
+}
+
+.cold-stores-heading p,
+.cold-stores-map-heading p,
+.cold-stores-results-heading p {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.cold-stores-eyebrow {
+  color: #147442;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cold-stores-heading .btn {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.cold-stores-controls {
+  padding: 19px 22px;
+  border: 1px solid #e6ede7;
+}
+
+.cold-stores-radius-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-weight: 750;
+}
+
+.cold-stores-radius-heading output {
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: #eaf7ed;
+  color: #147442;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+#radiusRange {
+  display: block;
+  width: 100%;
+  height: 25px;
+  margin: 9px 0 0;
+  accent-color: #168443;
+  cursor: pointer;
+}
+
+#radiusRange:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.cold-stores-range-labels {
+  display: flex;
+  justify-content: space-between;
+  color: var(--ink-soft);
+  font-size: 11px;
+}
+
+#radiusHelp {
+  margin: 7px 0 0;
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.cold-stores-place-form {
+  display: grid;
+  gap: 7px;
+  margin-top: 17px;
+  padding-top: 15px;
+  border-top: 1px solid #edf0ed;
+}
+
+.cold-stores-place-form label {
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.cold-stores-place-form > div {
+  display: flex;
+  gap: 9px;
+}
+
+.cold-stores-place-form input {
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #d7e1da;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.cold-stores-status {
+  min-height: 22px;
+  margin: 12px 0;
+  color: #53635a;
+  font-size: 13px;
+}
+
+.cold-stores-status[data-state="error"] {
+  color: #b42318;
+}
+
+.cold-stores-status[data-state="loading"] {
+  color: #147442;
+}
+
+.cold-stores-map-card {
+  overflow: hidden;
+  padding: 16px;
+  border: 1px solid #e6ede7;
+}
+
+.cold-stores-map-heading {
+  margin-bottom: 12px;
+}
+
+.cold-stores-map-heading h2,
+.cold-stores-results-heading h2 {
+  margin: 0 0 3px;
+  font-size: 17px;
+}
+
+.cold-stores-map-heading p,
+.cold-stores-results-heading p {
+  font-size: 12px;
+}
+
+.cold-stores-map-legend,
+.cold-stores-rate-note {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 7px;
+  color: #53635a;
+  font-size: 11px;
+}
+
+.cold-stores-map-legend i {
+  width: 11px;
+  height: 11px;
+  border: 2px solid #27865a;
+  border-radius: 50%;
+  background: rgba(39, 134, 90, 0.15);
+}
+
+.cold-stores-map {
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  height: clamp(280px, 48vw, 430px);
+  overflow: hidden;
+  border-radius: 11px;
+  background: #edf3ef;
+}
+
+.cold-stores-map-placeholder {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  align-content: center;
+  justify-items: center;
+  padding: 20px;
+  color: #627469;
+  text-align: center;
+}
+
+.cold-stores-map-placeholder span {
+  color: #178349;
+  font-size: 36px;
+}
+
+.cold-stores-map-placeholder p {
+  max-width: 320px;
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.cold-stores-map-credit {
+  margin: 7px 0 0;
+  color: var(--ink-soft);
+  font-size: 10px;
+  text-align: right;
+}
+
+.cold-store-marker {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 2px solid #fff;
+  border-radius: 50% 50% 50% 5px;
+  background: #147442;
+  box-shadow: 0 2px 8px rgba(15, 40, 27, 0.3);
+  color: #fff;
+  font-size: 17px;
+  transform: rotate(-45deg);
+}
+
+.cold-store-marker span {
+  transform: rotate(45deg);
+}
+
+.cold-stores-results {
+  margin-top: 22px;
+}
+
+.cold-stores-results-heading {
+  margin-bottom: 12px;
+}
+
+.cold-stores-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.cold-store-card {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #e6ede7;
+}
+
+.cold-store-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cold-store-card h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.cold-store-distance {
+  flex: none;
+  align-self: flex-start;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #eff7f1;
+  color: #147442;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.cold-store-address {
+  margin: 7px 0;
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.cold-store-rate {
+  margin: 12px 0;
+  color: #147442;
+  font-size: 18px;
+  font-weight: 850;
+}
+
+.cold-store-rate small {
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.cold-store-rate-caption {
+  display: block;
+  margin-top: 2px;
+  color: #946200;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.cold-store-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid #edf0ed;
+  color: var(--ink-soft);
+  font-size: 11px;
+}
+
+.cold-store-card-actions a {
+  color: #147442;
+  font-weight: 750;
+}
+
+.cold-stores-empty {
+  grid-column: 1 / -1;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 26px;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.cold-stores-empty span {
+  font-size: 27px;
+}
+
+.cold-stores-empty p {
+  max-width: 500px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.cold-stores-data-note {
+  margin-top: 16px;
+  padding: 13px 15px;
+  border: 1px solid #d9e9dc;
+  border-radius: 10px;
+  background: #f3f8f4;
+  color: #43594a;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.leaflet-popup-content {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@media (max-width: 700px) {
+  .cold-stores-heading {
+    align-items: flex-start;
+  }
+
+  .cold-stores-heading .btn {
+    padding-inline: 10px;
+    font-size: 12px;
+  }
+
+  .cold-stores-controls {
+    padding: 15px;
+  }
+
+  .cold-stores-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 460px) {
+  .cold-stores-heading {
+    flex-direction: column;
+  }
+
+  .cold-stores-place-form > div {
+    align-items: stretch;
+  }
+
+  .cold-stores-place-form .btn {
+    flex: none;
+    padding-inline: 12px;
+    font-size: 12px;
+  }
+
+  .cold-stores-map-heading {
+    align-items: flex-start;
+  }
+}

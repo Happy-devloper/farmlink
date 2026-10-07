@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>FarmLink Driver — दस्तावेज़ सत्यापन (KYC Verification)</title>
+    <link rel="stylesheet" href="../../shared/assets/css/driver.css" />
+  </head>
+  <body>
+    <div class="driver-app-frame no-bottom-nav">
+      <!-- Header -->
+      <header class="driver-header">
+        <a href="driver-registration.html" class="driver-brand">
+          <div class="driver-brand-icon">
+            <i data-lucide="shield-check"></i>
+          </div>
+          <div>
+            <div class="driver-brand-title">
+              FarmLink <span style="color: var(--primary)">Driver</span>
+            </div>
+            <div class="driver-brand-tag">केवाईसी व वाहन सत्यापन</div>
+          </div>
+        </a>
+        <a href="tel:1800FARMLINK" class="btn-icon-head" title="सहायता">
+          <i data-lucide="phone" style="width: 16px; height: 16px"></i>
+        </a>
+      </header>
+
+      <main
+        class="driver-main"
+        style="max-width: 760px; margin: 0 auto; width: 100%"
+      >
+        <!-- Verification Status Banner -->
+        <div id="statusAlertBox" class="driver-card highlight">
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 14px;
+              margin-bottom: 10px;
+            "
+          >
+            <div
+              id="statusIconWrap"
+              style="
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                background: var(--warning-bg);
+                color: var(--warning);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 22px;
+              "
+            >
+              <i data-lucide="clock" style="width: 24px; height: 24px"></i>
+            </div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px">
+                <h3 id="statusTitle" style="font-size: 17px">
+                  सत्यापन प्रक्रियाधीन
+                </h3>
+                <span id="statusPill" class="badge badge-pending"
+                  >लंबित (Pending)</span
+                >
+              </div>
+              <p id="statusDesc" style="font-size: 13px; margin-top: 2px">
+                सुरक्षा मानकों के तहत आपकी फ़ाइलें जांची जा रही हैं (अनुमानित
+                समय: 2-4 घंटे)
+              </p>
+            </div>
+          </div>
+
+          <div
+            style="
+              background: rgba(255, 255, 255, 0.85);
+              border: 1px solid var(--line);
+              border-radius: var(--radius-sm);
+              padding: 10px 14px;
+              font-size: 12px;
+              color: var(--ink-soft);
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            "
+          >
+            <i
+              data-lucide="lock"
+              style="width: 15px; height: 15px; color: var(--primary)"
+            ></i>
+            <span
+              >दस्तावेज़ सुरक्षित रूप से 256-bit एन्क्रिप्शन में संग्रहीत
+              हैं।</span
+            >
+          </div>
+        </div>
+
+        <!-- Document Uploads Form -->
+        <form id="docUploadForm" class="driver-card" style="padding: 24px">
+          <h2 style="font-size: 17px; margin-bottom: 4px">
+            दस्तावेज़ अपलोड करें
+          </h2>
+          <p
+            style="font-size: 13px; color: var(--ink-soft); margin-bottom: 18px"
+          >
+            कैमरे से फोटो लें या गैलरी/फ़ाइल से JPG, PNG या PDF चुनें
+          </p>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px">
+            <!-- 1. Driving Licence -->
+            <div class="form-field">
+              <label class="form-label"
+                >1. ड्राइविंग लाइसेंस (Driving Licence) *</label
+              >
+              <label class="doc-upload-box" for="dlUpload">
+                <div class="upload-icon-circle">
+                  <i data-lucide="camera"></i>
+                </div>
+                <div
+                  style="font-weight: 700; font-size: 14px; color: var(--ink)"
+                >
+                  DL की फोटो खींचें या चुनें
+                </div>
+                <span
+                  id="dlFileName"
+                  style="
+                    font-size: 12px;
+                    color: var(--primary);
+                    font-weight: 700;
+                  "
+                >
+                  (JPG/PNG/PDF · अधिकतम 5MB)
+                </span>
+                <input
+                  type="file"
+                  id="dlUpload"
+                  accept="image/*,.pdf"
+                  style="display: none"
+                />
+              </label>
+            </div>
+
+            <!-- 2. Vehicle Registration Document (RC) -->
+            <div class="form-field">
+              <label class="form-label">2. वाहन पंजीकरण (Vehicle RC) *</label>
+              <label class="doc-upload-box" for="rcUpload">
+                <div class="upload-icon-circle">
+                  <i data-lucide="file-text"></i>
+                </div>
+                <div
+                  style="font-weight: 700; font-size: 14px; color: var(--ink)"
+                >
+                  गाड़ी RC की फोटो चुनें
+                </div>
+                <span
+                  id="rcFileName"
+                  style="
+                    font-size: 12px;
+                    color: var(--primary);
+                    font-weight: 700;
+                  "
+                >
+                  (JPG/PNG/PDF · अधिकतम 5MB)
+                </span>
+                <input
+                  type="file"
+                  id="rcUpload"
+                  accept="image/*,.pdf"
+                  style="display: none"
+                />
+              </label>
+            </div>
+          </div>
+
+          <!-- 3. Driver Selfie with Vehicle -->
+          <div class="form-field" style="margin-top: 10px">
+            <label class="form-label"
+              >3. वाहन के साथ सेल्फी (Driver Selfie with Vehicle)</label
+            >
+            <label
+              class="doc-upload-box"
+              for="selfieUpload"
+              style="padding: 16px"
+            >
+              <div style="display: flex; align-items: center; gap: 12px">
+                <div
+                  class="upload-icon-circle"
+                  style="width: 40px; height: 40px"
+                >
+                  <i
+                    data-lucide="user-check"
+                    style="width: 20px; height: 20px"
+                  ></i>
+                </div>
+                <div style="text-align: left">
+                  <div
+                    style="
+                      font-weight: 700;
+                      font-size: 13.5px;
+                      color: var(--ink);
+                    "
+                  >
+                    सेल्फी फोटो अपलोड करें
+                  </div>
+                  <span
+                    id="selfieFileName"
+                    style="font-size: 11.5px; color: var(--ink-soft)"
+                  >
+                    (वैकल्पिक · त्वरित स्वीकृति के लिए)
+                  </span>
+                </div>
+              </div>
+              <input
+                type="file"
+                id="selfieUpload"
+                accept="image/*"
+                style="display: none"
+              />
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+            id="btnSubmitDocs"
+            style="margin-top: 12px; height: 52px; font-size: 15.5px"
+          >
+            <i data-lucide="upload-cloud" style="width: 18px; height: 18px"></i>
+            <span>दस्तावेज़ जमा करें (Submit Documents)</span>
+          </button>
+        </form>
+
+        <!-- Hackathon Instant Demo Verification Tool -->
+        <div
+          class="driver-card"
+          style="
+            background: #f0fdf4;
+            border: 1.5px dashed var(--success);
+            padding: 20px;
+          "
+        >
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              margin-bottom: 6px;
+            "
+          >
+            <span style="font-size: 20px">⚡</span>
+            <strong style="font-size: 14px; color: #15803d"
+              >हैकथॉन डेमो कंट्रोल (Hackathon Demo Tool)</strong
+            >
+          </div>
+          <p style="font-size: 12.5px; color: #166534; margin-bottom: 14px">
+            परीक्षण के लिए आप बिना प्रतीक्षा किए तुरंत अपने खाते को स्वीकृत या
+            लंबित कर सकते हैं:
+          </p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+            <button
+              type="button"
+              class="btn btn-lime btn-sm"
+              id="btnDemoApprove"
+            >
+              <span>✓ तुरंत स्वीकृत करें (Approve)</span>
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary btn-sm"
+              id="btnDemoReject"
+            >
+              <span>✕ अस्वीकृत टॉगल</span>
+            </button>
+          </div>
+        </div>
+
+        <a
+          href="driver-dashboard.html"
+          id="btnGoDashboard"
+          class="btn btn-secondary"
+          style="display: none; height: 52px; font-size: 15.5px"
+        >
+          <span>डैशबोर्ड पर जाएँ (Proceed to Dashboard) &rarr;</span>
+        </a>
+      </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../shared/assets/js/firebase.js"></script>
+    <script src="../../shared/assets/js/driver-data.js"></script>
+    <script src="../../shared/assets/js/driver-shell.js"></script>
+    <script defer src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      lucide.createIcons();
+
+      function updateStatusUI(status) {
+        const title = document.getElementById("statusTitle");
+        const pill = document.getElementById("statusPill");
+        const desc = document.getElementById("statusDesc");
+        const iconWrap = document.getElementById("statusIconWrap");
+        const btnDashboard = document.getElementById("btnGoDashboard");
+
+        if (status === "approved") {
+          title.textContent = "सत्यापन पूर्ण (Approved)";
+          pill.className = "badge badge-approved";
+          pill.textContent = "सत्यापित ✓";
+          desc.textContent =
+            "बधाई हो! आपका प्रोफाइल सत्यापित हो चुका है। अब आप ऑनलाइन आकर ऑर्डर स्वीकार कर सकते हैं।";
+          iconWrap.style.background = "var(--success-bg)";
+          iconWrap.style.color = "var(--success)";
+          iconWrap.innerHTML =
+            '<i data-lucide="check-circle" style="width:24px;height:24px;"></i>';
+          btnDashboard.style.display = "flex";
+          btnDashboard.className = "btn btn-primary";
+        } else if (status === "rejected") {
+          title.textContent = "सत्यापन अस्वीकृत (Rejected)";
+          pill.className = "badge badge-rejected";
+          pill.textContent = "अस्वीकृत ✕";
+          desc.textContent =
+            "दस्तावेज़ स्पष्ट नहीं थे। कृपया साफ़ फोटो दोबारा अपलोड करें।";
+          iconWrap.style.background = "var(--danger-bg)";
+          iconWrap.style.color = "var(--danger)";
+          iconWrap.innerHTML =
+            '<i data-lucide="alert-triangle" style="width:24px;height:24px;"></i>';
+          btnDashboard.style.display = "none";
+        } else {
+          title.textContent = "सत्यापन प्रक्रियाधीन";
+          pill.className = "badge badge-pending";
+          pill.textContent = "लंबित (Pending)";
+          desc.textContent =
+            "सुरक्षा मानकों के तहत आपकी फ़ाइलें जांची जा रही हैं (अनुमानित समय: 2-4 घंटे)";
+          iconWrap.style.background = "var(--warning-bg)";
+          iconWrap.style.color = "var(--warning)";
+          iconWrap.innerHTML =
+            '<i data-lucide="clock" style="width:24px;height:24px;"></i>';
+          btnDashboard.style.display = "none";
+        }
+        lucide.createIcons();
+      }
+
+      // Initialize with current profile
+      const profile = window.farmlinkDriver.getProfile();
+      updateStatusUI(profile.verification_status || "pending");
+
+      // File input labels
+      ["dlUpload", "rcUpload", "selfieUpload"].forEach((id) => {
+        const input = document.getElementById(id);
+        const nameSpan = document.getElementById(
+          id.replace("Upload", "FileName"),
+        );
+        input.addEventListener("change", function () {
+          if (this.files[0]) {
+            nameSpan.textContent = "✓ चयनित: " + this.files[0].name;
+            nameSpan.style.color = "var(--success)";
+          }
+        });
+      });
+
+      // Submit docs
+      document
+        .getElementById("docUploadForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const btn = document.getElementById("btnSubmitDocs");
+          btn.disabled = true;
+          btn.innerHTML = "अपलोड हो रहा है...";
+
+          setTimeout(() => {
+            window.driverShell.showToast("दस्तावेज़ सफलतापूर्वक जमा हुए!");
+            btn.disabled = false;
+            btn.innerHTML =
+              '<i data-lucide="check" style="width:18px;height:18px;"></i> <span>दस्तावेज़ सहेजे गए</span>';
+            lucide.createIcons();
+          }, 800);
+        });
+
+      // Demo buttons
+      document
+        .getElementById("btnDemoApprove")
+        .addEventListener("click", () => {
+          window.farmlinkDriver.saveProfile({
+            verification_status: "approved",
+            availability_status: "available",
+          });
+          updateStatusUI("approved");
+          window.driverShell.showToast("⚡ खाता सत्यापित कर दिया गया!");
+        });
+
+      document.getElementById("btnDemoReject").addEventListener("click", () => {
+        window.farmlinkDriver.saveProfile({
+          verification_status: "rejected",
+          availability_status: "offline",
+        });
+        updateStatusUI("rejected");
+        window.driverShell.showToast("खाता अस्वीकृत चिह्नित किया गया।");
+      });
+    </script>
+  </body>
+</html>

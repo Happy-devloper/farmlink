@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>वॉइस सहायता · KisanMandi</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+  </head>
+  <body>
+    <div id="app-shell">
+      <div class="main-col">
+        <div id="topbar-slot"></div>
+        <main class="content" style="max-width: 680px">
+          <h1 style="margin-bottom: 4px">वॉइस सहायक</h1>
+          <p style="margin-bottom: 22px">
+            बोलकर पूछें — जैसे "आज गेहूं का भाव क्या है?"
+          </p>
+
+          <div class="card" style="padding: 12px; margin-bottom: 18px">
+            <p
+              role="status"
+              style="
+                margin: 0;
+                padding: 32px 16px;
+                text-align: center;
+                color: var(--text-muted);
+              "
+            >
+              सुरक्षा कारणों से वॉइस सहायक अस्थायी रूप से बंद है। कृपया व्यवस्थापक से सुरक्षित सेटअप के लिए संपर्क करें।
+            </p>
+            <p class="hint" style="margin: 10px 4px 0; text-align: center">
+              FarmLink AI से हिंदी, English या अपनी क्षेत्रीय भाषा में बात करें
+            </p>
+          </div>
+
+          <div class="card">
+            <h2 style="margin-bottom: 12px">हाल की बातचीत</h2>
+            <div style="display: flex; flex-direction: column; gap: 10px">
+              <div
+                style="
+                  background: var(--soil-tint);
+                  padding: 10px 14px;
+                  border-radius: var(--radius-m);
+                  align-self: flex-end;
+                  max-width: 80%;
+                  font-size: 13.5px;
+                "
+              >
+                आज गेहूं का भाव क्या है?
+              </div>
+              <div
+                style="
+                  background: var(--card);
+                  border: 1px solid var(--line);
+                  padding: 10px 14px;
+                  border-radius: var(--radius-m);
+                  max-width: 85%;
+                  font-size: 13.5px;
+                "
+              >
+                आज गेहूं का भाव ₹2,180 प्रति क्विंटल है, जो पिछले हफ़्ते से 2.1%
+                अधिक है।
+              </div>
+              <div
+                style="
+                  background: var(--soil-tint);
+                  padding: 10px 14px;
+                  border-radius: var(--radius-m);
+                  align-self: flex-end;
+                  max-width: 80%;
+                  font-size: 13.5px;
+                "
+              >
+                मेरा अगला पिकअप कब है?
+              </div>
+              <div
+                style="
+                  background: var(--card);
+                  border: 1px solid var(--line);
+                  padding: 10px 14px;
+                  border-radius: var(--radius-m);
+                  max-width: 85%;
+                  font-size: 13.5px;
+                "
+              >
+                आपका अगला पिकअप कल सुबह 9 बजे है — ड्राइवर सुनील यादव आएंगे।
+              </div>
+            </div>
+          </div>
+
+          <h2 style="margin: 20px 0 10px">सुझाए गए प्रश्न</h2>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px">
+            <button class="btn btn-secondary btn-sm">
+              मेरी कमाई कितनी है?
+            </button>
+            <button class="btn btn-secondary btn-sm">
+              नई फसल कैसे जोड़ें?
+            </button>
+            <button class="btn btn-secondary btn-sm">
+              सरसों बेचूं या नहीं?
+            </button>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script>
+      initShell("seller", "voice", "वॉइस सहायक");
+    </script>
+  </body>
+</html>

@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>गेहूं · उत्पाद विवरण · KisanMandi</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+  </head>
+  <body>
+    <div id="app-shell">
+      <div class="main-col">
+        <div id="topbar-slot"></div>
+        <main class="content" style="max-width: 960px">
+          <div class="breadcrumb">
+            <a href="buyer-marketplace.html">बाज़ार</a> / गेहूं
+          </div>
+
+          <div id="productDetails"></div>
+        </main>
+      </div>
+    </div>
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/buyer-data.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script src="../../shared/assets/js/bids.js"></script>
+    <script>
+      initShell("buyer", "marketplace", "उत्पाद विवरण");
+
+      async function loadProduct() {
+        const productDetails = document.getElementById("productDetails");
+        const params = new URLSearchParams(window.location.search);
+        const listingId = params.get("id");
+
+        if (!listingId) {
+          productDetails.innerHTML =
+            '<div class="card">उत्पाद जानकारी उपलब्ध नहीं है।</div>';
+          return;
+        }
+
+        try {
+          let item = await window.farmlinkBuyerData.fetchListingById(listingId);
+          if (!item) {
+            try {
+              item = JSON.parse(sessionStorage.getItem("farmlink_marketplace_listings") || "[]").find((entry) => entry.id === listingId) || null;
+            } catch { /* The live query result remains the source of truth. */ }
+          }
+          if (!item) {
+            productDetails.innerHTML =
+              '<div class="card"><h2>यह फसल अब उपलब्ध नहीं है</h2><p>लिस्टिंग हटाई जा चुकी है या उसका लिंक पुराना है।</p><a class="btn btn-secondary" href="buyer-marketplace.html">बाज़ार पर वापस जाएँ</a></div>';
+            return;
+          }
+
+          const canBuy = item.status === "active" && Number(item.quantityKg || 0) >= 100;
+          const { client, user } = await window.farmlinkBids.getSession();
+          const role = await window.farmlinkBids.getRole(client, user.id);
+          const canOffer =
+            canBuy && role === "buyer" && item.farmerId !== user.id;
+
+          productDetails.innerHTML = `
+            <div class="grid grid-2" style="align-items: start; margin-bottom: 18px">
+              <div class="crop-thumb" style="aspect-ratio: 4/3; font-size: 52px">${item.emoji}</div>
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <h1 style="margin-bottom: 6px">${item.title} · ${item.grade}</h1>
+                  <span class="badge-verified">✓ सत्यापित किसान</span>
+                </div>
+                <div class="mono" style="font-size: 26px; font-weight: 700; margin-bottom: 10px">
+                  ${window.farmlinkBuyerData.money(item.pricePerKg * 100)}<span style="font-size: 13px; color: var(--ink-soft); font-weight: 400;">/क्विंटल</span>
+                </div>
+
+                <div class="grid grid-2" style="margin-bottom: 14px">
+                  <div class="stat">
+                    <div class="label">उपलब्ध मात्रा</div>
+                    <div class="value" style="font-size: 17px">${item.quantityQuintalLabel}</div>
+                  </div>
+                  <div class="stat">
+                    <div class="label">स्थान</div>
+                    <div class="value" style="font-size: 17px">${item.location}</div>
+                  </div>
+                </div>
+
+                <div class="card" style="background: var(--soil-tint); border: none; box-shadow: none; margin-bottom: 14px;">
+                  <div style="display: flex; align-items: center; gap: 10px">
+                    <div class="avatar" style="background: var(--card); color: var(--soil)">RK</div>
+                    <div>
+                      <strong>रामेश कुमार</strong>
+                      <p style="margin: 0; font-size: 12px">4.8★ · सत्यापित किसान · ${item.location}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
+                  <span class="pill pill-info">🚚 डिलीवरी उपलब्ध</span>
+                  <span class="pill pill-neutral">📦 पिकअप उपलब्ध</span>
+                  <span class="pill pill-success">✓ गुणवत्ता जाँची गई</span>
+                </div>
+
+                <div style="display: flex; gap: 10px">
+                  ${canBuy ? `<button class="btn btn-secondary btn-block" id="addCartBtn">🛒 कार्ट में जोड़ें</button><a href="buyer-checkout.html?itemId=${item.id}" class="btn btn-primary btn-block">अभी खरीदें</a>` : '<span class="pill pill-neutral">यह फसल अभी sold out है</span>'}
+                </div>
+                ${canOffer ? `<form id="bidForm" class="card" style="margin-top: 14px; padding: 16px; background: #f4f8f4;">
+                  <h2 style="margin: 0 0 4px; font-size: 18px;">अपनी कीमत की बोली दें</h2>
+                  <p style="margin: 0 0 12px; color: var(--ink-soft); font-size: 12px;">किसान प्रस्ताव स्वीकार या अस्वीकार कर सकता है।</p>
+                  <div class="grid grid-2">
+                    <label style="font-size: 12px; font-weight: 700;">आपकी कीमत (₹/क्विंटल)
+                      <input id="bidPrice" type="number" min="1" step="1" required value="${Math.max(1, Math.round(Number(item.pricePerQuintal || item.pricePerKg * 100)))}" style="display: block; width: 100%; height: 42px; margin-top: 5px; padding: 0 10px; border: 1px solid #d7e1da; border-radius: 8px;">
+                    </label>
+                    <label style="font-size: 12px; font-weight: 700;">मात्रा (क्विंटल)
+                      <input id="bidQuantity" type="number" min="1" max="${Math.floor(Number(item.quantityKg) / 100)}" step="1" required value="1" style="display: block; width: 100%; height: 42px; margin-top: 5px; padding: 0 10px; border: 1px solid #d7e1da; border-radius: 8px;">
+                    </label>
+                  </div>
+                  <button id="submitBid" class="btn btn-primary" type="submit" style="margin-top: 12px;">बोली भेजें</button>
+                  <span id="bidMessage" role="status" style="margin-left: 10px; font-size: 12px;"></span>
+                </form>` : ""}
+              </div>
+            </div>
+
+            <div class="card">
+              <h2 style="margin-bottom: 10px">फसल विवरण</h2>
+              <p>${item.description || "लिस्टिंग विवरण उपलब्ध नहीं है।"}</p>
+              <div class="divider"></div>
+              <div class="grid grid-2">
+                <div>
+                  <strong style="font-size: 13px">उपलब्धता</strong>
+                  <p style="margin: 2px 0; font-size: 13px">${item.quantityQuintalLabel}</p>
+                </div>
+                <div>
+                  <strong style="font-size: 13px">लिस्टिंग तिथि</strong>
+                  <p style="margin: 2px 0; font-size: 13px">${window.farmlinkBuyerData.shortDate(item.createdAt)}</p>
+                </div>
+                <div>
+                  <strong style="font-size: 13px">पैकेजिंग</strong>
+                  <p style="margin: 2px 0; font-size: 13px">50 किग्रा बोरी</p>
+                </div>
+                <div>
+                  <strong style="font-size: 13px">भुगतान तरीके</strong>
+                  <p style="margin: 2px 0; font-size: 13px">UPI, बैंक ट्रांसफर, COD</p>
+                </div>
+              </div>
+            </div>
+          `;
+
+          document
+            .getElementById("addCartBtn")
+            ?.addEventListener("click", function () {
+              const cart = window.farmlinkBuyerData.getBuyerCart();
+              const exists = cart.find((entry) => entry.listingId === item.id);
+              if (exists) {
+                exists.quantityKg = Number(exists.quantityKg || 0) + 100;
+              } else {
+                cart.push({
+                  listingId: item.id,
+                  title: item.title,
+                  quantityKg: 100,
+                  pricePerKg: item.pricePerKg,
+                  emoji: item.emoji,
+                  seller: "रामेश कुमार",
+                  location: item.location,
+                  grade: item.grade,
+                });
+              }
+              window.farmlinkBuyerData.saveBuyerCart(cart);
+              showToast("✓ कार्ट में जोड़ा गया");
+            });
+
+          document
+            .getElementById("bidForm")
+            ?.addEventListener("submit", async (event) => {
+              event.preventDefault();
+              const button = document.getElementById("submitBid");
+              const message = document.getElementById("bidMessage");
+              button.disabled = true;
+              message.textContent = "भेज रहे हैं…";
+              try {
+                const quantityKg =
+                  Number(document.getElementById("bidQuantity").value) * 100;
+                await window.farmlinkBids.createBid(
+                  item,
+                  document.getElementById("bidPrice").value,
+                  quantityKg,
+                );
+                message.textContent = "बोली भेज दी गई।";
+                showToast("✓ बोली किसान को भेज दी गई");
+              } catch (error) {
+                console.error("Buyer bid could not be submitted:", error);
+                message.textContent = error.message;
+                button.disabled = false;
+              }
+            });
+        } catch (error) {
+          console.error("Product load failed", error);
+          productDetails.innerHTML =
+            '<div class="card">उत्पाद डेटा लोड नहीं हो सका।</div>';
+        }
+      }
+
+      loadProduct();
+    </script>
+  </body>
+</html>

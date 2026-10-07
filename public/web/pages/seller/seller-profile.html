@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>प्रोफ़ाइल · FarmLink</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+  </head>
+  <body>
+    <div id="app-shell">
+      <div class="main-col">
+        <div id="topbar-slot"></div>
+        <main class="content" style="max-width: 800px">
+          <div class="card-title-row" style="margin-bottom: 18px">
+            <div>
+              <h1 style="margin-bottom: 4px">प्रोफ़ाइल</h1>
+              <p>व्यक्तिगत, खेत और सत्यापन जानकारी</p>
+            </div>
+            <button id="refreshProfile" class="btn btn-secondary btn-sm">
+              रिफ्रेश
+            </button>
+          </div>
+          <div id="profileMessage" class="alert alert-info">
+            प्रोफ़ाइल लोड हो रही है…
+          </div>
+          <div
+            class="card"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 16px;
+              margin: 16px 0;
+            "
+          >
+            <div
+              id="avatar"
+              class="avatar"
+              style="width: 58px; height: 58px; font-size: 20px"
+            >
+              —
+            </div>
+            <div style="flex: 1">
+              <h2 id="profileName" style="margin-bottom: 2px">—</h2>
+              <p id="profileMeta" style="margin: 0; font-size: 13px">—</p>
+            </div>
+            <span id="sellerBadge" class="pill pill-neutral"
+              >स्थिति जाँच रहे हैं</span
+            >
+          </div>
+          <form id="profileForm" class="card" style="margin-bottom: 16px">
+            <h2 style="margin-bottom: 14px">व्यक्तिगत और खेत जानकारी</h2>
+            <div class="grid grid-2">
+              <div class="field">
+                <label for="fullName">पूरा नाम</label
+                ><input id="fullName" required />
+              </div>
+              <div class="field">
+                <label for="phone">मोबाइल नंबर</label
+                ><input id="phone" disabled />
+              </div>
+              <div class="field">
+                <label for="state">राज्य</label><input id="state" required />
+              </div>
+              <div class="field">
+                <label for="district">जिला</label
+                ><input id="district" required />
+              </div>
+              <div class="field">
+                <label for="subDistrict">तहसील / उप-जिला</label
+                ><input id="subDistrict" />
+              </div>
+              <div class="field">
+                <label for="village">गाँव</label><input id="village" required />
+              </div>
+              <div class="field">
+                <label for="land">भूमि (एकड़)</label
+                ><input id="land" type="number" min="0" step="0.01" />
+              </div>
+              <div class="field">
+                <label for="crops">मुख्य फसलें</label
+                ><input id="crops" placeholder="जैसे गेहूं, धान" />
+              </div>
+            </div>
+            <button id="saveProfile" class="btn btn-primary" type="submit">
+              बदलाव सहेजें
+            </button>
+          </form>
+          <section class="card" style="margin-bottom: 16px">
+            <h2 style="margin-bottom: 14px">सत्यापन और भुगतान स्थिति</h2>
+            <div class="grid grid-2">
+              <div class="stat">
+                <div class="label">पहचान / KYC</div>
+                <div id="kycStatus" style="margin-top: 8px"></div>
+                <p id="kycDetail" class="hint" style="margin: 8px 0 0"></p>
+                <a
+                  id="kycLink"
+                  class="btn btn-secondary btn-sm"
+                  href="../onboarding/seller-identity-verification.html"
+                  style="margin-top: 10px"
+                  >KYC देखें / पूरा करें</a
+                >
+              </div>
+              <div class="stat">
+                <div class="label">बैंक / UPI</div>
+                <div id="bankStatus" style="margin-top: 8px"></div>
+                <p id="bankDetail" class="hint" style="margin: 8px 0 0"></p>
+                <a
+                  id="bankLink"
+                  class="btn btn-secondary btn-sm"
+                  href="../onboarding/seller-bank-verification.html"
+                  style="margin-top: 10px"
+                  >बैंक विवरण देखें / जोड़ें</a
+                >
+              </div>
+            </div>
+          </section>
+          <section class="card">
+            <h2 style="margin-bottom: 10px">खाता</h2>
+            <p class="hint">
+              मोबाइल नंबर Firebase Authentication से जुड़ा है और इसे यहाँ बदला
+              नहीं जा सकता।
+            </p>
+            <button id="logoutButton" class="btn btn-secondary" type="button">
+              लॉग आउट
+            </button>
+          </section>
+        </main>
+      </div>
+    </div>
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script src="../../shared/assets/js/up-post-office.js"></script>
+    <script>
+      initShell("seller", "profile", "प्रोफ़ाइल");
+      const $ = (id) => document.getElementById(id),
+        state = { client: null, user: null, profile: null };
+      const statusMeta = (value, kind) => {
+        const map = {
+          approved: ["सत्यापित", "pill-success"],
+          pending: ["समीक्षा में", "pill-warn"],
+          rejected: ["अस्वीकृत", "pill-neutral"],
+          missing: ["अभी जमा नहीं किया", "pill-neutral"],
+        };
+        const [label, style] = map[value] || map.missing;
+        return {
+          label,
+          style,
+          href:
+            kind === "kyc"
+              ? "../onboarding/seller-identity-verification.html"
+              : "../onboarding/seller-bank-verification.html",
+        };
+      };
+      const mask = (value, visible = 4) =>
+        value
+          ? `${"•".repeat(Math.max(0, String(value).length - visible))}${String(value).slice(-visible)}`
+          : "—";
+      function setVerification(
+        element,
+        detailElement,
+        linkElement,
+        record,
+        kind,
+        fallback,
+      ) {
+        const current =
+            record?.status || fallback || (record ? "pending" : "missing"),
+          meta = statusMeta(current, kind);
+        element.innerHTML = `<span class="pill ${meta.style}">${meta.label}</span>`;
+        linkElement.href = meta.href;
+        if (kind === "kyc")
+          detailElement.textContent = record
+            ? `${record.document_type || "दस्तावेज़"} · ${mask(record.document_number)}`
+            : fallback
+              ? "प्रोफ़ाइल से स्थिति उपलब्ध है"
+              : "पहचान दस्तावेज़ जमा नहीं किया गया है";
+        else
+          detailElement.textContent = record
+            ? record.upi_id
+              ? `UPI: ${mask(record.upi_id, 5)}`
+              : `खाता: ${mask(record.account_number)}`
+            : fallback
+              ? "प्रोफ़ाइल से स्थिति उपलब्ध है"
+              : "बैंक या UPI विवरण जमा नहीं किया गया है";
+      }
+      async function latestKyc(profile) {
+        const ids = [state.user.id, profile?.id].filter(Boolean);
+        const results = await Promise.all(
+          ids.map(async (id) => {
+            const result = await state.client
+              .from("kyc_verifications")
+              .select("status,document_type,document_number,created_at")
+              .eq("farmer_profile_id", id);
+            if (result.error) throw result.error;
+            return result.data || [];
+          }),
+        );
+        return (
+          results
+            .flat()
+            .sort(
+              (a, b) => new Date(b.created_at) - new Date(a.created_at),
+            )[0] || null
+        );
+      }
+      async function load() {
+        $("profileMessage").style.display = "block";
+        const [userResult, profileResult, bankResult] = await Promise.all([
+          state.client
+            .from("users")
+            .select("id,full_name,phone_number,verified")
+            .eq("id", state.user.id)
+            .maybeSingle(),
+          state.client
+            .from("farmer_profiles")
+            .select(
+              "id,user_id,state,district,sub_district,village,land_size_acres,primary_crops,identity_verified,bank_verified",
+            )
+            .eq("user_id", state.user.id)
+            .maybeSingle(),
+          state.client
+            .from("bank_verifications")
+            .select("status,account_number,upi_id,created_at")
+            .eq("user_id", state.user.id),
+        ]);
+        if (userResult.error) throw userResult.error;
+        if (profileResult.error) throw profileResult.error;
+        if (bankResult.error) throw bankResult.error;
+        state.profile = profileResult.data;
+        const user = userResult.data || {
+          id: state.user.id,
+          phone_number: state.user.phone,
+        };
+        const kyc = await latestKyc(state.profile);
+        const bank =
+          (bankResult.data || []).sort(
+            (a, b) => new Date(b.created_at) - new Date(a.created_at),
+          )[0] || null;
+        $("fullName").value = user.full_name || "";
+        $("phone").value = user.phone_number || state.user.phone || "";
+        [
+          "state",
+          "district",
+          "subDistrict",
+          "village",
+          "land",
+          "crops",
+        ].forEach((field) => ($(field).value = ""));
+        $("state").value = state.profile?.state || "";
+        $("district").value = state.profile?.district || "";
+        $("subDistrict").value = state.profile?.sub_district || "";
+        $("village").value = state.profile?.village || "";
+        $("land").value = state.profile?.land_size_acres ?? "";
+        $("crops").value = state.profile?.primary_crops || "";
+        const name = user.full_name || "किसान";
+        $("profileName").textContent = name;
+        $("avatar").textContent = name
+          .split(/\s+/)
+          .slice(0, 2)
+          .map((part) => part[0])
+          .join("")
+          .toUpperCase();
+        $("profileMeta").textContent =
+          [
+            user.phone_number || state.user.phone,
+            [
+              state.profile?.village,
+              state.profile?.district,
+              state.profile?.state,
+            ]
+              .filter(Boolean)
+              .join(", "),
+          ]
+            .filter(Boolean)
+            .join(" · ") || "स्थान उपलब्ध नहीं";
+        $("sellerBadge").className =
+          `pill ${user.verified ? "pill-success" : "pill-warn"}`;
+        $("sellerBadge").textContent = user.verified
+          ? "सत्यापित विक्रेता"
+          : "सत्यापन लंबित";
+        setVerification(
+          $("kycStatus"),
+          $("kycDetail"),
+          $("kycLink"),
+          kyc,
+          "kyc",
+          state.profile?.identity_verified ? "approved" : null,
+        );
+        setVerification(
+          $("bankStatus"),
+          $("bankDetail"),
+          $("bankLink"),
+          bank,
+          "bank",
+          state.profile?.bank_verified ? "approved" : null,
+        );
+        $("profileMessage").style.display = "none";
+      }
+      $("profileForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const button = $("saveProfile");
+        button.disabled = true;
+        button.textContent = "सेव हो रहा है…";
+        try {
+          const fullName = $("fullName").value.trim(),
+            profileId = state.profile?.id || state.user.id;
+          const [{ error: userError }, { error: profileError }] =
+            await Promise.all([
+              state.client
+                .from("users")
+                .upsert({
+                  id: state.user.id,
+                  phone_number: $("phone").value || state.user.phone || null,
+                  full_name: fullName,
+                  role: "farmer",
+                }),
+              state.client
+                .from("farmer_profiles")
+                .upsert({
+                  id: profileId,
+                  user_id: state.user.id,
+                  state: $("state").value.trim(),
+                  district: $("district").value.trim(),
+                  sub_district: $("subDistrict").value.trim(),
+                  village: $("village").value.trim(),
+                  land_size_acres: Number($("land").value || 0),
+                  primary_crops: $("crops").value.trim(),
+                  identity_verified: state.profile?.identity_verified || false,
+                  bank_verified: state.profile?.bank_verified || false,
+                }),
+            ]);
+          if (userError) throw userError;
+          if (profileError) throw profileError;
+          showToast("✓ प्रोफ़ाइल Firebase में अपडेट हो गई");
+          await load();
+        } catch (error) {
+          console.error("Profile update failed:", error);
+          showToast(`प्रोफ़ाइल सेव नहीं हुई: ${error.message}`);
+        } finally {
+          button.disabled = false;
+          button.textContent = "बदलाव सहेजें";
+        }
+      });
+      $("refreshProfile").addEventListener("click", () => load().catch(fail));
+      $("logoutButton").addEventListener("click", async () => {
+        const button = $("logoutButton");
+        button.disabled = true;
+        try {
+          await state.client.auth.signOut();
+          window.location.href = "../../../login.html";
+        } catch (error) {
+          button.disabled = false;
+          showToast(`लॉग आउट नहीं हुआ: ${error.message}`);
+        }
+      });
+      function fail(error) {
+        console.error("Profile load failed:", error);
+        $("profileMessage").textContent =
+          `प्रोफ़ाइल लोड नहीं हुई: ${error.message}`;
+        $("profileMessage").className = "alert alert-error";
+      }
+      (async () => {
+        try {
+          await window.firebaseScriptReady;
+          const { client, user } = await getCurrentUser();
+          if (!user) return;
+          state.client = client;
+          state.user = user;
+          await load();
+        } catch (error) {
+          fail(error);
+        }
+      })();
+    </script>
+  </body>
+</html>

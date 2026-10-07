@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <title>FarmLink AI — लॉग इन</title>
+    <link rel="stylesheet" href="web/shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="web/shared/assets/css/components.css" />
+    <link rel="stylesheet" href="web/shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="web/shared/assets/css/style.css" />
+    <style>
+      .direct-market-flow {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr auto 1fr;
+        align-items: center;
+        gap: 10px;
+        margin: 0 0 24px;
+        padding: 14px;
+        border: 1px solid #dcefe2;
+        border-radius: 14px;
+        background: #f5fbf6;
+        text-align: center;
+      }
+      .direct-market-flow span {
+        display: grid;
+        gap: 2px;
+      }
+      .direct-market-flow strong {
+        color: #155f37;
+        font-size: 13px;
+      }
+      .direct-market-flow small {
+        color: #64748b;
+        font-size: 10px;
+        line-height: 1.35;
+      }
+      .direct-market-flow > b {
+        color: #10a05a;
+      }
+      @media (max-width: 520px) {
+        .direct-market-flow {
+          gap: 6px;
+          padding: 12px 8px;
+        }
+        .direct-market-flow small {
+          font-size: 9px;
+        }
+      }
+    </style>
+  </head>
+  <body class="login-page">
+    <!-- Top Header Bar -->
+    <header class="auth-header">
+      <div class="header-left">
+        <div class="logo-wrap">
+          <span class="logo-icon"><i data-lucide="leaf"></i></span>
+          <div class="logo-text">
+            <span class="brand-title"
+              >FarmLink <span class="ai-text">AI</span></span
+            >
+            <span class="brand-sub">सीधी किसान सेवा</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-right">
+        <button
+          class="btn-help-call"
+          onclick="location.href = 'tel:1800XXXXXXX'"
+        >
+          <i data-lucide="phone" style="width: 16px; height: 16px"></i> सहायता
+          केंद्र पर कॉल करें
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Split Container -->
+    <div class="auth-wrap split-new">
+      <!-- Left Side Content (Mockup-identical marketing details) -->
+      <div class="auth-left-new">
+        <h2
+          style="
+            font-size: 38px;
+            line-height: 1.2;
+            font-weight: 800;
+            color: #000;
+            margin-bottom: 8px;
+          "
+        >
+          किसानों को मिले सही दाम।<br /><span style="color: #10b981"
+            >परिवारों को मिले ताज़ा सामान।</span
+          >
+        </h2>
+        <div
+          class="sub"
+          style="font-size: 15.5px; color: #475569; margin-bottom: 28px"
+        >
+          सीधे किसानों से खरीदें और बेचें। पारदर्शी कीमत, स्मार्ट डिलीवरी और
+          आसान सहायता के साथ।
+        </div>
+
+        <div class="bullet-list" style="margin-bottom: 28px">
+          <div class="bullet-item">
+            <div class="bullet-icon"><i data-lucide="bookmark"></i></div>
+            <div class="bullet-details">
+              <span class="bullet-title">सीधी खरीद-बिक्री</span>
+              <span class="bullet-desc">बिना बिचौलियों के</span>
+            </div>
+          </div>
+          <div class="bullet-item">
+            <div class="bullet-icon"><i data-lucide="shield-check"></i></div>
+            <div class="bullet-details">
+              <span class="bullet-title">पारदर्शी बाज़ार भाव</span>
+              <span class="bullet-desc">बेहतर दाम पर निर्णय लें</span>
+            </div>
+          </div>
+          <div class="bullet-item">
+            <div class="bullet-icon"><i data-lucide="truck"></i></div>
+            <div class="bullet-details">
+              <span class="bullet-title">स्मार्ट डिलीवरी</span>
+              <span class="bullet-desc">समय पर खरीदार तक</span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="direct-market-flow"
+          aria-label="किसान से खरीदार तक सीधा व्यापार"
+        >
+          <span><strong>किसान</strong><small>फसल सूचीबद्ध करें</small></span>
+          <b aria-hidden="true">→</b>
+          <span><strong>FarmLink</strong><small>भाव और खरीदार खोजें</small></span>
+          <b aria-hidden="true">→</b>
+          <span><strong>खरीदार</strong><small>सीधे खरीदें</small></span>
+        </div>
+
+        <!-- Original illustration from the mockup -->
+        <div class="illustration-container">
+          <img
+            src="web/shared/assets/images/farming_illustration.webp"
+            alt="FarmLink AI Smart Mandi"
+            width="1024"
+            height="1024"
+          />
+        </div>
+
+        <!-- Green Footer Banner -->
+        <div class="bottom-green-banner">
+          किसानों, एफपीओ, खरीदारों और स्थानीय समुदायों के लिए बनाया गया है।<br />
+          विश्वास के साथ व्यापार करें, साथ मिलकर आगे बढ़ें।
+        </div>
+      </div>
+
+      <!-- Right Side Content Card (Single Page Step Manager) -->
+      <div class="auth-right-new">
+        <!-- Step 1: Enter Mobile Number -->
+        <div class="card-welcome" id="step-phone">
+          <div class="icon-circle-welcome">
+            <i data-lucide="phone"></i>
+          </div>
+          <h1>FarmLink AI में आपका स्वागत है</h1>
+          <div class="subtitle">
+            आगे बढ़ने के लिए अपना मोबाइल नंबर दर्ज करें।
+          </div>
+
+          <form id="loginForm" novalidate>
+            <div class="phone-select-wrapper">
+              <select>
+                <option>IN +91</option>
+              </select>
+              <input
+                type="tel"
+                id="mobile"
+                placeholder="10 अंकों का मोबाइल नंबर"
+                maxlength="10"
+                inputmode="numeric"
+                required
+              />
+            </div>
+            <div
+              class="error-msg"
+              id="mobileErr"
+              style="
+                display: none;
+                margin-bottom: 12px;
+                justify-content: center;
+              "
+            >
+              ⚠ कृपया 10 अंकों का सही मोबाइल नंबर डालें
+            </div>
+
+            <button type="submit" class="btn-auth-submit" id="sendOtpButton">
+              OTP के साथ आगे बढ़ें &nbsp;&rarr;
+            </button>
+            <div id="recaptcha-container"></div>
+          </form>
+
+          <div class="separator-or">
+            <span>या</span>
+          </div>
+
+          <button
+            class="btn-outline-reg"
+            onclick="showToast('FPO / CSC कोड पंजीकरण जल्द आ रहा है')"
+          >
+            FPO / CSC कोड के माध्यम से पंजीकरण करें
+          </button>
+
+          <div class="auth-foot-new">
+            पहली बार FarmLink AI का उपयोग कर रहे हैं?
+            <a href="web/pages/onboarding/role-selection.html"
+              >नया खाता बनाएं</a
+            >
+          </div>
+
+          <div class="contact-note">
+            सहायता चाहिए? कॉल करें <strong>1800-XXX-XXXX</strong>
+          </div>
+        </div>
+
+        <!-- Step 2: OTP Verification Card (Hidden by Default) -->
+        <div class="card-welcome" id="step-otp" style="display: none">
+          <div class="icon-circle-welcome">
+            <i data-lucide="shield-alert"></i>
+          </div>
+          <h1>OTP सत्यापन करें</h1>
+          <div class="subtitle" style="margin-bottom: 12px">
+            Verify the OTP sent to
+          </div>
+          <p
+            style="
+              text-align: center;
+              margin-bottom: 22px;
+              font-weight: 600;
+              color: var(--ink);
+            "
+          >
+            +91 <span id="display-number">98765 43210</span> ·
+            <a
+              href="#"
+              id="btn-back-phone"
+              style="color: #10b981; text-decoration: underline"
+              >बदलें</a
+            >
+          </p>
+
+          <form id="otpForm" novalidate>
+            <div class="field">
+              <label
+                style="
+                  font-weight: 600;
+                  font-size: 13.5px;
+                  color: #1e293b;
+                  display: block;
+                  margin-bottom: 10px;
+                "
+                >6 अंकों का OTP डालें</label
+              >
+              <div class="input-otp" id="otpBoxes" style="margin-bottom: 20px">
+                <input
+                  type="text"
+                  maxlength="1"
+                  inputmode="numeric"
+                  style="border: 1.5px solid #cbd5e1"
+                />
+                <input
+                  type="text"
+                  maxlength="1"
+                  inputmode="numeric"
+                  style="border: 1.5px solid #cbd5e1"
+                />
+                <input
+                  type="text"
+                  maxlength="1"
+                  inputmode="numeric"
+                  style="border: 1.5px solid #cbd5e1"
+                />
+                <input
+                  type="text"
+                  maxlength="1"
+                  inputmode="numeric"
+                  style="border: 1.5px solid #cbd5e1"
+                />
+                <input
+                  type="text"
+                  maxlength="1"
+                  inputmode="numeric"
+                  style="border: 1.5px solid #cbd5e1"
+                />
+                <input
+                  type="text"
+                  maxlength="1"
+                  inputmode="numeric"
+                  style="border: 1.5px solid #cbd5e1"
+                />
+              </div>
+              <div
+                class="error-msg"
+                id="otpErr"
+                style="
+                  display: none;
+                  justify-content: center;
+                  margin-bottom: 16px;
+                "
+              >
+                ⚠ OTP गलत है, फिर से कोशिश करें
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              class="btn-auth-submit"
+              style="margin-bottom: 12px"
+            >
+              सत्यापित करें &nbsp;&rarr;
+            </button>
+            <button
+              type="button"
+              class="btn-outline-reg"
+              id="resendBtn"
+              style="padding: 10px 20px; font-size: 13px"
+            >
+              OTP फिर से भेजें (00:30)
+            </button>
+          </form>
+
+          <div class="contact-note" style="margin-top: 36px">
+            सहायता चाहिए? कॉल करें <strong>1800-XXX-XXXX</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="web/shared/assets/js/app.js"></script>
+    <script src="web/shared/assets/js/ui.js"></script>
+    <script>
+      // Flow Navigation Control
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const mobile = document.getElementById("mobile");
+          const err = document.getElementById("mobileErr");
+          const valid = /^[6-9]\d{9}$/.test(mobile.value.trim());
+          mobile.classList.toggle("invalid", !valid);
+          err.style.display = valid ? "none" : "flex";
+
+          if (valid) {
+            const submitButton = this.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            try {
+              const phone = `+91${mobile.value.trim()}`;
+              console.info("[FarmLink Auth] Requesting Firebase test OTP", {
+                phone,
+              });
+              submitButton.textContent = "OTP भेजा जा रहा है...";
+              await requestFirebasePhoneOtp(phone, "recaptcha-container");
+              console.info("[FarmLink Auth] OTP request accepted by Firebase", {
+                phone,
+              });
+              sessionStorage.setItem("farmlink_phone", phone);
+              document.getElementById("display-number").textContent =
+                mobile.value.trim();
+              document.getElementById("step-phone").style.display = "none";
+              document.getElementById("step-otp").style.display = "block";
+              startOtpTimer();
+              submitButton.disabled = false;
+              submitButton.textContent = "OTP के साथ आगे बढ़ें →";
+              return;
+            } catch (phoneAuthError) {
+              console.error("Firebase phone OTP failed:", phoneAuthError);
+              err.textContent = `⚠ OTP नहीं भेजा गया: ${phoneAuthError.message}`;
+              err.style.display = "flex";
+              submitButton.disabled = false;
+              submitButton.textContent = "OTP के साथ आगे बढ़ें →";
+              return;
+            }
+            try {
+              const withTimeout = (promise, message) =>
+                Promise.race([
+                  promise,
+                  new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error(message)), 10000),
+                  ),
+                ]);
+              const client = await Promise.race([
+                window.firebaseReady,
+                new Promise((_, reject) =>
+                  setTimeout(
+                    () =>
+                      reject(
+                        new Error(
+                          "Firebase connection timed out. Check the project configuration and network.",
+                        ),
+                      ),
+                    10000,
+                  ),
+                ),
+              ]);
+              const phone = `+91${mobile.value.trim()}`;
+              submitButton.textContent = "डेटा सेव हो रहा है...";
+              const { data: sessionData } = await withTimeout(
+                client.auth.getSession(),
+                "Firebase session request timed out. Check the project configuration and network.",
+              );
+              // The previous Firebase session is tied to the phone number.
+              // session. If the entered phone differs, start a new demo
+              // session instead of accidentally opening the previous user's
+              // buyer or seller account.
+              let sessionUser = sessionData.session?.user || null;
+              let currentDbUser = null;
+              if (sessionUser) {
+                const { data: existingUser, error: existingUserError } =
+                  await withTimeout(
+                    client
+                      .from("users")
+                      .select("id, phone_number, role, verified")
+                      .eq("id", sessionUser.id)
+                      .maybeSingle(),
+                    "users table request timed out. Check the table and RLS policies.",
+                  );
+                if (existingUserError) throw existingUserError;
+                currentDbUser = existingUser;
+
+                // A legacy session can exist before its public.users row was
+                // created. In that case retain the phone stored with the
+                // saved session instead of creating a new account
+                // for the same number on every login attempt.
+                const currentPhone =
+                  currentDbUser?.phone_number ||
+                  sessionStorage.getItem("farmlink_phone") ||
+                  localStorage.getItem("farmlink_demo_phone");
+                if (currentPhone !== phone) {
+                  await client.auth.signOut();
+                  sessionUser = null;
+                }
+              }
+
+              const { data, error } = sessionUser
+                ? { data: { user: sessionUser }, error: null }
+                : await withTimeout(
+                    client.auth.getUser(),
+                    "Firebase Phone Auth timed out. Check the test number and Firebase Authentication settings.",
+                  );
+              if (error)
+                throw new Error(
+                  `Firebase authentication failed: ${error.message}`,
+                );
+              if (!data.user)
+                throw new Error("Firebase did not return a user.");
+              sessionStorage.setItem("farmlink_phone", phone);
+              localStorage.setItem("farmlink_demo_phone", phone);
+              sessionStorage.setItem("farmlink_mock_user_id", data.user.id);
+              // Existing users retain their saved role. A newly entered phone
+              // receives the neutral `pending` role and therefore reaches the
+              // role-choice page after the demo OTP, not the buyer dashboard.
+              if (!currentDbUser) {
+                const { error: userError } = await withTimeout(
+                  client.from("users").insert({
+                    id: data.user.id,
+                    phone_number: phone,
+                    full_name: "नया उपयोगकर्ता",
+                    role: "pending",
+                    verified: true,
+                  }),
+                  "users table request timed out. Check the table and RLS policies.",
+                );
+                if (userError)
+                  throw new Error(
+                    `users table write failed: ${userError.message}`,
+                  );
+              }
+              document.getElementById("display-number").textContent =
+                mobile.value.trim();
+              document.getElementById("step-phone").style.display = "none";
+              document.getElementById("step-otp").style.display = "block";
+              startOtpTimer();
+            } catch (error) {
+              console.error("Mock login/session setup failed:", error);
+              const message = error.message.includes("phone")
+                ? "⚠ Firebase Phone Authentication check करें और configured test OTP से फिर कोशिश करें।"
+                : error.message.includes("users_role_check")
+                  ? "⚠ Firebase Firestore setup बाकी है। Console में Cloud Firestore database बनाएँ और Security Rules लागू करें।"
+                  : error.message.includes("row-level security")
+                    ? "⚠ Firebase Firestore Security Rules missing हैं। Rules publish करके फिर कोशिश करें।"
+                    : `⚠ डेटा सेव नहीं हुआ: ${error.message}`;
+              err.textContent = message;
+              err.style.display = "flex";
+              submitButton.disabled = false;
+            }
+          }
+        });
+
+      // Keep users signed in on this browser. If Firebase has a valid cached
+      // session, skip the phone/OTP screen and resume the saved journey.
+      async function restoreCachedSession() {
+        try {
+          const client = await window.firebaseReady;
+          if (!client?.auth) return;
+          const { data: sessionData, error: sessionError } =
+            await client.auth.getSession();
+          if (sessionError || !sessionData.session?.user) return;
+
+          const { data: dbUser, error: dbError } = await client
+            .from("users")
+            .select("role, verified")
+            .eq("id", sessionData.session.user.id)
+            .maybeSingle();
+          if (dbError || !dbUser) return;
+
+          if (dbUser.role === "buyer") {
+            window.location.replace("web/pages/buyer/buyer-dashboard.html");
+          } else if (dbUser.role === "farmer" && dbUser.verified) {
+            window.location.replace("web/pages/seller/seller-dashboard.html");
+          } else if (dbUser.role === "farmer") {
+            window.location.replace(
+              "web/pages/onboarding/verification-pending.html",
+            );
+          } else {
+            window.location.replace("web/pages/onboarding/role-selection.html");
+          }
+        } catch (error) {
+          console.warn("Cached session restore skipped:", error);
+        }
+      }
+      restoreCachedSession();
+
+      document
+        .getElementById("btn-back-phone")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          document.getElementById("step-otp").style.display = "none";
+          document.getElementById("step-phone").style.display = "block";
+        });
+
+      // OTP inputs logic
+      wireOtpInputs("#otpBoxes input");
+
+      document
+        .getElementById("otpForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const vals = [...document.querySelectorAll("#otpBoxes input")].map(
+            (i) => i.value,
+          );
+          const complete = vals.every((v) => v.length === 1);
+          const otpError = document.getElementById("otpErr");
+          otpError.style.display = complete ? "none" : "flex";
+          if (!complete) return;
+
+          const submitButton = this.querySelector('button[type="submit"]');
+          submitButton.disabled = true;
+          submitButton.textContent = "सत्यापन हो रहा है...";
+
+          let phoneVerified = false;
+          try {
+            console.info("[FarmLink Auth] Verifying OTP", {
+              phone: sessionStorage.getItem("farmlink_phone"),
+            });
+            await confirmFirebasePhoneOtp(vals.join(""));
+            phoneVerified = true;
+            console.info("[FarmLink Auth] OTP verified successfully");
+            const client = await window.firebaseReady;
+            const {
+              data: { user },
+            } = await client.auth.getUser();
+            if (!user) throw new Error("यूज़र नहीं मिला।");
+
+            const firestoreTimeout = (promise, label) =>
+              Promise.race([
+                promise,
+                new Promise((_, reject) =>
+                  setTimeout(
+                    () =>
+                      reject(new Error(`${label} timed out after 5 seconds.`)),
+                    5000,
+                  ),
+                ),
+              ]);
+            console.info("[FarmLink Auth] Looking up Firestore user profile", {
+              userId: user.id,
+            });
+            const { data: dbUser, error: dbError } = await firestoreTimeout(
+              client
+                .from("users")
+                .select("role, verified")
+                .eq("id", user.id)
+                .maybeSingle(),
+              "Firestore user lookup",
+            );
+
+            if (dbError) throw dbError;
+
+            if (!dbUser) {
+              console.info(
+                "[FarmLink Auth] Creating initial Firestore user profile",
+                { userId: user.id },
+              );
+              const { error: createUserError } = await firestoreTimeout(
+                client.from("users").insert({
+                  id: user.id,
+                  phone_number:
+                    user.phone || sessionStorage.getItem("farmlink_phone"),
+                  full_name: "नया उपयोगकर्ता",
+                  role: "pending",
+                  verified: true,
+                }),
+                "Firestore user creation",
+              );
+              if (createUserError) throw createUserError;
+              console.info(
+                "[FarmLink Auth] Initial Firestore user profile created",
+              );
+            }
+
+            if (dbUser && dbUser.role === "buyer") {
+              console.info("[FarmLink Auth] Redirecting to buyer dashboard");
+              window.location.href = "web/pages/buyer/buyer-dashboard.html";
+            } else if (
+              dbUser &&
+              dbUser.role === "farmer" &&
+              dbUser.verified === true
+            ) {
+              console.info("[FarmLink Auth] Redirecting to seller dashboard");
+              window.location.href = "web/pages/seller/seller-dashboard.html";
+            } else if (dbUser && dbUser.role === "farmer") {
+              console.info(
+                "[FarmLink Auth] Redirecting to verification pending",
+              );
+              window.location.href =
+                "web/pages/onboarding/verification-pending.html";
+            } else {
+              console.info("[FarmLink Auth] Redirecting to role selection");
+              window.location.href = "web/pages/onboarding/role-selection.html";
+            }
+          } catch (err) {
+            console.error(
+              "[FarmLink Auth] OTP verification or profile setup failed",
+              {
+                code: err.code,
+                message: err.message,
+                phoneVerified,
+                error: err,
+              },
+            );
+            if (phoneVerified) {
+              // Authentication succeeded; a Firestore profile bootstrap issue
+              // must not trap a valid user on the OTP screen.
+              console.warn(
+                "[FarmLink Auth] Phone verified; Firestore setup failed. Redirecting to role selection.",
+              );
+              window.location.href = "web/pages/onboarding/role-selection.html";
+              return;
+            }
+            window.farmlinkPhoneConfirmation = null;
+            otpError.textContent = `⚠ OTP सही नहीं है: ${err.message}`;
+            otpError.style.display = "flex";
+            submitButton.disabled = false;
+            submitButton.textContent = "सत्यापित करें →";
+          }
+        });
+
+      // Resend Countdown
+      let timerInterval;
+      function startOtpTimer() {
+        clearInterval(timerInterval);
+        let t = 30;
+        const resend = document.getElementById("resendBtn");
+        resend.disabled = true;
+        resend.textContent = `OTP फिर से भेजें (00:30)`;
+
+        timerInterval = setInterval(() => {
+          t--;
+          if (t <= 0) {
+            resend.textContent = "OTP फिर से भेजें";
+            resend.disabled = false;
+            clearInterval(timerInterval);
+          } else {
+            resend.textContent = `OTP फिर से भेजें (00:${t.toString().padStart(2, "0")})`;
+          }
+        }, 1000);
+      }
+
+      document
+        .getElementById("resendBtn")
+        .addEventListener("click", async () => {
+          const phone = sessionStorage.getItem("farmlink_phone");
+          const resend = document.getElementById("resendBtn");
+          if (!phone) return;
+          resend.disabled = true;
+          try {
+            await requestFirebasePhoneOtp(phone, "recaptcha-container");
+            startOtpTimer();
+          } catch (error) {
+            document.getElementById("otpErr").textContent =
+              `⚠ OTP नहीं भेजा गया: ${error.message}`;
+            document.getElementById("otpErr").style.display = "flex";
+            resend.disabled = false;
+          }
+        });
+
+      // Load Lucide Icons
+      if (!window.lucide) {
+        const lucideScript = document.createElement("script");
+        lucideScript.src = "https://unpkg.com/lucide@latest";
+        lucideScript.onload = () => {
+          if (window.lucide) window.lucide.createIcons();
+        };
+        document.head.appendChild(lucideScript);
+      } else {
+        window.lucide.createIcons();
+      }
+    </script>
+  </body>
+</html>

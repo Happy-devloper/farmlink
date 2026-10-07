@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>नज़दीकी कोल्ड स्टोर · FarmLink</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link
+      rel="stylesheet"
+      href="../../shared/assets/css/cold-stores.css"
+    />
+    <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  </head>
+  <body>
+    <div id="app-shell">
+      <div class="main-col">
+        <div id="topbar-slot"></div>
+        <main class="content cold-stores-page">
+          <header class="cold-stores-heading">
+            <div>
+              <span class="cold-stores-eyebrow">किसानों के लिए भंडारण</span>
+              <h1>नज़दीकी कोल्ड स्टोर</h1>
+              <p>अपने आसपास के कोल्ड स्टोर खोजें और भंडारण दर सीधे पता करें।</p>
+            </div>
+            <button id="locateButton" class="btn btn-secondary" type="button">
+              <i data-lucide="locate-fixed" aria-hidden="true"></i>
+              मेरी लोकेशन
+            </button>
+          </header>
+
+          <section class="cold-stores-controls card" aria-label="खोज का क्षेत्र">
+            <div class="cold-stores-radius-heading">
+              <label for="radiusRange">कितनी दूरी तक खोजें?</label>
+              <output id="radiusOutput" for="radiusRange">25 किमी</output>
+            </div>
+            <input
+              id="radiusRange"
+              type="range"
+              min="5"
+              max="100"
+              step="5"
+              value="25"
+              aria-describedby="radiusHelp"
+              disabled
+            />
+            <div class="cold-stores-range-labels" aria-hidden="true">
+              <span>5 किमी</span><span>50 किमी</span><span>100 किमी</span>
+            </div>
+            <p id="radiusHelp">
+              क्षेत्र बदलने के लिए पहले अपनी लोकेशन या शहर चुनें।
+            </p>
+            <form id="placeForm" class="cold-stores-place-form">
+              <label for="placeInput">गाँव, शहर या पिनकोड</label>
+              <div>
+                <input
+                  id="placeInput"
+                  type="search"
+                  autocomplete="postal-code"
+                  placeholder="जैसे: बाराबंकी, उत्तर प्रदेश"
+                  required
+                />
+                <button class="btn btn-primary" type="submit">यहाँ खोजें</button>
+              </div>
+            </form>
+          </section>
+
+          <p id="coldStoresStatus" class="cold-stores-status" role="status">
+            कोल्ड स्टोर देखने के लिए अपनी लोकेशन का उपयोग करें या शहर खोजें।
+          </p>
+
+          <section class="cold-stores-map-card card" aria-label="कोल्ड स्टोर का नक्शा">
+            <div class="cold-stores-map-heading">
+              <div>
+                <h2>आपके आसपास</h2>
+                <p id="mapLocationLabel">लोकेशन चुनने पर नक्शा दिखेगा</p>
+              </div>
+              <span class="cold-stores-map-legend">
+                <i aria-hidden="true"></i> आपकी खोज की सीमा
+              </span>
+            </div>
+            <div
+              id="coldStoresMap"
+              class="cold-stores-map"
+              role="application"
+              aria-label="आपकी लोकेशन के आसपास कोल्ड स्टोर का नक्शा"
+            >
+              <div class="cold-stores-map-placeholder">
+                <span aria-hidden="true">⌖</span>
+                <p>कोल्ड स्टोर के नक्शे के लिए अपनी लोकेशन चुनें।</p>
+              </div>
+            </div>
+            <p class="cold-stores-map-credit">
+              नक्शा © OpenStreetMap contributors
+            </p>
+          </section>
+
+          <section class="cold-stores-results" aria-labelledby="resultsTitle">
+            <div class="cold-stores-results-heading">
+              <div>
+                <h2 id="resultsTitle">नज़दीकी कोल्ड स्टोर</h2>
+                <p id="resultsCount">लोकेशन चुनने पर नतीजे दिखेंगे</p>
+              </div>
+              <span class="cold-stores-rate-note">दर: प्रति क्विंटल/माह · स्टोर से पुष्टि करें</span>
+            </div>
+            <div id="coldStoresList" class="cold-stores-list">
+              <div class="cold-stores-empty card">
+                <span aria-hidden="true">🏬</span>
+                <p>लोकेशन चुनें; उस क्षेत्र में OpenStreetMap पर दर्ज स्टोर यहाँ दिखेंगे।</p>
+              </div>
+            </div>
+          </section>
+
+          <aside class="cold-stores-data-note" role="note">
+            <strong>दर और उपलब्धता:</strong> ऑनलाइन प्रकाशित प्रति क्विंटल
+            भंडारण-दर उपलब्ध नहीं है। दर, उपलब्धता और भंडारण की सुविधा सीधे
+            स्टोर से पक्की करें; ये फसल, अवधि और मात्रा के अनुसार बदल सकती हैं।
+            सूची में सार्वजनिक व्यावसायिक सूचियों और OpenStreetMap के स्थान
+            शामिल हैं और यह पूरी सूची नहीं है।
+          </aside>
+        </main>
+      </div>
+    </div>
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script src="../../shared/assets/js/cold-stores.js"></script>
+  </body>
+</html>

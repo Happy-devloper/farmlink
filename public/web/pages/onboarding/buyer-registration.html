@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FarmLink AI — खरीदार पंजीकरण</title>
+    <link rel="stylesheet" href="../../shared/assets/css/design-system.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/components.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/compact-ui.css" />
+    <link rel="stylesheet" href="../../shared/assets/css/style.css" />
+  </head>
+  <body>
+    <!-- Top Header Bar -->
+    <header class="auth-header">
+      <div class="header-left">
+        <div class="logo-wrap">
+          <span class="logo-icon"><i data-lucide="leaf"></i></span>
+          <div class="logo-text">
+            <span class="brand-title"
+              >FarmLink <span class="ai-text">AI</span></span
+            >
+            <span class="brand-sub">सीधी किसान सेवा</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Centered Card Container -->
+    <div class="auth-centered-layout">
+      <div class="auth-centered-card" style="max-width: 520px">
+        <h1
+          style="
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 4px;
+            font-weight: 700;
+          "
+        >
+          खरीदार पंजीकरण
+        </h1>
+        <p
+          style="
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: #64748b;
+          "
+        >
+          अपनी व्यावसायिक और डिलीवरी जानकारी साझा करें
+        </p>
+
+        <form id="regForm" novalidate>
+          <div class="field">
+            <label for="fname">पूरा नाम / संस्था का नाम · Full / Company name</label>
+            <input
+              type="text"
+              id="fname"
+              placeholder="जैसे रमेश कुमार या अग्रवाल ट्रेडर्स"
+              required
+              style="border: 1.5px solid #cbd5e1"
+            />
+          </div>
+
+          <div class="field">
+            <label for="pincode">पिन कोड · PIN Code</label>
+            <input
+              type="text"
+              id="pincode"
+              placeholder="6 अंकों का पिन कोड दर्ज करें"
+              maxlength="6"
+              inputmode="numeric"
+              required
+              style="border: 1.5px solid #cbd5e1"
+            />
+          </div>
+
+          <div class="field">
+            <label for="address">डिलीवरी का पूरा पता · Delivery Address</label>
+            <textarea
+              id="address"
+              placeholder="गली नंबर, दुकान / मकान नंबर, क्षेत्र, शहर दर्ज करें"
+              required
+              style="border: 1.5px solid #cbd5e1; width: 100%; min-height: 80px; padding: 10px; border-radius: 8px; font-family: inherit;"
+            ></textarea>
+          </div>
+
+          <button type="submit" class="btn-auth-submit" style="margin-top: 8px">
+            आगे बढ़ें &nbsp;&rarr;
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script src="../../shared/assets/js/app.js"></script>
+    <script src="../../shared/assets/js/ui.js"></script>
+    <script>
+      document
+        .getElementById("regForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          let ok = true;
+          ["fname", "pincode", "address"].forEach((id) => {
+            const el = document.getElementById(id);
+            const bad = !el.value.trim();
+            el.classList.toggle("invalid", bad);
+            if (bad) ok = false;
+          });
+          
+          const pincodeVal = document.getElementById("pincode").value.trim();
+          if (pincodeVal && !/^\d{6}$/.test(pincodeVal)) {
+            document.getElementById("pincode").classList.add("invalid");
+            showToast("कृपया 6 अंकों का सही पिन कोड डालें।");
+            ok = false;
+          }
+
+          if (!ok) return;
+
+          const submitButton = this.querySelector('button[type="submit"]');
+          submitButton.disabled = true;
+          try {
+            const { client, user } = await getCurrentUser();
+            if (!user) throw new Error("पहले Firebase में लॉग इन करें।");
+
+            // Update user's name, role, and verified status
+            // Upsert makes the public profile match the Firebase Auth UID
+            // even for accounts created before the login bootstrap existed.
+            const { error: userError } = await client.from("users").upsert(
+              {
+                id: user.id,
+                phone_number:
+                  user.phone || sessionStorage.getItem("farmlink_phone"),
+                full_name: document.getElementById("fname").value.trim(),
+                role: "buyer",
+                verified: true,
+              },
+              { onConflict: "id" },
+            );
+            if (userError) throw userError;
+
+            // Insert/Upsert buyer profile
+            const { error: profileError } = await client
+              .from("buyer_profiles")
+              .upsert(
+                {
+                  user_id: user.id,
+                  pin_code: pincodeVal,
+                  delivery_address: document.getElementById("address").value.trim()
+                },
+                { onConflict: "user_id" }
+              );
+            if (profileError) throw profileError;
+
+            showToast("पंजीकरण सफलतापूर्वक पूरा हुआ!");
+            setTimeout(() => {
+              window.location.href = "../buyer/buyer-dashboard.html";
+            }, 1000);
+          } catch (error) {
+            const errorMessage = formatFirebaseError(error);
+            console.error("Buyer registration failed:", errorMessage, error);
+            showToast(`पंजीकरण सेव नहीं हुआ: ${errorMessage}`);
+            submitButton.disabled = false;
+          }
+        });
+
+      // Load Lucide Icons
+      if (!window.lucide) {
+        const lucideScript = document.createElement("script");
+        lucideScript.src = "https://unpkg.com/lucide@latest";
+        lucideScript.onload = () => {
+          if (window.lucide) window.lucide.createIcons();
+        };
+        document.head.appendChild(lucideScript);
+      } else {
+        window.lucide.createIcons();
+      }
+    </script>
+  </body>
+</html>
