@@ -4,7 +4,7 @@
 
 **Live demo:** [[Live Demo](https://framlink-sih.web.app/)]  |  **Demo video:** [Demo](https://www.youtube.com/watch?v=8h3LLuLtHIs)]
 
-**Smart India Hackathon:**
+**Smart India Hackathon**
 
 <!--![Farmlink screenshot](./docs/screenshot.png)-->
 <!-- TODO: add 1-2 screenshots to a /docs folder and update the path above -->
